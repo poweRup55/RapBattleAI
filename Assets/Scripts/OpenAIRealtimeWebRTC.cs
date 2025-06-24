@@ -2,12 +2,12 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using EpicRapBattle.Config;
 using EpicRapBattle.Managers;
-using Unity.VisualScripting;
+using Newtonsoft.Json;
 using Unity.WebRTC;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.Networking;
 
 public class OpenAIRealtimeWebRTC : MonoBehaviour
@@ -31,10 +31,6 @@ public class OpenAIRealtimeWebRTC : MonoBehaviour
     [Tooltip("Reference to the UIManager for updating UI elements.")]
     [SerializeField]
     private UIManager uiManager;
-
-    [Header("Transcription Events")]
-    public UnityEvent<string> OnInputTranscription = new UnityEvent<string>();
-    public UnityEvent<string> OnOutputTranscription = new UnityEvent<string>();
 
     private void Start()
     {
@@ -63,7 +59,7 @@ public class OpenAIRealtimeWebRTC : MonoBehaviour
             aiConfig.GptModelString,
             aiConfig.RapPersonality
         );
-        string jsonBody = JsonUtility.ToJson(sessionRequest);
+        string jsonBody = JsonConvert.SerializeObject(sessionRequest);
 
         UnityWebRequest req = new UnityWebRequest(sessionUrl, "POST");
         byte[] bodyRaw = Encoding.UTF8.GetBytes(jsonBody);
@@ -82,7 +78,8 @@ public class OpenAIRealtimeWebRTC : MonoBehaviour
         }
 
         string json = req.downloadHandler.text;
-        OpenAISessionResponse sessionResponse = JsonUtility.FromJson<OpenAISessionResponse>(json);
+        OpenAISessionResponse sessionResponse =
+            JsonConvert.DeserializeObject<OpenAISessionResponse>(json);
         if (
             sessionResponse == null
             || sessionResponse.client_secret == null
@@ -112,6 +109,18 @@ public class OpenAIRealtimeWebRTC : MonoBehaviour
         {
             string message = Encoding.UTF8.GetString(bytes);
             OAIEventController.HandleOAIEvent(message);
+        };
+        dataChannel.OnOpen = () =>
+        {
+            Debug.Log("DataChannel opened successfully.");
+        };
+        dataChannel.OnClose = () =>
+        {
+            Debug.LogWarning("DataChannel closed.");
+        };
+        dataChannel.OnError = error =>
+        {
+            Debug.LogError($"DataChannel error: {error}");
         };
 
         var offerOp = peerConnection.CreateOffer();
@@ -210,184 +219,280 @@ public class OpenAIRealtimeWebRTC : MonoBehaviour
         peerConnection?.Close();
         peerConnection?.Dispose();
     }
-}
 
-[Serializable]
-public class OpenAISessionRequest
-{
-    public string model;
-    public string[] modalities = new[] { "audio", "text" };
-    public string instructions;
+    private bool isRecording = false;
+    private List<float> audioBuffer = new List<float>();
+    private int lastMicrophonePosition = 0;
 
-    // [Serializable]
-    // public class InputAudioNoiseReductionConfig { }
-
-    // public InputAudioNoiseReductionConfig input_audio_noise_reduction = null; // Optional, can be null
-    public string voice;
-
-    // [Serializable]
-    // public class InputAudioTranscriptionConfig
-    // {
-    //     public string language;
-    //     public string model;
-    //     public string prompt;
-
-    //     public InputAudioTranscriptionConfig(
-    //         string language = null,
-    //         string model = null,
-    //         string prompt = null
-    //     )
-    //     {
-    //         this.language = language ?? "en";
-    //         this.model = model ?? "whisper-1";
-    //         this.prompt = prompt;
-    //     }
-    // }
-
-    // public InputAudioTranscriptionConfig input_audio_transcription = null; // Optional, can be null
-
-    public OpenAISessionRequest(string model, string instructions, string voice = "alloy")
+    private void Update()
     {
-        this.model = model;
-        this.instructions = instructions;
-        this.voice = voice;
-        // this.input_audio_transcription = input_audio_transcription;
+        if (Input.GetKeyDown(KeyCode.T))
+        {
+            StartRecording();
+        }
+
+        if (Input.GetKeyUp(KeyCode.T))
+        {
+            StopAndCommitRecording();
+        }
+
+        // Capture audio data while recording
+        if (isRecording && micAudioSource != null && micAudioSource.clip != null)
+        {
+            CaptureAudioData();
+        }
     }
-}
 
-[Serializable]
-public class OpenAISessionResponse
-{
-    public ClientSecret client_secret;
-}
+    private void CaptureAudioData()
+    {
+        int currentPosition = Microphone.GetPosition(null);
+        if (currentPosition < 0)
+            return; // Microphone not available
 
-[Serializable]
-public class ClientSecret
-{
-    public string value;
-    public long expires_at;
-}
+        AudioClip clip = micAudioSource.clip;
+        if (clip == null)
+            return;
 
-[Serializable]
-public class BaseOAIEvent
-{
-    public string event_id;
-    public string type;
-}
+        // Handle wrap-around
+        int samplesToRead;
+        if (currentPosition >= lastMicrophonePosition)
+        {
+            samplesToRead = currentPosition - lastMicrophonePosition;
+        }
+        else
+        {
+            // Handle buffer wrap-around
+            samplesToRead = (clip.samples - lastMicrophonePosition) + currentPosition;
+        }
 
-[Serializable]
-public class InputAudioBufferCommittedEvent : BaseOAIEvent
-{
-    public string item_id;
-    public string previous_item_id;
-}
+        if (samplesToRead > 0)
+        {
+            float[] samples = new float[samplesToRead * clip.channels];
 
-[Serializable]
-public class InputAudioBufferClearedEvent : BaseOAIEvent { }
+            if (currentPosition >= lastMicrophonePosition)
+            {
+                // Simple case - no wrap around
+                clip.GetData(samples, lastMicrophonePosition);
+            }
+            else
+            {
+                // Handle wrap around
+                int samplesBeforeWrap = (clip.samples - lastMicrophonePosition) * clip.channels;
+                int samplesAfterWrap = currentPosition * clip.channels;
 
-[Serializable]
-public class InputAudioBufferSpeechStartedEvent : BaseOAIEvent
-{
-    public int audio_start_ms;
-    public string item_id;
-}
+                float[] beforeWrap = new float[samplesBeforeWrap];
+                float[] afterWrap = new float[samplesAfterWrap];
 
-[Serializable]
-public class InputAudioBufferSpeechStoppedEvent : BaseOAIEvent
-{
-    public int audio_end_ms;
-    public string item_id;
-}
+                clip.GetData(beforeWrap, lastMicrophonePosition);
+                clip.GetData(afterWrap, 0);
 
-[Serializable]
-public class ConversationItemCreatedEvent : BaseOAIEvent
-{
-    public string conversation_id;
-    public string item_id;
-    public string role;
-    public string content;
-    public long created_at;
-}
+                Array.Copy(beforeWrap, 0, samples, 0, samplesBeforeWrap);
+                Array.Copy(afterWrap, 0, samples, samplesBeforeWrap, samplesAfterWrap);
+            }
 
-[Serializable]
-public class ResponseCreatedEvent : BaseOAIEvent
-{
-    public string response_id;
-    public string conversation_id;
-    public long created_at;
-}
+            // Add samples to buffer
+            audioBuffer.AddRange(samples);
+            lastMicrophonePosition = currentPosition;
+        }
+    }
 
-[Serializable]
-public class ResponseOutputItemAddedEvent : BaseOAIEvent
-{
-    public string response_id;
-    public string item_id;
-    public string content_type;
-    public string content;
-}
+    private void StartRecording()
+    {
+        if (micAudioSource == null || !micAudioSource.isPlaying)
+        {
+            Debug.LogError("Microphone is not initialized or not playing.");
+            return;
+        }
 
-[Serializable]
-public class ResponseContentPartAddedEvent : BaseOAIEvent
-{
-    public string response_id;
-    public string part_id;
-    public string content;
-}
+        isRecording = true;
+        audioBuffer.Clear();
+        lastMicrophonePosition = Microphone.GetPosition(null);
+        Debug.Log("Started recording audio.");
+    }
 
-[Serializable]
-public class ResponseAudioTranscriptDeltaEvent : BaseOAIEvent
-{
-    public string response_id;
-    public string transcript;
-    public bool is_final;
-    public string delta;
-}
+    private void StopAndCommitRecording()
+    {
+        if (!isRecording)
+        {
+            Debug.LogWarning("Recording was not started.");
+            return;
+        }
 
-[Serializable]
-public class OutputAudioBufferStartedEvent : BaseOAIEvent
-{
-    public string response_id;
-    public long started_at;
-}
+        isRecording = false;
 
-[Serializable]
-public class ResponseAudioDoneEvent : BaseOAIEvent
-{
-    public string response_id;
-    public long finished_at;
-}
+        // Check if we have any audio data
+        if (audioBuffer.Count == 0)
+        {
+            Debug.LogWarning("No audio data recorded.");
+            return;
+        }
 
-[Serializable]
-public class ResponseAudioTranscriptDoneEvent : BaseOAIEvent
-{
-    public string response_id;
-    public string transcript;
-}
+        // Convert audio data to Base64 and send input_audio_buffer.append event
+        byte[] audioBytes = ConvertFloatArrayToByteArray(audioBuffer.ToArray());
+        string base64Audio = Convert.ToBase64String(audioBytes);
+        bool appendSuccess = SafeSendDataChannelMessage(
+            Encoding.UTF8.GetBytes(
+                JsonConvert.SerializeObject(
+                    new
+                    {
+                        event_id = Guid.NewGuid().ToString(),
+                        type = "input_audio_buffer.append",
+                        audio = base64Audio,
+                    }
+                )
+            ),
+            "input_audio_buffer.append"
+        );
 
-[Serializable]
-public class ResponseContentPartDoneEvent : BaseOAIEvent
-{
-    public string response_id;
-    public string part_id;
-}
+        if (!appendSuccess)
+        {
+            Debug.LogError("Failed to send audio buffer append event. Aborting recording commit.");
+            return;
+        }
 
-[Serializable]
-public class ResponseOutputItemDoneEvent : BaseOAIEvent
-{
-    public string response_id;
-    public string item_id;
-}
+        // Commit the audio buffer
+        bool commitSuccess = SafeSendDataChannelMessage(
+            Encoding.UTF8.GetBytes(
+                JsonConvert.SerializeObject(
+                    new { event_id = Guid.NewGuid().ToString(), type = "input_audio_buffer.commit" }
+                )
+            ),
+            "input_audio_buffer.commit"
+        );
 
-[Serializable]
-public class ResponseDoneEvent : BaseOAIEvent
-{
-    public string response_id;
-}
+        if (!commitSuccess)
+        {
+            Debug.LogError("Failed to send audio buffer commit event.");
+            return;
+        }
 
-[Serializable]
-public class RateLimitsUpdatedEvent : BaseOAIEvent
-{
-    public int requests_remaining;
-    public int tokens_remaining;
-    public long reset_at;
+        // Send response.create event
+        bool responseSuccess = SafeSendDataChannelMessage(
+            Encoding.UTF8.GetBytes(
+                JsonConvert.SerializeObject(
+                    new { event_id = Guid.NewGuid().ToString(), type = "response.create" }
+                )
+            ),
+            "response.create"
+        );
+
+        if (responseSuccess)
+        {
+            Debug.Log(
+                "Successfully stopped recording, committed audio buffer, and requested response."
+            );
+        }
+        else
+        {
+            Debug.LogError("Failed to send response create event.");
+        }
+    }
+
+    private void SendAudioBufferAppendEvent(string base64Audio)
+    {
+        var appendEvent = new
+        {
+            event_id = Guid.NewGuid().ToString(),
+            type = "input_audio_buffer.append",
+            audio = base64Audio,
+        };
+
+        string json = JsonConvert.SerializeObject(appendEvent);
+        SafeSendDataChannelMessage(Encoding.UTF8.GetBytes(json), "input_audio_buffer.append");
+    }
+
+    /// <summary>
+    /// Safely sends data through the DataChannel with proper state validation
+    /// </summary>
+    /// <param name="data">The data to send</param>
+    /// <param name="eventType">The type of event being sent (for logging)</param>
+    /// <returns>True if the data was sent successfully, false otherwise</returns>
+    private bool SafeSendDataChannelMessage(byte[] data, string eventType)
+    {
+        if (dataChannel == null)
+        {
+            Debug.LogWarning($"DataChannel is null. Cannot send {eventType} event.");
+            return false;
+        }
+
+        if (dataChannel.ReadyState != RTCDataChannelState.Open)
+        {
+            Debug.LogWarning(
+                $"DataChannel is not open (State: {dataChannel.ReadyState}). Cannot send {eventType} event."
+            );
+            return false;
+        }
+
+        try
+        {
+            dataChannel.Send(data);
+            Debug.Log($"Sent {eventType} event successfully.");
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"Failed to send {eventType} event: {ex.Message}");
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// Converts float audio samples to byte array (16-bit PCM format)
+    /// </summary>
+    /// <param name="samples">Float audio samples (range -1.0 to 1.0)</param>
+    /// <returns>Byte array representing 16-bit PCM audio data</returns>
+    private byte[] ConvertFloatArrayToByteArray(float[] samples)
+    {
+        byte[] bytes = new byte[samples.Length * sizeof(short)];
+        int byteIndex = 0;
+
+        for (int i = 0; i < samples.Length; i++)
+        {
+            // Clamp the float value to [-1.0, 1.0] and convert to 16-bit signed integer
+            float clampedSample = Mathf.Clamp(samples[i], -1.0f, 1.0f);
+            short sample16Bit = (short)(clampedSample * short.MaxValue);
+
+            // Convert to little-endian byte array
+            bytes[byteIndex++] = (byte)(sample16Bit & 0xFF);
+            bytes[byteIndex++] = (byte)((sample16Bit >> 8) & 0xFF);
+        }
+
+        return bytes;
+    }
+
+    [Serializable]
+    public class TurnDetectionConfig
+    {
+        public string type = "semantic_vad"; // "server_vad" or "semantic_vad"
+
+        public bool? create_response = true;
+
+        public string eagerness = "auto"; // Used only for semantic_vad: "low", "medium", "high", "auto"
+        public bool? interrupt_response = false;
+
+        // public int? prefix_padding_ms = 300; // Used only for server_vad
+        // public int? silence_duration_ms = 1000; // Used only for server_vad
+        // public float? threshold = 0.8f; // Used only for server_vad
+
+        public TurnDetectionConfig() { }
+    }
+
+    [Serializable]
+    public class OpenAISessionRequest
+    {
+        public string model;
+        public string[] modalities = new[] { "audio", "text" };
+        public string instructions;
+        public string voice;
+
+        [SerializeField]
+        public TurnDetectionConfig turn_detection = null;
+
+        public OpenAISessionRequest(string model, string instructions, string voice = "alloy")
+        {
+            this.model = model;
+            this.instructions = instructions;
+            this.voice = voice;
+        }
+    }
 }

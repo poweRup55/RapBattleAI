@@ -26,93 +26,109 @@ public class OAIEventController
         switch (baseEvent.type)
         {
             case "input_audio_buffer.committed":
+                Debug.Log("Handling event: input_audio_buffer.committed");
                 TriggerEvent(
                     JsonUtility.FromJson<InputAudioBufferCommittedEvent>(json),
                     OnInputAudioBufferCommittedEvent
                 );
                 break;
             case "input_audio_buffer.cleared":
+                Debug.Log("Handling event: input_audio_buffer.cleared");
                 TriggerEvent(
                     JsonUtility.FromJson<InputAudioBufferClearedEvent>(json),
                     OnInputAudioBufferClearedEvent
                 );
                 break;
             case "input_audio_buffer.speech_started":
+                Debug.Log("Handling event: input_audio_buffer.speech_started");
                 TriggerEvent(
                     JsonUtility.FromJson<InputAudioBufferSpeechStartedEvent>(json),
                     OnInputAudioBufferSpeechStartedEvent
                 );
                 break;
             case "input_audio_buffer.speech_stopped":
+                Debug.Log("Handling event: input_audio_buffer.speech_stopped");
                 TriggerEvent(
                     JsonUtility.FromJson<InputAudioBufferSpeechStoppedEvent>(json),
                     OnInputAudioBufferSpeechStoppedEvent
                 );
                 break;
             case "conversation.item.created":
+                Debug.Log("Handling event: conversation.item.created");
                 TriggerEvent(
                     JsonUtility.FromJson<ConversationItemCreatedEvent>(json),
                     OnConversationItemCreatedEvent
                 );
                 break;
             case "response.created":
+                Debug.Log("Handling event: response.created");
                 TriggerEvent(
                     JsonUtility.FromJson<ResponseCreatedEvent>(json),
                     OnResponseCreatedEvent
                 );
                 break;
             case "response.output_item.added":
+                Debug.Log("Handling event: response.output_item.added");
                 TriggerEvent(
                     JsonUtility.FromJson<ResponseOutputItemAddedEvent>(json),
                     OnResponseOutputItemAddedEvent
                 );
                 break;
             case "response.content_part.added":
+                Debug.Log("Handling event: response.content_part.added");
                 TriggerEvent(
                     JsonUtility.FromJson<ResponseContentPartAddedEvent>(json),
                     OnResponseContentPartAddedEvent
                 );
                 break;
             case "response.audio_transcript.delta":
+                Debug.Log("Handling event: response.audio_transcript.delta");
                 TriggerEvent(
                     JsonUtility.FromJson<ResponseAudioTranscriptDeltaEvent>(json),
                     OnResponseAudioTranscriptDeltaEvent
                 );
                 break;
             case "output_audio_buffer.started":
+                Debug.Log("Handling event: output_audio_buffer.started");
                 TriggerEvent(
                     JsonUtility.FromJson<OutputAudioBufferStartedEvent>(json),
                     OnOutputAudioBufferStartedEvent
                 );
                 break;
             case "response.audio.done":
+                Debug.Log("Handling event: response.audio.done");
                 TriggerEvent(
                     JsonUtility.FromJson<ResponseAudioDoneEvent>(json),
                     OnResponseAudioDoneEvent
                 );
                 break;
             case "response.audio_transcript.done":
+                Debug.Log("Handling event: response.audio_transcript.done");
                 TriggerEvent(
                     JsonUtility.FromJson<ResponseAudioTranscriptDoneEvent>(json),
                     OnResponseAudioTranscriptDoneEvent
                 );
                 break;
             case "response.content_part.done":
+                Debug.Log("Handling event: response.content_part.done");
                 TriggerEvent(
                     JsonUtility.FromJson<ResponseContentPartDoneEvent>(json),
                     OnResponseContentPartDoneEvent
                 );
                 break;
             case "response.output_item.done":
+                Debug.Log("Handling event: response.output_item.done");
                 TriggerEvent(
                     JsonUtility.FromJson<ResponseOutputItemDoneEvent>(json),
                     OnResponseOutputItemDoneEvent
                 );
                 break;
             case "response.done":
+                Debug.Log("Handling event: response.done");
                 TriggerEvent(JsonUtility.FromJson<ResponseDoneEvent>(json), OnResponseDoneEvent);
                 break;
             case "rate_limits.updated":
+                Debug.Log("Handling event: rate_limits.updated");
                 TriggerEvent(
                     JsonUtility.FromJson<RateLimitsUpdatedEvent>(json),
                     OnRateLimitsUpdatedEvent
