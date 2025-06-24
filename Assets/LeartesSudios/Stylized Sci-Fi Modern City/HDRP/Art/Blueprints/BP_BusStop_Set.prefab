@@ -1,0 +1,609 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &5078862293236260154
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2266226440517737557}
+  m_Layer: 0
+  m_Name: BP_BusStop_Set
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2266226440517737557
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5078862293236260154}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 3865262884180840103}
+  - {fileID: 3865262884180839791}
+  - {fileID: 3865262884180840191}
+  - {fileID: 3865262884180839901}
+  - {fileID: 3865262884180800000}
+  - {fileID: 3865262884180839685}
+  - {fileID: 3865262884180839691}
+  - {fileID: 3865262884180839811}
+  - {fileID: 3865262884180839907}
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &3865262883431164186
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 2266226440517737557}
+    m_Modifications:
+    - target: {fileID: 1030973372, guid: abc00000000013782433643290634477, type: 3}
+      propertyPath: m_Name
+      value: BP_BusStop_Set_C_1_SM_Bench_9_21970
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030973373, guid: abc00000000013782433643290634477, type: 3}
+      propertyPath: m_RootOrder
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030973373, guid: abc00000000013782433643290634477, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030973373, guid: abc00000000013782433643290634477, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030973373, guid: abc00000000013782433643290634477, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030973373, guid: abc00000000013782433643290634477, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.30000296
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030973373, guid: abc00000000013782433643290634477, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030973373, guid: abc00000000013782433643290634477, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030973373, guid: abc00000000013782433643290634477, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.6755905
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030973373, guid: abc00000000013782433643290634477, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030973373, guid: abc00000000013782433643290634477, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.73727715
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030973373, guid: abc00000000013782433643290634477, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: abc00000000013782433643290634477, type: 3}
+--- !u!4 &3865262884180840103 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1030973373, guid: abc00000000013782433643290634477,
+    type: 3}
+  m_PrefabInstance: {fileID: 3865262883431164186}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &3865262883431164226
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 2266226440517737557}
+    m_Modifications:
+    - target: {fileID: 1030973372, guid: abc00000000013782433643290634477, type: 3}
+      propertyPath: m_Name
+      value: BP_BusStop_Set_C_1_SM_Bench_7_21968
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030973373, guid: abc00000000013782433643290634477, type: 3}
+      propertyPath: m_RootOrder
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030973373, guid: abc00000000013782433643290634477, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030973373, guid: abc00000000013782433643290634477, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030973373, guid: abc00000000013782433643290634477, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030973373, guid: abc00000000013782433643290634477, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.40245837
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030973373, guid: abc00000000013782433643290634477, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030973373, guid: abc00000000013782433643290634477, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.95005995
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030973373, guid: abc00000000013782433643290634477, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.724247
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030973373, guid: abc00000000013782433643290634477, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030973373, guid: abc00000000013782433643290634477, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.68954074
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030973373, guid: abc00000000013782433643290634477, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: abc00000000013782433643290634477, type: 3}
+--- !u!4 &3865262884180840191 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1030973373, guid: abc00000000013782433643290634477,
+    type: 3}
+  m_PrefabInstance: {fileID: 3865262883431164226}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &3865262883431164254
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 2266226440517737557}
+    m_Modifications:
+    - target: {fileID: 1030972546, guid: abc00000000010211713419577742105, type: 3}
+      propertyPath: m_Name
+      value: BP_BusStop_Set_C_1_SM_TrashBags_02_6_21967
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972547, guid: abc00000000010211713419577742105, type: 3}
+      propertyPath: m_RootOrder
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972547, guid: abc00000000010211713419577742105, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1.8937495
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972547, guid: abc00000000010211713419577742105, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1.89375
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972547, guid: abc00000000010211713419577742105, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1.8937495
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972547, guid: abc00000000010211713419577742105, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.5822063
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972547, guid: abc00000000010211713419577742105, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972547, guid: abc00000000010211713419577742105, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -3.1066394
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972547, guid: abc00000000010211713419577742105, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972547, guid: abc00000000010211713419577742105, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972547, guid: abc00000000010211713419577742105, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972547, guid: abc00000000010211713419577742105, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: abc00000000010211713419577742105, type: 3}
+--- !u!4 &3865262884180839901 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1030972547, guid: abc00000000010211713419577742105,
+    type: 3}
+  m_PrefabInstance: {fileID: 3865262883431164254}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &3865262883431164278
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 2266226440517737557}
+    m_Modifications:
+    - target: {fileID: 1030972440, guid: abc00000000003948403567769991151, type: 3}
+      propertyPath: m_Name
+      value: BP_BusStop_Set_C_1_SM_CautionCone_Base_8_21969
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972441, guid: abc00000000003948403567769991151, type: 3}
+      propertyPath: m_RootOrder
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972441, guid: abc00000000003948403567769991151, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972441, guid: abc00000000003948403567769991151, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972441, guid: abc00000000003948403567769991151, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972441, guid: abc00000000003948403567769991151, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.9000014
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972441, guid: abc00000000003948403567769991151, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972441, guid: abc00000000003948403567769991151, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 2.6000004
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972441, guid: abc00000000003948403567769991151, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972441, guid: abc00000000003948403567769991151, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972441, guid: abc00000000003948403567769991151, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972441, guid: abc00000000003948403567769991151, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: abc00000000003948403567769991151, type: 3}
+--- !u!4 &3865262884180839791 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1030972441, guid: abc00000000003948403567769991151,
+    type: 3}
+  m_PrefabInstance: {fileID: 3865262883431164278}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &3865262883431164294
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 2266226440517737557}
+    m_Modifications:
+    - target: {fileID: 1030972546, guid: abc00000000010211713419577742105, type: 3}
+      propertyPath: m_Name
+      value: BP_BusStop_Set_C_1_SM_TrashBags_02_4_21965
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972547, guid: abc00000000010211713419577742105, type: 3}
+      propertyPath: m_RootOrder
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972547, guid: abc00000000010211713419577742105, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1.5000013
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972547, guid: abc00000000010211713419577742105, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972547, guid: abc00000000010211713419577742105, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1.5000013
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972547, guid: abc00000000010211713419577742105, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.0073094377
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972547, guid: abc00000000010211713419577742105, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972547, guid: abc00000000010211713419577742105, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -3.065804
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972547, guid: abc00000000010211713419577742105, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.5735766
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972547, guid: abc00000000010211713419577742105, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972547, guid: abc00000000010211713419577742105, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.81915194
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972547, guid: abc00000000010211713419577742105, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: abc00000000010211713419577742105, type: 3}
+--- !u!4 &3865262884180839685 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1030972547, guid: abc00000000010211713419577742105,
+    type: 3}
+  m_PrefabInstance: {fileID: 3865262883431164294}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &3865262883431164306
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 2266226440517737557}
+    m_Modifications:
+    - target: {fileID: 1030972568, guid: abc00000000015491710955790801168, type: 3}
+      propertyPath: m_Name
+      value: BP_BusStop_Set_C_1_SM_TrashBags_03_3_21964
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972569, guid: abc00000000015491710955790801168, type: 3}
+      propertyPath: m_RootOrder
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972569, guid: abc00000000015491710955790801168, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1.5750006
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972569, guid: abc00000000015491710955790801168, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1.575
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972569, guid: abc00000000015491710955790801168, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1.5750006
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972569, guid: abc00000000015491710955790801168, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.33479336
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972569, guid: abc00000000015491710955790801168, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972569, guid: abc00000000015491710955790801168, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -2.3298657
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972569, guid: abc00000000015491710955790801168, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.8660253
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972569, guid: abc00000000015491710955790801168, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972569, guid: abc00000000015491710955790801168, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.50000006
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972569, guid: abc00000000015491710955790801168, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: abc00000000015491710955790801168, type: 3}
+--- !u!4 &3865262884180839691 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1030972569, guid: abc00000000015491710955790801168,
+    type: 3}
+  m_PrefabInstance: {fileID: 3865262883431164306}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &3865262883431164330
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 2266226440517737557}
+    m_Modifications:
+    - target: {fileID: 1030986665, guid: abc00000000018378968159827109921, type: 3}
+      propertyPath: m_Name
+      value: BP_BusStop_Set_C_1_SM_BusStop_5_21966
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030986666, guid: abc00000000018378968159827109921, type: 3}
+      propertyPath: m_RootOrder
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030986666, guid: abc00000000018378968159827109921, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030986666, guid: abc00000000018378968159827109921, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030986666, guid: abc00000000018378968159827109921, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030986666, guid: abc00000000018378968159827109921, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030986666, guid: abc00000000018378968159827109921, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030986666, guid: abc00000000018378968159827109921, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030986666, guid: abc00000000018378968159827109921, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030986666, guid: abc00000000018378968159827109921, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030986666, guid: abc00000000018378968159827109921, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030986666, guid: abc00000000018378968159827109921, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: abc00000000018378968159827109921, type: 3}
+--- !u!4 &3865262884180800000 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1030986666, guid: abc00000000018378968159827109921,
+    type: 3}
+  m_PrefabInstance: {fileID: 3865262883431164330}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &3865262883431164398
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 2266226440517737557}
+    m_Modifications:
+    - target: {fileID: 1030972524, guid: abc00000000000465427067750365650, type: 3}
+      propertyPath: m_Name
+      value: BP_BusStop_Set_C_1_SM_TrashBags_01_2_21963
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972525, guid: abc00000000000465427067750365650, type: 3}
+      propertyPath: m_RootOrder
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972525, guid: abc00000000000465427067750365650, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1.5000013
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972525, guid: abc00000000000465427067750365650, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972525, guid: abc00000000000465427067750365650, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1.5000013
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972525, guid: abc00000000000465427067750365650, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.5614775
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972525, guid: abc00000000000465427067750365650, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972525, guid: abc00000000000465427067750365650, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -2.347976
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972525, guid: abc00000000000465427067750365650, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.5735766
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972525, guid: abc00000000000465427067750365650, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972525, guid: abc00000000000465427067750365650, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.81915194
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972525, guid: abc00000000000465427067750365650, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: abc00000000000465427067750365650, type: 3}
+--- !u!4 &3865262884180839811 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1030972525, guid: abc00000000000465427067750365650,
+    type: 3}
+  m_PrefabInstance: {fileID: 3865262883431164398}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &3865262883431164410
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 2266226440517737557}
+    m_Modifications:
+    - target: {fileID: 1030972440, guid: abc00000000003948403567769991151, type: 3}
+      propertyPath: m_Name
+      value: BP_BusStop_Set_C_1_SM_CautionCone_Base_1_21962
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972441, guid: abc00000000003948403567769991151, type: 3}
+      propertyPath: m_RootOrder
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972441, guid: abc00000000003948403567769991151, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972441, guid: abc00000000003948403567769991151, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972441, guid: abc00000000003948403567769991151, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972441, guid: abc00000000003948403567769991151, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 1.3499984
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972441, guid: abc00000000003948403567769991151, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972441, guid: abc00000000003948403567769991151, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 2.1500006
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972441, guid: abc00000000003948403567769991151, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.8660253
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972441, guid: abc00000000003948403567769991151, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972441, guid: abc00000000003948403567769991151, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.50000006
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972441, guid: abc00000000003948403567769991151, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: abc00000000003948403567769991151, type: 3}
+--- !u!4 &3865262884180839907 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1030972441, guid: abc00000000003948403567769991151,
+    type: 3}
+  m_PrefabInstance: {fileID: 3865262883431164410}
+  m_PrefabAsset: {fileID: 0}

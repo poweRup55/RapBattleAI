@@ -1,0 +1,2637 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &6049957047503952088
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5897513849640551572}
+  m_Layer: 0
+  m_Name: SM_Street_Median_Garden
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5897513849640551572
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6049957047503952088}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1152589858158637158}
+  - {fileID: 7399984629068676379}
+  - {fileID: 8258466326937113698}
+  - {fileID: 3863244312898495678}
+  - {fileID: 7359803007398372039}
+  - {fileID: 28767478580344773}
+  - {fileID: 5539163334999932892}
+  - {fileID: 1959998019242136027}
+  - {fileID: 7530028563508796707}
+  - {fileID: 1171924745276758774}
+  - {fileID: 1469847621348317487}
+  - {fileID: 8164396096140787224}
+  - {fileID: 1889224595645237070}
+  - {fileID: 4533829448854560983}
+  - {fileID: 5958513404740449992}
+  - {fileID: 7360826433179350915}
+  - {fileID: 3044970451509342526}
+  - {fileID: 5586512483166722483}
+  - {fileID: 2604379913866378813}
+  - {fileID: 6959616506330568595}
+  - {fileID: 9042483264098957812}
+  - {fileID: 7894918953523372710}
+  - {fileID: 2418407826604174458}
+  - {fileID: 3557520928994894680}
+  - {fileID: 6244321306753018018}
+  - {fileID: 8273961906635810976}
+  - {fileID: 7179339542260589037}
+  - {fileID: 8445908329119922699}
+  - {fileID: 5552238974626242222}
+  - {fileID: 5266519519104266906}
+  - {fileID: 7934924966113029628}
+  - {fileID: 8352206676483649739}
+  - {fileID: 5558188945465716429}
+  - {fileID: 3579810530183098261}
+  - {fileID: 285481924614590935}
+  - {fileID: 4484276186802280461}
+  - {fileID: 7656705769692933127}
+  - {fileID: 8781026054635762321}
+  - {fileID: 4403510299395426084}
+  - {fileID: 9159489439552124150}
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &28767479164496267
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 5897513849640551572}
+    m_Modifications:
+    - target: {fileID: 1030987341, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_Name
+      value: SM_Street_Median_Garden_C_4_SM_Grass_01_36_5687
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_RootOrder
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 14.700001
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.1000061
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -9.800003
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: abc00000000006172857038398828553, type: 3}
+--- !u!4 &28767478580344773 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1030987342, guid: abc00000000006172857038398828553,
+    type: 3}
+  m_PrefabInstance: {fileID: 28767479164496267}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &285481925630562201
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 5897513849640551572}
+    m_Modifications:
+    - target: {fileID: 1030987341, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_Name
+      value: SM_Street_Median_Garden_C_4_SM_Grass_01_5_5658
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_RootOrder
+      value: 34
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 13.200001
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.1000061
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -8.600002
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: abc00000000006172857038398828553, type: 3}
+--- !u!4 &285481924614590935 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1030987342, guid: abc00000000006172857038398828553,
+    type: 3}
+  m_PrefabInstance: {fileID: 285481925630562201}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &1152589858878844587
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 5897513849640551572}
+    m_Modifications:
+    - target: {fileID: 1030987468, guid: abc00000000007108024212932628990, type: 3}
+      propertyPath: m_Name
+      value: SM_Street_Median_Garden_C_4_SM_Street_MainMedian_41_5692
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987469, guid: abc00000000007108024212932628990, type: 3}
+      propertyPath: m_RootOrder
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987469, guid: abc00000000007108024212932628990, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987469, guid: abc00000000007108024212932628990, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987469, guid: abc00000000007108024212932628990, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987469, guid: abc00000000007108024212932628990, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987469, guid: abc00000000007108024212932628990, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987469, guid: abc00000000007108024212932628990, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987469, guid: abc00000000007108024212932628990, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987469, guid: abc00000000007108024212932628990, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987469, guid: abc00000000007108024212932628990, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987469, guid: abc00000000007108024212932628990, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: abc00000000007108024212932628990, type: 3}
+--- !u!4 &1152589858158637158 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1030987469, guid: abc00000000007108024212932628990,
+    type: 3}
+  m_PrefabInstance: {fileID: 1152589858878844587}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &1171924746267624627
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 5897513849640551572}
+    m_Modifications:
+    - target: {fileID: 1030987332, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_Name
+      value: SM_Street_Median_Garden_C_4_SM_Grass_02_32_5683
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_RootOrder
+      value: 9
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 14
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.1000061
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -9.200001
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: abc00000000008267815160481349698, type: 3}
+--- !u!4 &1171924745276758774 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1030987333, guid: abc00000000008267815160481349698,
+    type: 3}
+  m_PrefabInstance: {fileID: 1171924746267624627}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &1469847622366316358
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 5897513849640551572}
+    m_Modifications:
+    - target: {fileID: 1030987368, guid: abc00000000018159736814438787824, type: 3}
+      propertyPath: m_Name
+      value: SM_Street_Median_Garden_C_4_SM_Flower_Red_31_5682
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987369, guid: abc00000000018159736814438787824, type: 3}
+      propertyPath: m_RootOrder
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987369, guid: abc00000000018159736814438787824, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.779305
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987369, guid: abc00000000018159736814438787824, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.779305
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987369, guid: abc00000000018159736814438787824, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.779305
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987369, guid: abc00000000018159736814438787824, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 14.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987369, guid: abc00000000018159736814438787824, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.19999695
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987369, guid: abc00000000018159736814438787824, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -6.6000023
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987369, guid: abc00000000018159736814438787824, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987369, guid: abc00000000018159736814438787824, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987369, guid: abc00000000018159736814438787824, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987369, guid: abc00000000018159736814438787824, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: abc00000000018159736814438787824, type: 3}
+--- !u!4 &1469847621348317487 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1030987369, guid: abc00000000018159736814438787824,
+    type: 3}
+  m_PrefabInstance: {fileID: 1469847622366316358}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &1889224595726014773
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 5897513849640551572}
+    m_Modifications:
+    - target: {fileID: 1030987386, guid: abc00000000007976607041879561395, type: 3}
+      propertyPath: m_Name
+      value: SM_Street_Median_Garden_C_4_SM_Bush_29_5680
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987387, guid: abc00000000007976607041879561395, type: 3}
+      propertyPath: m_RootOrder
+      value: 12
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987387, guid: abc00000000007976607041879561395, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.734634
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987387, guid: abc00000000007976607041879561395, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.734634
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987387, guid: abc00000000007976607041879561395, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.734634
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987387, guid: abc00000000007976607041879561395, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 14
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987387, guid: abc00000000007976607041879561395, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.19999695
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987387, guid: abc00000000007976607041879561395, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -8
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987387, guid: abc00000000007976607041879561395, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987387, guid: abc00000000007976607041879561395, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987387, guid: abc00000000007976607041879561395, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987387, guid: abc00000000007976607041879561395, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: abc00000000007976607041879561395, type: 3}
+--- !u!4 &1889224595645237070 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1030987387, guid: abc00000000007976607041879561395,
+    type: 3}
+  m_PrefabInstance: {fileID: 1889224595726014773}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &1959998019153039244
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 5897513849640551572}
+    m_Modifications:
+    - target: {fileID: 1030987350, guid: abc00000000016316890974403210963, type: 3}
+      propertyPath: m_Name
+      value: SM_Street_Median_Garden_C_4_SM_Flower_Blue_34_5685
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987351, guid: abc00000000016316890974403210963, type: 3}
+      propertyPath: m_RootOrder
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987351, guid: abc00000000016316890974403210963, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.7793055
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987351, guid: abc00000000016316890974403210963, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.779305
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987351, guid: abc00000000016316890974403210963, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.7793055
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987351, guid: abc00000000016316890974403210963, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 13.299999
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987351, guid: abc00000000016316890974403210963, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.19999695
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987351, guid: abc00000000016316890974403210963, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -9.400002
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987351, guid: abc00000000016316890974403210963, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987351, guid: abc00000000016316890974403210963, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987351, guid: abc00000000016316890974403210963, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987351, guid: abc00000000016316890974403210963, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: abc00000000016316890974403210963, type: 3}
+--- !u!4 &1959998019242136027 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1030987351, guid: abc00000000016316890974403210963,
+    type: 3}
+  m_PrefabInstance: {fileID: 1959998019153039244}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &2418407826553015462
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 5897513849640551572}
+    m_Modifications:
+    - target: {fileID: 1030987995, guid: abc00000000012983052241087814100, type: 3}
+      propertyPath: m_Name
+      value: SM_Street_Median_Garden_C_4_Plane_17_5670
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987996, guid: abc00000000012983052241087814100, type: 3}
+      propertyPath: m_RootOrder
+      value: 22
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987996, guid: abc00000000012983052241087814100, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 24.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987996, guid: abc00000000012983052241087814100, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987996, guid: abc00000000012983052241087814100, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 16
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987996, guid: abc00000000012983052241087814100, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 14.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987996, guid: abc00000000012983052241087814100, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987996, guid: abc00000000012983052241087814100, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -8
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987996, guid: abc00000000012983052241087814100, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987996, guid: abc00000000012983052241087814100, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987996, guid: abc00000000012983052241087814100, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987996, guid: abc00000000012983052241087814100, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: abc00000000012983052241087814100, type: 3}
+--- !u!4 &2418407826604174458 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1030987996, guid: abc00000000012983052241087814100,
+    type: 3}
+  m_PrefabInstance: {fileID: 2418407826553015462}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &2604379913550651507
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 5897513849640551572}
+    m_Modifications:
+    - target: {fileID: 1030987341, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_Name
+      value: SM_Street_Median_Garden_C_4_SM_Grass_01_23_5674
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_RootOrder
+      value: 18
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.78996944
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.789969
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.78996944
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 13.20718
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.1000061
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -9.146412
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.9659259
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.25881898
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: abc00000000006172857038398828553, type: 3}
+--- !u!4 &2604379913866378813 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1030987342, guid: abc00000000006172857038398828553,
+    type: 3}
+  m_PrefabInstance: {fileID: 2604379913550651507}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &3044970451424374651
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 5897513849640551572}
+    m_Modifications:
+    - target: {fileID: 1030987332, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_Name
+      value: SM_Street_Median_Garden_C_4_SM_Grass_02_25_5676
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_RootOrder
+      value: 16
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 14
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.1000061
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -7.1000023
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: abc00000000008267815160481349698, type: 3}
+--- !u!4 &3044970451509342526 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1030987333, guid: abc00000000008267815160481349698,
+    type: 3}
+  m_PrefabInstance: {fileID: 3044970451424374651}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &3557520928238839312
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 5897513849640551572}
+    m_Modifications:
+    - target: {fileID: 1030980935, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_Name
+      value: SM_Street_Median_Garden_C_4_Pipe_4m_16_5669
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_RootOrder
+      value: 23
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 4.3499985
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -4
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: abc00000000013791375229119664612, type: 3}
+--- !u!4 &3557520928994894680 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1030980936, guid: abc00000000013791375229119664612,
+    type: 3}
+  m_PrefabInstance: {fileID: 3557520928238839312}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &3579810529997730256
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 5897513849640551572}
+    m_Modifications:
+    - target: {fileID: 1030987332, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_Name
+      value: SM_Street_Median_Garden_C_4_SM_Grass_02_6_5659
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_RootOrder
+      value: 33
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 14.650002
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.1000061
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -8.513397
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.50000024
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.8660253
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: abc00000000008267815160481349698, type: 3}
+--- !u!4 &3579810530183098261 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1030987333, guid: abc00000000008267815160481349698,
+    type: 3}
+  m_PrefabInstance: {fileID: 3579810529997730256}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &3863244312174099195
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 5897513849640551572}
+    m_Modifications:
+    - target: {fileID: 1030987332, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_Name
+      value: SM_Street_Median_Garden_C_4_SM_Grass_02_38_5689
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_RootOrder
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 14.700001
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.1000061
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -7.1000023
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: abc00000000008267815160481349698, type: 3}
+--- !u!4 &3863244312898495678 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1030987333, guid: abc00000000008267815160481349698,
+    type: 3}
+  m_PrefabInstance: {fileID: 3863244312174099195}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &4279272878721941064
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 5897513849640551572}
+    m_Modifications:
+    - target: {fileID: 4935385675359652542, guid: 000b50db309156148ad93a5aedaafb8f,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 39
+      objectReference: {fileID: 0}
+    - target: {fileID: 4935385675359652542, guid: 000b50db309156148ad93a5aedaafb8f,
+        type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.8189212
+      objectReference: {fileID: 0}
+    - target: {fileID: 4935385675359652542, guid: 000b50db309156148ad93a5aedaafb8f,
+        type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.8189212
+      objectReference: {fileID: 0}
+    - target: {fileID: 4935385675359652542, guid: 000b50db309156148ad93a5aedaafb8f,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 14
+      objectReference: {fileID: 0}
+    - target: {fileID: 4935385675359652542, guid: 000b50db309156148ad93a5aedaafb8f,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4935385675359652542, guid: 000b50db309156148ad93a5aedaafb8f,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -11.200001
+      objectReference: {fileID: 0}
+    - target: {fileID: 4935385675359652542, guid: 000b50db309156148ad93a5aedaafb8f,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 4935385675359652542, guid: 000b50db309156148ad93a5aedaafb8f,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4935385675359652542, guid: 000b50db309156148ad93a5aedaafb8f,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 4935385675359652542, guid: 000b50db309156148ad93a5aedaafb8f,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4935385675359652542, guid: 000b50db309156148ad93a5aedaafb8f,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4935385675359652542, guid: 000b50db309156148ad93a5aedaafb8f,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4935385675359652542, guid: 000b50db309156148ad93a5aedaafb8f,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4935385675359652543, guid: 000b50db309156148ad93a5aedaafb8f,
+        type: 3}
+      propertyPath: m_Name
+      value: BP_TreePot21
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 000b50db309156148ad93a5aedaafb8f, type: 3}
+--- !u!4 &9159489439552124150 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4935385675359652542, guid: 000b50db309156148ad93a5aedaafb8f,
+    type: 3}
+  m_PrefabInstance: {fileID: 4279272878721941064}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &4484276186589185608
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 5897513849640551572}
+    m_Modifications:
+    - target: {fileID: 1030987332, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_Name
+      value: SM_Street_Median_Garden_C_4_SM_Grass_02_4_5657
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_RootOrder
+      value: 35
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 14.700001
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.1000061
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -9.100002
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: abc00000000008267815160481349698, type: 3}
+--- !u!4 &4484276186802280461 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1030987333, guid: abc00000000008267815160481349698,
+    type: 3}
+  m_PrefabInstance: {fileID: 4484276186589185608}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &4533829449579101337
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 5897513849640551572}
+    m_Modifications:
+    - target: {fileID: 1030986829, guid: abc00000000017652450556724735410, type: 3}
+      propertyPath: m_Name
+      value: SM_Street_Median_Garden_C_4_SM_FloorBed_28_5679
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030986830, guid: abc00000000017652450556724735410, type: 3}
+      propertyPath: m_RootOrder
+      value: 13
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030986830, guid: abc00000000017652450556724735410, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030986830, guid: abc00000000017652450556724735410, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030986830, guid: abc00000000017652450556724735410, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030986830, guid: abc00000000017652450556724735410, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 14
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030986830, guid: abc00000000017652450556724735410, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030986830, guid: abc00000000017652450556724735410, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -8
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030986830, guid: abc00000000017652450556724735410, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030986830, guid: abc00000000017652450556724735410, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030986830, guid: abc00000000017652450556724735410, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030986830, guid: abc00000000017652450556724735410, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: abc00000000017652450556724735410, type: 3}
+--- !u!4 &4533829448854560983 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1030986830, guid: abc00000000017652450556724735410,
+    type: 3}
+  m_PrefabInstance: {fileID: 4533829449579101337}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &5266519518513818847
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 5897513849640551572}
+    m_Modifications:
+    - target: {fileID: 1030987332, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_Name
+      value: SM_Street_Median_Garden_C_4_SM_Grass_02_10_5663
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_RootOrder
+      value: 29
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 14
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.1000061
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -6.6000023
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: abc00000000008267815160481349698, type: 3}
+--- !u!4 &5266519519104266906 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1030987333, guid: abc00000000008267815160481349698,
+    type: 3}
+  m_PrefabInstance: {fileID: 5266519518513818847}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &5539163335326065042
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 5897513849640551572}
+    m_Modifications:
+    - target: {fileID: 1030987341, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_Name
+      value: SM_Street_Median_Garden_C_4_SM_Grass_01_35_5686
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_RootOrder
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.7899681
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.789969
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.7899681
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 13.20718
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.1000061
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -7.0464134
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.8660253
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.50000024
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: abc00000000006172857038398828553, type: 3}
+--- !u!4 &5539163334999932892 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1030987342, guid: abc00000000006172857038398828553,
+    type: 3}
+  m_PrefabInstance: {fileID: 5539163335326065042}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &5552238974176500710
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 5897513849640551572}
+    m_Modifications:
+    - target: {fileID: 1030980935, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_Name
+      value: SM_Street_Median_Garden_C_4_Pipe_4m_11_5664
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_RootOrder
+      value: 28
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 23.650002
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -4
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: abc00000000013791375229119664612, type: 3}
+--- !u!4 &5552238974626242222 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1030980936, guid: abc00000000013791375229119664612,
+    type: 3}
+  m_PrefabInstance: {fileID: 5552238974176500710}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &5558188944602902659
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 5897513849640551572}
+    m_Modifications:
+    - target: {fileID: 1030987341, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_Name
+      value: SM_Street_Median_Garden_C_4_SM_Grass_01_7_5660
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_RootOrder
+      value: 32
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 14.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.1000061
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -8.400002
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: abc00000000006172857038398828553, type: 3}
+--- !u!4 &5558188945465716429 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1030987342, guid: abc00000000006172857038398828553,
+    type: 3}
+  m_PrefabInstance: {fileID: 5558188944602902659}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &5586512482169751549
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 5897513849640551572}
+    m_Modifications:
+    - target: {fileID: 1030987341, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_Name
+      value: SM_Street_Median_Garden_C_4_SM_Grass_01_24_5675
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_RootOrder
+      value: 17
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.7899681
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.789969
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.7899681
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 13.700001
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.1000061
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -6.300003
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.8660253
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.50000024
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: abc00000000006172857038398828553, type: 3}
+--- !u!4 &5586512483166722483 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1030987342, guid: abc00000000006172857038398828553,
+    type: 3}
+  m_PrefabInstance: {fileID: 5586512482169751549}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &5958513403743348877
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 5897513849640551572}
+    m_Modifications:
+    - target: {fileID: 1030987332, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_Name
+      value: SM_Street_Median_Garden_C_4_SM_Grass_02_27_5678
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_RootOrder
+      value: 14
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 13.299999
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.1000061
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -7.4000015
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: abc00000000008267815160481349698, type: 3}
+--- !u!4 &5958513404740449992 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1030987333, guid: abc00000000008267815160481349698,
+    type: 3}
+  m_PrefabInstance: {fileID: 5958513403743348877}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &6244321307502652906
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 5897513849640551572}
+    m_Modifications:
+    - target: {fileID: 1030980935, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_Name
+      value: SM_Street_Median_Garden_C_4_Pipe_4m_15_5668
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_RootOrder
+      value: 24
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 4.3499985
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -8
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: abc00000000013791375229119664612, type: 3}
+--- !u!4 &6244321306753018018 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1030980936, guid: abc00000000013791375229119664612,
+    type: 3}
+  m_PrefabInstance: {fileID: 6244321307502652906}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &6959616507352762838
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 5897513849640551572}
+    m_Modifications:
+    - target: {fileID: 1030987332, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_Name
+      value: SM_Street_Median_Garden_C_4_SM_Grass_02_22_5673
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_RootOrder
+      value: 19
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 13.599998
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.1000061
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -6.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: abc00000000008267815160481349698, type: 3}
+--- !u!4 &6959616506330568595 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1030987333, guid: abc00000000008267815160481349698,
+    type: 3}
+  m_PrefabInstance: {fileID: 6959616507352762838}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &7179339542206882981
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 5897513849640551572}
+    m_Modifications:
+    - target: {fileID: 1030980935, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_Name
+      value: SM_Street_Median_Garden_C_4_Pipe_4m_13_5666
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_RootOrder
+      value: 26
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 23.650002
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -12
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: abc00000000013791375229119664612, type: 3}
+--- !u!4 &7179339542260589037 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1030980936, guid: abc00000000013791375229119664612,
+    type: 3}
+  m_PrefabInstance: {fileID: 7179339542206882981}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &7359803007345065097
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 5897513849640551572}
+    m_Modifications:
+    - target: {fileID: 1030987341, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_Name
+      value: SM_Street_Median_Garden_C_4_SM_Grass_01_37_5688
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_RootOrder
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.78996944
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.789969
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.78996944
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 13.233974
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.1000061
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -9.592823
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.9659259
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.25881898
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: abc00000000006172857038398828553, type: 3}
+--- !u!4 &7359803007398372039 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1030987342, guid: abc00000000006172857038398828553,
+    type: 3}
+  m_PrefabInstance: {fileID: 7359803007345065097}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &7360826434195450317
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 5897513849640551572}
+    m_Modifications:
+    - target: {fileID: 1030987341, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_Name
+      value: SM_Street_Median_Garden_C_4_SM_Grass_01_26_5677
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_RootOrder
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 13.200001
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.1000061
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -6.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: abc00000000006172857038398828553, type: 3}
+--- !u!4 &7360826433179350915 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1030987342, guid: abc00000000006172857038398828553,
+    type: 3}
+  m_PrefabInstance: {fileID: 7360826434195450317}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &7399984628340013139
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 5897513849640551572}
+    m_Modifications:
+    - target: {fileID: 1030980935, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_Name
+      value: SM_Street_Median_Garden_C_4_Pipe_4m_40_5691
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_RootOrder
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 23.650002
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: abc00000000013791375229119664612, type: 3}
+--- !u!4 &7399984629068676379 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1030980936, guid: abc00000000013791375229119664612,
+    type: 3}
+  m_PrefabInstance: {fileID: 7399984628340013139}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &7530028563048629094
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 5897513849640551572}
+    m_Modifications:
+    - target: {fileID: 1030987332, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_Name
+      value: SM_Street_Median_Garden_C_4_SM_Grass_02_33_5684
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_RootOrder
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 13.599998
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.1000061
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -8.600002
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: abc00000000008267815160481349698, type: 3}
+--- !u!4 &7530028563508796707 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1030987333, guid: abc00000000008267815160481349698,
+    type: 3}
+  m_PrefabInstance: {fileID: 7530028563048629094}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &7656705769643487810
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 5897513849640551572}
+    m_Modifications:
+    - target: {fileID: 1030987332, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_Name
+      value: SM_Street_Median_Garden_C_4_SM_Grass_02_3_5656
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_RootOrder
+      value: 36
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 14
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.1000061
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -9.100002
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: abc00000000008267815160481349698, type: 3}
+--- !u!4 &7656705769692933127 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1030987333, guid: abc00000000008267815160481349698,
+    type: 3}
+  m_PrefabInstance: {fileID: 7656705769643487810}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &7894918954243718376
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 5897513849640551572}
+    m_Modifications:
+    - target: {fileID: 1030987341, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_Name
+      value: SM_Street_Median_Garden_C_4_SM_Grass_01_18_5671
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_RootOrder
+      value: 21
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 14.700001
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.1000061
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -6.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: abc00000000006172857038398828553, type: 3}
+--- !u!4 &7894918953523372710 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1030987342, guid: abc00000000006172857038398828553,
+    type: 3}
+  m_PrefabInstance: {fileID: 7894918954243718376}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &7934924965398721465
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 5897513849640551572}
+    m_Modifications:
+    - target: {fileID: 1030987332, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_Name
+      value: SM_Street_Median_Garden_C_4_SM_Grass_02_9_5662
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_RootOrder
+      value: 30
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 14.400002
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.1000061
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -6.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: abc00000000008267815160481349698, type: 3}
+--- !u!4 &7934924966113029628 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1030987333, guid: abc00000000008267815160481349698,
+    type: 3}
+  m_PrefabInstance: {fileID: 7934924965398721465}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &8164396096231907448
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 5897513849640551572}
+    m_Modifications:
+    - target: {fileID: 1030987359, guid: abc00000000012254565911698104409, type: 3}
+      propertyPath: m_Name
+      value: SM_Street_Median_Garden_C_4_SM_Flower_Purple_30_5681
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987360, guid: abc00000000012254565911698104409, type: 3}
+      propertyPath: m_RootOrder
+      value: 11
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987360, guid: abc00000000012254565911698104409, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.65965396
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987360, guid: abc00000000012254565911698104409, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.659654
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987360, guid: abc00000000012254565911698104409, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.65965396
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987360, guid: abc00000000012254565911698104409, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 13.4062195
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987360, guid: abc00000000012254565911698104409, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.19999695
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987360, guid: abc00000000012254565911698104409, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -6.798336
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987360, guid: abc00000000012254565911698104409, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: -0.25881898
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987360, guid: abc00000000012254565911698104409, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987360, guid: abc00000000012254565911698104409, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.9659259
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987360, guid: abc00000000012254565911698104409, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: abc00000000012254565911698104409, type: 3}
+--- !u!4 &8164396096140787224 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1030987360, guid: abc00000000012254565911698104409,
+    type: 3}
+  m_PrefabInstance: {fileID: 8164396096231907448}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &8258466325952662032
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 5897513849640551572}
+    m_Modifications:
+    - target: {fileID: 1030987377, guid: abc00000000012938833235630870894, type: 3}
+      propertyPath: m_Name
+      value: SM_Street_Median_Garden_C_4_SM_Flower_White_39_5690
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987378, guid: abc00000000012938833235630870894, type: 3}
+      propertyPath: m_RootOrder
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987378, guid: abc00000000012938833235630870894, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.8951029
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987378, guid: abc00000000012938833235630870894, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.895103
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987378, guid: abc00000000012938833235630870894, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.8951029
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987378, guid: abc00000000012938833235630870894, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 14.483013
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987378, guid: abc00000000012938833235630870894, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.19999695
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987378, guid: abc00000000012938833235630870894, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -9.0634
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987378, guid: abc00000000012938833235630870894, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: -0.25881898
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987378, guid: abc00000000012938833235630870894, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987378, guid: abc00000000012938833235630870894, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.9659259
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987378, guid: abc00000000012938833235630870894, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: abc00000000012938833235630870894, type: 3}
+--- !u!4 &8258466326937113698 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1030987378, guid: abc00000000012938833235630870894,
+    type: 3}
+  m_PrefabInstance: {fileID: 8258466325952662032}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &8273961907394162152
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 5897513849640551572}
+    m_Modifications:
+    - target: {fileID: 1030980935, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_Name
+      value: SM_Street_Median_Garden_C_4_Pipe_4m_14_5667
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_RootOrder
+      value: 25
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 4.3499985
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -12
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: abc00000000013791375229119664612, type: 3}
+--- !u!4 &8273961906635810976 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1030980936, guid: abc00000000013791375229119664612,
+    type: 3}
+  m_PrefabInstance: {fileID: 8273961907394162152}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &8352206676157771406
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 5897513849640551572}
+    m_Modifications:
+    - target: {fileID: 1030987332, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_Name
+      value: SM_Street_Median_Garden_C_4_SM_Grass_02_8_5661
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_RootOrder
+      value: 31
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 13.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.1000061
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -9.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987333, guid: abc00000000008267815160481349698, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: abc00000000008267815160481349698, type: 3}
+--- !u!4 &8352206676483649739 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1030987333, guid: abc00000000008267815160481349698,
+    type: 3}
+  m_PrefabInstance: {fileID: 8352206676157771406}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &8445908330144546627
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 5897513849640551572}
+    m_Modifications:
+    - target: {fileID: 1030980935, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_Name
+      value: SM_Street_Median_Garden_C_4_Pipe_4m_12_5665
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_RootOrder
+      value: 27
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 23.650002
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -8
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: abc00000000013791375229119664612, type: 3}
+--- !u!4 &8445908329119922699 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1030980936, guid: abc00000000013791375229119664612,
+    type: 3}
+  m_PrefabInstance: {fileID: 8445908330144546627}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &8746670344466599322
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 5897513849640551572}
+    m_Modifications:
+    - target: {fileID: 4935385675359652542, guid: 000b50db309156148ad93a5aedaafb8f,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 38
+      objectReference: {fileID: 0}
+    - target: {fileID: 4935385675359652542, guid: 000b50db309156148ad93a5aedaafb8f,
+        type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.8189215
+      objectReference: {fileID: 0}
+    - target: {fileID: 4935385675359652542, guid: 000b50db309156148ad93a5aedaafb8f,
+        type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.8189215
+      objectReference: {fileID: 0}
+    - target: {fileID: 4935385675359652542, guid: 000b50db309156148ad93a5aedaafb8f,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 14
+      objectReference: {fileID: 0}
+    - target: {fileID: 4935385675359652542, guid: 000b50db309156148ad93a5aedaafb8f,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4935385675359652542, guid: 000b50db309156148ad93a5aedaafb8f,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -4.800003
+      objectReference: {fileID: 0}
+    - target: {fileID: 4935385675359652542, guid: 000b50db309156148ad93a5aedaafb8f,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 4935385675359652542, guid: 000b50db309156148ad93a5aedaafb8f,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4935385675359652542, guid: 000b50db309156148ad93a5aedaafb8f,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 4935385675359652542, guid: 000b50db309156148ad93a5aedaafb8f,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4935385675359652542, guid: 000b50db309156148ad93a5aedaafb8f,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4935385675359652542, guid: 000b50db309156148ad93a5aedaafb8f,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4935385675359652542, guid: 000b50db309156148ad93a5aedaafb8f,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4935385675359652543, guid: 000b50db309156148ad93a5aedaafb8f,
+        type: 3}
+      propertyPath: m_Name
+      value: BP_TreePot20
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 000b50db309156148ad93a5aedaafb8f, type: 3}
+--- !u!4 &4403510299395426084 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4935385675359652542, guid: 000b50db309156148ad93a5aedaafb8f,
+    type: 3}
+  m_PrefabInstance: {fileID: 8746670344466599322}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &8781026053653018585
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 5897513849640551572}
+    m_Modifications:
+    - target: {fileID: 1030980935, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_Name
+      value: SM_Street_Median_Garden_C_4_Pipe_4m_1_5655
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_RootOrder
+      value: 37
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 4.3499985
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030980936, guid: abc00000000013791375229119664612, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: abc00000000013791375229119664612, type: 3}
+--- !u!4 &8781026054635762321 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1030980936, guid: abc00000000013791375229119664612,
+    type: 3}
+  m_PrefabInstance: {fileID: 8781026053653018585}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &9042483264190408634
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 5897513849640551572}
+    m_Modifications:
+    - target: {fileID: 1030987341, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_Name
+      value: SM_Street_Median_Garden_C_4_SM_Grass_01_21_5672
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_RootOrder
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 14.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.1000061
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -6.300003
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987342, guid: abc00000000006172857038398828553, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: abc00000000006172857038398828553, type: 3}
+--- !u!4 &9042483264098957812 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1030987342, guid: abc00000000006172857038398828553,
+    type: 3}
+  m_PrefabInstance: {fileID: 9042483264190408634}
+  m_PrefabAsset: {fileID: 0}
