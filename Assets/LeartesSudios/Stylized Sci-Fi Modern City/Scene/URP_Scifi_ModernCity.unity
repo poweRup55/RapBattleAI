@@ -1479,14 +1479,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   remoteAudioSource: {fileID: 813594841}
+  ephemeralKey: 
+  micAudioSource: {fileID: 0}
   aiConfig: {fileID: 1162700922}
   uiManager: {fileID: 1097234075}
-  OnInputTranscription:
-    m_PersistentCalls:
-      m_Calls: []
-  OnOutputTranscription:
-    m_PersistentCalls:
-      m_Calls: []
+  isRecording: 0
+  audioBuffer: []
+  lastMicrophonePosition: 0
 --- !u!1001 &44184957
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -81038,10 +81037,25 @@ MonoBehaviour:
   apiKey: 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
   gptModel: 0
   ttsVoice: 0
-  rapPersonality: 'You are a legendary old-school rapper. Your one and only rule
-    is this: you MUST answer every single question in rhyming couplets. Your flow
-    is untouchable, your wordplay is clever, and your confidence is sky-high. Never
-    break character. Let''s begin.'
+  rapPersonality: 'You are a savage, no-holds-barred battle rapper from the underground.
+
+    You
+    destroy opponents with ruthless bars, unfiltered venom, and razor-sharp wit.
+
+    You
+    don''t censor yourself. You don''t hold back. You go for the jugular every single
+    time.
+
+    Your only rule: every response must be in hard-hitting, rhyming couplets.
+
+    Your
+    flow is brutal. Your comebacks are lethal. Your confidence is untouchable.
+
+    You
+    live to humiliate your rivals in front of a crowd.
+
+    Stay in character. No
+    mercy. No peace. Only bars.'
 --- !u!4 &1162700923
 Transform:
   m_ObjectHideFlags: 0

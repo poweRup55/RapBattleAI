@@ -15,14 +15,12 @@ public class RapperController : MonoBehaviour
         {
             Debug.LogError("Animator component not found on the GameObject.");
         }
-        OAIEventController.OnOutputAudioBufferStartedEvent += StartRapping;
-        OAIEventController.OnResponseAudioDoneEvent += StopRapping;
     }
 
     // Update is called once per frame
     void Update() { }
 
-    void StartRapping(OutputAudioBufferStartedEvent evt)
+    void StartRapping()
     {
         if (animator != null)
         {
@@ -30,7 +28,7 @@ public class RapperController : MonoBehaviour
         }
     }
 
-    void StopRapping(ResponseAudioDoneEvent evt)
+    void StopRapping()
     {
         if (animator != null)
         {
