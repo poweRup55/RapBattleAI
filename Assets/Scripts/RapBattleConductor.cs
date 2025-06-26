@@ -10,77 +10,95 @@ namespace EpicRapBattle.Managers
 {
     public class RapBattleConductor : MonoBehaviour
     {
-        public AudioSource musicSource;
-        public float bpm = 90f;
-        public UIManager uiManager;
+        [Header("Audio Sources")]
+        [Tooltip("Audio source for background music.")]
+        [SerializeField]
+        private AudioSource musicSource;
+
+        [SerializeField]
+        private const float bpm = 90f;
+
+        [SerializeField]
+        [Tooltip("Audio source for NPC responses.")]
+        private AudioSource npcAudioSource;
+
+        [SerializeField]
+        private UIManager uiManager;
 
         [Header("AI Integration")]
         [SerializeField]
         private AIConfig aiConfig;
 
+        [Header("Game Configuration")]
+        [Tooltip("Number of bars to wait at the start of the game.")]
         [SerializeField]
-        private AudioSource npcAudioSource;
+        private const int startOfGameRestLenInBars = 2;
 
+        [Tooltip("Number of bars per turn for the player.")]
+        [SerializeField]
+        private const int countDownLenInBars = 2;
+
+        [Tooltip("Number of bars for the rest turn.")]
+        [SerializeField]
+        private const int restTurnLenInBars = 2;
+
+        [Tooltip("Number of bars for the player turn.")]
+        [SerializeField]
+        private const int playerTurnBars = 4;
+
+        [Header("Debugging")]
+        [Tooltip("Play back microphone recording after player turn.")]
+        [SerializeField]
+        private bool playBackRecording = false;
         private float secondsPerBeat;
         private float secondsPerBar;
-        private int barsPerTurn = 8;
-        private int barsRest = 2;
-
-        private enum BattleState
-        {
-            WaitingStart,
-            PlayerCountdown,
-            PlayerTurn,
-            WaitingTurn,
-            NPCTurn,
-            Rest,
-        }
-
         private BattleState currentState = BattleState.WaitingStart;
-
-        private List<Message> messages = new List<Message>();
         private AudioClip playerClip;
         private string microphoneDevice;
         private bool isRecording = false;
         private const int sampleRate = 16000;
-        private const int maxRecordSeconds = 20;
-        private const int playerTurnBars = 1;
+        private List<Message> messages = new List<Message>();
+
+        public BattleState CurrentState => currentState;
+
+        private string npcResponseText;
+        private string npcResponseAudio;
 
         private void Start()
         {
             uiManager.clearText();
-            messages.Add(
-                new Message
-                {
-                    role = "system",
-                    content = new MessageContent[]
-                    {
-                        new MessageContent { text = aiConfig.RapPersonality, type = "text" },
-                    },
-                }
-            );
+            AddSystemMessage(aiConfig.RapPersonality);
             secondsPerBeat = 60f / bpm;
             secondsPerBar = secondsPerBeat * 4f;
+            InitializeMicrophone();
+            StartCoroutine(BattleLoop());
+        }
+
+        private void InitializeMicrophone()
+        {
             microphoneDevice = Microphone.devices.Length > 0 ? Microphone.devices[0] : null;
             if (microphoneDevice == null)
             {
                 Debug.LogError("No microphone detected! Please connect a microphone.");
-                return;
+                throw new InvalidOperationException(
+                    "No microphone detected! Please connect a microphone."
+                );
             }
             if (musicSource != null)
                 musicSource.Play();
-            StartCoroutine(BattleLoop());
         }
 
         private IEnumerator BattleLoop()
         {
-            // Wait 4 bars at the start
+            uiManager.UpdateStatus("Get ready to rap!");
+            yield return StartCoroutine(WaitBars(startOfGameRestLenInBars));
+            // Wait for the player to start the battle
 
             while (true)
             {
                 // Player Countdown
                 currentState = BattleState.PlayerCountdown;
-                yield return StartCoroutine(PlayerCountdown(1));
+                yield return StartCoroutine(PlayerCountdown(countDownLenInBars));
 
                 // Player Turn
                 currentState = BattleState.PlayerTurn;
@@ -88,18 +106,18 @@ namespace EpicRapBattle.Managers
 
                 // Waiting Turn
                 currentState = BattleState.WaitingTurn;
-                uiManager.UpdateStatus("Waiting for system...");
-                yield return StartCoroutine(HandleWaitingTurn());
+                uiManager.UpdateStatus("Your Opponent is thinking...");
+                yield return StartCoroutine(ProcessSystemResponseTurn());
 
                 // NPC Turn
                 currentState = BattleState.NPCTurn;
-                uiManager.UpdateStatus("NPC's turn!");
+                uiManager.UpdateStatus("Opponents turn!");
                 yield return StartCoroutine(PlayNpcResponse());
 
                 // Rest Turn
                 currentState = BattleState.Rest;
                 uiManager.UpdateStatus("Rest...");
-                yield return StartCoroutine(WaitBars(barsRest));
+                yield return StartCoroutine(WaitBars(restTurnLenInBars));
             }
         }
 
@@ -119,7 +137,7 @@ namespace EpicRapBattle.Managers
             int beats = bars * 4;
             for (int i = beats; i > 0; i--)
             {
-                uiManager.UpdateStatus($"Your turn in: {i}");
+                uiManager.UpdateStatus($"Your turn in: {i} beats");
                 yield return new WaitForSeconds(secondsPerBeat);
             }
         }
@@ -151,7 +169,7 @@ namespace EpicRapBattle.Managers
                 sampleRate
             );
             isRecording = true;
-            Debug.Log("Microphone recording started.");
+            // Debug.Log("Microphone recording started.");
         }
 
         private void StopMicrophoneRecording()
@@ -160,56 +178,21 @@ namespace EpicRapBattle.Managers
                 return;
             Microphone.End(microphoneDevice);
             isRecording = false;
-            Debug.Log("Microphone recording stopped.");
+            // Debug.Log("Microphone recording stopped.");
         }
 
-        private IEnumerator HandleWaitingTurn()
+        private IEnumerator ProcessSystemResponseTurn()
         {
             yield return StartCoroutine(SendToOpenAI());
         }
 
         private IEnumerator SendToOpenAI()
         {
-            uiManager.UpdateStatus("Playing back your recording...");
-            if (playerClip != null)
+            if (playBackRecording)
             {
-                musicSource.Pause();
-                AudioSource playbackSource = gameObject.AddComponent<AudioSource>();
-                playbackSource.clip = playerClip;
-                playbackSource.Play();
-                Debug.Log("CLip length: " + playerClip.length);
-                yield return new WaitForSeconds(playerClip.length);
-                Destroy(playbackSource);
-                musicSource.UnPause();
+                yield return StartCoroutine(PlayBackRecording());
             }
-            var playerRecordingBase64 = playerClip
-                ? Convert.ToBase64String(WavUtility.FromAudioClip(playerClip))
-                : null;
-
-            if (string.IsNullOrEmpty(playerRecordingBase64))
-            {
-                Debug.LogError("No audio recording found!");
-                yield break;
-            }
-            // Add current user message
-            messages.Add(
-                new Message
-                {
-                    role = "user",
-                    content = new MessageContent[]
-                    {
-                        new MessageContent
-                        {
-                            type = "input_audio",
-                            input_audio = new InputAudio
-                            {
-                                data = playerRecordingBase64,
-                                format = "wav",
-                            },
-                        },
-                    },
-                }
-            );
+            submitUserAudioMessage();
 
             var payload = new OpenAIPayload
             {
@@ -218,12 +201,12 @@ namespace EpicRapBattle.Managers
                 modalities = new[] { "text", "audio" },
                 audio = new OpenAIAudio { voice = aiConfig.TtsVoiceString, format = "wav" },
             };
-            Debug.Log($"Sending OpenAI payload: {payload}");
+            // Debug.Log($"Sending OpenAI payload: {payload}");
             string json = JsonUtility.ToJson(payload);
             json = System.Text.RegularExpressions.Regex.Replace(json, ",?\"\\w+\":\"\"", "");
             json = System.Text.RegularExpressions.Regex.Replace(json, ",(?=\\s*[}\\]])", "");
 
-            Debug.Log($"Sending to OpenAI: {json}");
+            // Debug.Log($"Sending to OpenAI: {json}");
 
             using (
                 UnityWebRequest req = new UnityWebRequest(
@@ -246,7 +229,7 @@ namespace EpicRapBattle.Managers
                 ChatCompletionResponse response = JsonUtility.FromJson<ChatCompletionResponse>(
                     req.downloadHandler.text
                 );
-                Debug.Log($"OpenAI response: {req.downloadHandler.text}");
+                // Debug.Log($"OpenAI response: {req.downloadHandler.text}");
 
                 npcResponseText = "";
                 npcResponseAudio = "";
@@ -258,40 +241,109 @@ namespace EpicRapBattle.Managers
                         npcResponseAudio = response.choices[0].message.audio.data;
                     }
                 }
-                messages.Add(
-                    new Message
-                    {
-                        role = "assistant",
-                        audio = new AssistantResponseAudio
-                        {
-                            id = response.choices[0].message.audio.id,
-                        },
-                    }
-                );
-                Debug.Log($"NPC response text: {npcResponseText}");
-                Debug.Log($"NPC response audio: {npcResponseAudio}");
+                AddAssistantAudioMessage(response?.choices?[0]?.message?.audio?.id);
+                // Debug.Log($"NPC response text: {npcResponseText}");
+                // Debug.Log($"NPC response audio: {npcResponseAudio}");
             }
         }
 
-        private string npcResponseText = "";
-        private string npcResponseAudio = "";
+        private void submitUserAudioMessage()
+        {
+            var playerRecordingBase64 = playerClip
+                ? Convert.ToBase64String(WavUtility.FromAudioClip(playerClip))
+                : null;
+
+            if (string.IsNullOrEmpty(playerRecordingBase64))
+            {
+                Debug.LogError("No audio recording found!");
+            }
+            // Add current user message
+            AddUserAudioMessage(playerRecordingBase64);
+        }
+
+        private IEnumerator PlayBackRecording()
+        {
+            uiManager.UpdateStatus("Playing back your recording...");
+            if (playerClip != null)
+            {
+                musicSource.Pause();
+                AudioSource playbackSource = gameObject.AddComponent<AudioSource>();
+                playbackSource.clip = playerClip;
+                playbackSource.Play();
+                // Debug.Log("CLip length: " + playerClip.length);
+                yield return new WaitForSeconds(playerClip.length);
+                Destroy(playbackSource);
+                musicSource.UnPause();
+            }
+            yield break;
+        }
 
         private IEnumerator PlayNpcResponse()
         {
-            uiManager.UpdateComputerText(npcResponseText);
             if (!string.IsNullOrEmpty(npcResponseAudio))
             {
                 byte[] audioBytes = Convert.FromBase64String(npcResponseAudio);
                 AudioClip clip = WavUtility.AudioClipFromCorruptWav(audioBytes);
                 npcAudioSource.clip = clip;
+                uiManager.UpdateComputerText(npcResponseText);
+                float timeToNextBar = secondsPerBar - (musicSource.time % secondsPerBar);
+                if (timeToNextBar > 0.05f)
+                {
+                    // Debug.Log($"Waiting {timeToNextBar:F2}s to sync NPC response to the beat.");
+                    yield return new WaitForSeconds(timeToNextBar);
+                }
                 npcAudioSource.Play();
                 yield return new WaitForSeconds(clip.length);
             }
             else
             {
                 Debug.LogWarning("No audio response from NPC.");
-                yield return StartCoroutine(WaitBars(barsPerTurn));
+                yield return StartCoroutine(WaitBars(countDownLenInBars));
             }
+        }
+
+        // --- Message Helper Methods ---
+        private void AddSystemMessage(string textMessage)
+        {
+            messages.Add(
+                new Message
+                {
+                    role = "system",
+                    content = new MessageContent[]
+                    {
+                        new MessageContent { text = textMessage, type = "text" },
+                    },
+                }
+            );
+        }
+
+        private void AddUserAudioMessage(string base64Audio)
+        {
+            messages.Add(
+                new Message
+                {
+                    role = "user",
+                    content = new MessageContent[]
+                    {
+                        new MessageContent
+                        {
+                            type = "input_audio",
+                            input_audio = new InputAudio { data = base64Audio, format = "wav" },
+                        },
+                    },
+                }
+            );
+        }
+
+        private void AddAssistantAudioMessage(string audioId)
+        {
+            messages.Add(
+                new Message
+                {
+                    role = "assistant",
+                    audio = new AssistantResponseAudio { id = audioId },
+                }
+            );
         }
     }
 
@@ -370,5 +422,15 @@ namespace EpicRapBattle.Managers
     {
         public string voice = null;
         public string format = null;
+    }
+
+    public enum BattleState
+    {
+        WaitingStart,
+        PlayerCountdown,
+        PlayerTurn,
+        WaitingTurn,
+        NPCTurn,
+        Rest,
     }
 }
