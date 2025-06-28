@@ -66,8 +66,8 @@ namespace EpicRapBattle.Managers
         private const int sampleRate = 16000;
         public BattleState CurrentState => currentState;
         private string npcResponseText;
-        private string npcResponseAudio;
         private OpenAIService openAIService;
+        private List<string> responseHistory = new List<string>();
 
         private void Start()
         {
@@ -119,9 +119,7 @@ namespace EpicRapBattle.Managers
 
                 // NPC Turn
                 currentState = BattleState.NPCTurn;
-                uiManager.UpdateStatus("Opponents turn!");
-                animationController.SetTrigger("StartRapping");
-                yield return StartCoroutine(PlayNpcResponse());
+                yield return StartCoroutine(GetAndPlayNpcResponse());
 
                 // Rest Turn
                 currentState = BattleState.Rest;
@@ -206,43 +204,62 @@ namespace EpicRapBattle.Managers
             submitUserAudioMessage();
 
             OpenAIService.ChatCompletionResponse response = null;
+            Exception error = null;
             int maxRetries = 3;
             float backoff = 1f;
+
             for (int attempt = 0; attempt < maxRetries; attempt++)
             {
-                yield return openAIService.SendToOpenAI(
-                    (OpenAIService.ChatCompletionResponse res) =>
-                    {
-                        response = res;
-                    },
-                    (Exception ex) =>
-                    {
-                        Debug.LogError(ex.Message);
-                    }
+                yield return StartCoroutine(
+                    SendToOpenAICoroutine((res) => response = res, (ex) => error = ex)
                 );
-                if (response == null)
-                {
-                    Debug.LogWarning(
-                        $"OpenAI response as failed. (attempt {attempt + 1}). Retrying..."
-                    );
-                    yield return new WaitForSeconds(backoff);
-                    backoff *= 2f; // Exponential backoff
-                }
+
+                if (response != null)
+                    break;
+
+                Debug.LogWarning($"OpenAI response failed. (attempt {attempt + 1}). Retrying...");
+                yield return new WaitForSeconds(backoff);
+                backoff *= 2f;
             }
 
-            npcResponseText = "";
-            npcResponseAudio = "";
-            if (response != null && response.choices != null && response.choices.Count > 0)
+            if (response == null)
             {
-                npcResponseText = response.choices[0].message.audio.transcript;
-                if (response.choices[0].message.audio != null)
-                {
-                    npcResponseAudio = response.choices[0].message.audio.data;
-                }
+                Debug.LogError("Failed to get a response from OpenAI after retries.");
+                yield break;
             }
-            openAIService.AddAssistantAudioMessage(response?.choices?[0]?.message?.audio?.id);
+
+            npcResponseText = response.choices[0].message.content;
+            responseHistory.Add(npcResponseText);
+            openAIService.ReplaceSystemMessage(
+                $"{aiConfig.RapPersonality} - responses history divided by '|': {string.Join(" | ", responseHistory)}"
+            );
             // Debug.Log($"NPC response text: {npcResponseText}");
             // Debug.Log($"NPC response audio: {npcResponseAudio}");
+        }
+
+        private IEnumerator SendToOpenAICoroutine(
+            Action<OpenAIService.ChatCompletionResponse> onSuccess,
+            Action<Exception> onError
+        )
+        {
+            OpenAIService.ChatCompletionResponse localResponse = null;
+            Exception localError = null;
+
+            yield return openAIService.SendToOpenAI(
+                (res) =>
+                {
+                    localResponse = res;
+                },
+                (ex) =>
+                {
+                    localError = ex;
+                }
+            );
+
+            if (localResponse != null)
+                onSuccess(localResponse);
+            else
+                onError(localError);
         }
 
         private void submitUserAudioMessage()
@@ -276,14 +293,103 @@ namespace EpicRapBattle.Managers
             yield break;
         }
 
-        private IEnumerator PlayNpcResponse()
+        private IEnumerator GetAndPlayNpcResponse()
         {
-            if (!string.IsNullOrEmpty(npcResponseAudio))
+            if (!string.IsNullOrEmpty(npcResponseText))
             {
+                string npcResponseAudio = null;
+                string geminiApiKey = aiConfig.GeminiApiKey;
+                string geminiTtsUrl =
+                    "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent";
+
+                var requestBody = new GeminiTtsRequest
+                {
+                    contents = new[]
+                    {
+                        new GeminiTtsRequest.Content
+                        {
+                            parts = new GeminiTtsRequest.Part[]
+                            {
+                                new GeminiTtsRequest.Part
+                                {
+                                    text =
+                                        $"[PROMPT: Say it all like a rapper. Very Fast and with a flow] {npcResponseText}",
+                                },
+                            },
+                        },
+                    },
+                    generationConfig = new GeminiTtsRequest.GenerationConfig
+                    {
+                        responseModalities = new[] { "AUDIO" },
+                        speechConfig = new GeminiTtsRequest.SpeechConfig
+                        {
+                            voiceConfig = new GeminiTtsRequest.VoiceConfig
+                            {
+                                prebuiltVoiceConfig = new GeminiTtsRequest.PrebuiltVoiceConfig
+                                {
+                                    voiceName = aiConfig.SelectedGeminiTtsVoice.ToString(),
+                                },
+                            },
+                        },
+                    },
+                    model = "gemini-2.5-flash-preview-tts",
+                };
+
+                string jsonBody = JsonUtility.ToJson(requestBody);
+                using (UnityWebRequest request = new UnityWebRequest(geminiTtsUrl, "POST"))
+                {
+                    byte[] bodyRaw = Encoding.UTF8.GetBytes(jsonBody);
+                    request.uploadHandler = new UploadHandlerRaw(bodyRaw);
+                    request.downloadHandler = new DownloadHandlerBuffer();
+                    request.SetRequestHeader("Content-Type", "application/json");
+                    request.SetRequestHeader("x-goog-api-key", geminiApiKey);
+
+                    yield return request.SendWebRequest();
+
+                    if (request.result != UnityWebRequest.Result.Success)
+                    {
+                        Debug.LogError(
+                            $"Gemini TTS with request: {jsonBody} \nfailed: {request.error} \nResponse: {request.downloadHandler.text}"
+                        );
+                        yield break;
+                    }
+
+                    try
+                    {
+                        // Parse the response to extract the base64 audio string
+                        var responseJson = request.downloadHandler.text;
+                        var response = JsonUtility.FromJson<GeminiTtsResponse>(responseJson);
+                        if (
+                            response.candidates != null
+                            && response.candidates.Length > 0
+                            && response.candidates[0].content.parts != null
+                            && response.candidates[0].content.parts.Length > 0
+                            && response.candidates[0].content.parts[0].inlineData != null
+                        )
+                        {
+                            npcResponseAudio = response
+                                .candidates[0]
+                                .content
+                                .parts[0]
+                                .inlineData
+                                .data;
+                        }
+                        else
+                        {
+                            Debug.LogError("Gemini TTS response missing audio data.");
+                            yield break;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.LogError($"Failed to parse Gemini TTS response: {ex}");
+                        yield break;
+                    }
+                }
                 byte[] audioBytes = Convert.FromBase64String(npcResponseAudio);
                 AudioClip clip = WavUtility.AudioClipFromCorruptWav(audioBytes);
-                npcAudioSource.clip = clip;
                 uiManager.UpdateComputerText(npcResponseText);
+                npcAudioSource.clip = clip;
                 float timeToNextBar = secondsPerBar - (musicSource.time % secondsPerBar);
                 if (timeToNextBar > 0.05f)
                 {
@@ -291,6 +397,9 @@ namespace EpicRapBattle.Managers
                     yield return new WaitForSeconds(timeToNextBar);
                 }
                 npcAudioSource.Play();
+                uiManager.UpdateStatus("Opponents turn!");
+                animationController.SetTrigger("StartRapping");
+
                 yield return new WaitForSeconds(clip.length);
             }
             else
@@ -310,4 +419,81 @@ public enum BattleState
     WaitingTurn,
     NPCTurn,
     Rest,
+}
+
+// Gemini TTS request classes
+[Serializable]
+public class GeminiTtsRequest
+{
+    public Content[] contents;
+    public GenerationConfig generationConfig;
+    public string model;
+
+    [Serializable]
+    public class Content
+    {
+        public Part[] parts;
+    }
+
+    [Serializable]
+    public class Part
+    {
+        public string text;
+    }
+
+    [Serializable]
+    public class GenerationConfig
+    {
+        public string[] responseModalities;
+        public SpeechConfig speechConfig;
+    }
+
+    [Serializable]
+    public class SpeechConfig
+    {
+        public VoiceConfig voiceConfig;
+    }
+
+    [Serializable]
+    public class VoiceConfig
+    {
+        public PrebuiltVoiceConfig prebuiltVoiceConfig;
+    }
+
+    [Serializable]
+    public class PrebuiltVoiceConfig
+    {
+        public string voiceName;
+    }
+}
+
+// Gemini TTS response classes
+[Serializable]
+public class GeminiTtsResponse
+{
+    public Candidate[] candidates;
+
+    [Serializable]
+    public class Candidate
+    {
+        public Content content;
+    }
+
+    [Serializable]
+    public class Content
+    {
+        public Part[] parts;
+    }
+
+    [Serializable]
+    public class Part
+    {
+        public InlineData inlineData;
+    }
+
+    [Serializable]
+    public class InlineData
+    {
+        public string data;
+    }
 }

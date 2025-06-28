@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
-using System.Threading.Tasks;
 using EpicRapBattle.Config;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -23,23 +22,28 @@ public class OpenAIService
         Action<Exception> onError
     )
     {
+        var model =
+            aiConfig.SelectedProvider == AIConfig.Provider.Gemini
+                ? aiConfig.GeminiModelVariantString
+                : aiConfig.GptModelString;
+        Debug.Log($"Sending request to {aiConfig.SelectedProvider} with model {model}");
+
         var payload = new OpenAIPayload
         {
-            model = aiConfig.GptModelString,
+            model = model,
             messages = messages,
-            modalities = new[] { "text", "audio" },
-            audio = new OpenAIAudio { voice = aiConfig.TtsVoiceString, format = "wav" },
+            modalities = new[] { "text" },
         };
         string json = JsonUtility.ToJson(payload);
         json = System.Text.RegularExpressions.Regex.Replace(json, ",?\"\\w+\":\"\"", "");
         json = System.Text.RegularExpressions.Regex.Replace(json, ",(?=\\s*[}\\]])", "");
 
-        using (
-            UnityWebRequest req = new UnityWebRequest(
-                "https://api.openai.com/v1/chat/completions",
-                "POST"
-            )
-        )
+        string apiUrl =
+            aiConfig.SelectedProvider == AIConfig.Provider.Gemini
+                ? "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"
+                : "https://api.openai.com/v1/chat/completions";
+
+        using (UnityWebRequest req = new UnityWebRequest(apiUrl, "POST"))
         {
             byte[] bodyRaw = Encoding.UTF8.GetBytes(json);
             req.uploadHandler = new UploadHandlerRaw(bodyRaw);
@@ -49,15 +53,20 @@ public class OpenAIService
             yield return req.SendWebRequest();
             if (req.result != UnityWebRequest.Result.Success)
             {
-                Debug.LogError($"OpenAI API error: {req.error} \n{req.downloadHandler.text} ");
+                Debug.LogError(
+                    $"{aiConfig.SelectedProvider} API error: {req.error} \n{req.downloadHandler.text} \nRequest: {json}"
+                );
                 onError?.Invoke(
-                    new Exception($"OpenAI API error: {req.error} \n{req.downloadHandler.text}")
+                    new Exception(
+                        $"{aiConfig.SelectedProvider} API error: {req.error} \n{req.downloadHandler.text}"
+                    )
                 );
                 yield break;
             }
             ChatCompletionResponse response = JsonUtility.FromJson<ChatCompletionResponse>(
                 req.downloadHandler.text
             );
+            Debug.Log($"{aiConfig.SelectedProvider} API response: {req.downloadHandler.text}");
             onSuccess?.Invoke(response);
         }
     }
@@ -74,6 +83,22 @@ public class OpenAIService
                 },
             }
         );
+    }
+
+    public void ReplaceSystemMessage(string newSystemPrompt)
+    {
+        var systemMessage = messages.Find(m => m.role == "system");
+        if (systemMessage != null)
+        {
+            systemMessage.content = new MessageContent[]
+            {
+                new MessageContent { text = newSystemPrompt, type = "text" },
+            };
+        }
+        else
+        {
+            AddSystemMessage(newSystemPrompt);
+        }
     }
 
     public void AddUserAudioMessage(string base64Audio)
@@ -94,13 +119,16 @@ public class OpenAIService
         );
     }
 
-    public void AddAssistantAudioMessage(string audioId)
+    public void AddAssistantTextMessage(string text)
     {
         messages.Add(
             new Message
             {
                 role = "assistant",
-                audio = new AssistantResponseAudio { id = audioId },
+                content = new MessageContent[]
+                {
+                    new MessageContent { text = text, type = "text" },
+                },
             }
         );
     }
@@ -154,16 +182,7 @@ public class OpenAIService
     {
         public string role = null;
         public string refusal = null;
-        public ChatCompletionAudio audio = null;
-    }
-
-    [Serializable]
-    public class ChatCompletionAudio
-    {
-        public string data = null;
-        public int expires_at = 0;
-        public string id = null;
-        public string transcript = null;
+        public string content = null;
     }
 
     [Serializable]
@@ -172,13 +191,5 @@ public class OpenAIService
         public string model = null;
         public List<Message> messages = null;
         public string[] modalities = null;
-        public OpenAIAudio audio = null;
-    }
-
-    [Serializable]
-    public class OpenAIAudio
-    {
-        public string voice = null;
-        public string format = null;
     }
 }
