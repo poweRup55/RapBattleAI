@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using EpicRapBattle.Config;
 using EpicRapBattle.Managers;
+using Unity.PlasticSCM.Editor.WebApi;
 using UnityEditor.Compilation;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -36,7 +37,14 @@ namespace EpicRapBattle.Managers
         [SerializeField]
         private AIConfig aiConfig;
 
+        [SerializeField]
+        private AudioRecorder audioRecorder;
+
         [Header("Game Configuration")]
+        [Tooltip("Total Rap Rounds")]
+        [SerializeField]
+        private int totalRounds = 1;
+
         [Tooltip("Number of bars to wait at the start of the game.")]
         [SerializeField]
         private int startOfGameRestLenInBars = 2;
@@ -57,6 +65,9 @@ namespace EpicRapBattle.Managers
         [Tooltip("Play back microphone recording after player turn.")]
         [SerializeField]
         private bool playBackRecording = false;
+
+        private int currentRound = 0;
+
         private float secondsPerBeat;
         private float secondsPerBar;
         private BattleState currentState = BattleState.WaitingStart;
@@ -102,7 +113,7 @@ namespace EpicRapBattle.Managers
             yield return StartCoroutine(WaitBars(startOfGameRestLenInBars));
             // Wait for the player to start the battle
 
-            while (true)
+            while (totalRounds > currentRound)
             {
                 // Player Countdown
                 currentState = BattleState.PlayerCountdown;
@@ -123,11 +134,20 @@ namespace EpicRapBattle.Managers
 
                 // Rest Turn
                 currentState = BattleState.Rest;
-                uiManager.UpdateStatus("Rest...");
                 animationController.SetTrigger("StopRapping");
+                currentRound++;
+                if (totalRounds > currentRound)
+                {
+                    uiManager.UpdateStatus(
+                        $"Finished round number {currentRound + 1} of {totalRounds}"
+                    );
 
-                yield return StartCoroutine(WaitBars(restTurnLenInBars));
+                    yield return StartCoroutine(WaitBars(restTurnLenInBars));
+                }
             }
+            uiManager.UpdateStatus("Finished! Let's wait for the judge to decide the winner!");
+            var wavByteRound = audioRecorder.Save(44100, 2, "./gameSound.wav");
+            uiManager.UpdateStatus("Game Over! Thanks for playing!");
         }
 
         private IEnumerator WaitBars(int barCount)
@@ -154,6 +174,7 @@ namespace EpicRapBattle.Managers
         private IEnumerator PlayerTurnWithRecording(int bars)
         {
             int totalBeats = bars * 4;
+            audioRecorder.StartRecording();
             StartMicrophoneRecording();
             for (int i = totalBeats; i > 0; i--)
             {
@@ -161,6 +182,7 @@ namespace EpicRapBattle.Managers
                 yield return new WaitForSeconds(secondsPerBeat);
             }
             StopMicrophoneRecording();
+            audioRecorder.StopRecording(WavUtility.FromAudioClip(playerClip));
             uiManager.UpdateStatus("Recording stopped.");
         }
 
@@ -396,7 +418,9 @@ namespace EpicRapBattle.Managers
                     // Debug.Log($"Waiting {timeToNextBar:F2}s to sync NPC response to the beat.");
                     yield return new WaitForSeconds(timeToNextBar);
                 }
+                audioRecorder.StartRecording();
                 npcAudioSource.Play();
+                audioRecorder.StopRecording();
                 uiManager.UpdateStatus("Opponents turn!");
                 animationController.SetTrigger("StartRapping");
 
