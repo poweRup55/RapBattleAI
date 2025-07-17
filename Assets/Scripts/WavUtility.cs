@@ -572,8 +572,8 @@ public class WavUtility
 
     public static AudioClip AudioClipFromCorruptWav(
         byte[] wavData,
-        string clipName = "FixedClip",
         int sampleRate = 24000,
+        string clipName = "FixedClip",
         int channels = 1
     )
     {
@@ -593,5 +593,49 @@ public class WavUtility
         AudioClip clip = AudioClip.Create(clipName, sampleCount, channels, sampleRate, false);
         clip.SetData(samples, 0);
         return clip;
+    }
+
+    public static byte[] RemoveHeaderFromWavByteArray(byte[] wavData)
+    {
+        const int headerSize = 44;
+        if (wavData == null || wavData.Length <= headerSize)
+        {
+            Debug.LogError("WAV data too short or null.");
+            return null;
+        }
+        byte[] dataWithoutHeader = new byte[wavData.Length - headerSize];
+        Array.Copy(wavData, headerSize, dataWithoutHeader, 0, dataWithoutHeader.Length);
+        return dataWithoutHeader;
+    }
+
+    public static byte[] AddHeaderToWavByteArray(byte[] audioData, int sampleRate, int channels)
+    {
+        int headerSize = 44;
+        int fileSize = audioData.Length + headerSize - 8;
+        byte[] wav = new byte[audioData.Length + headerSize];
+
+        // RIFF header
+        System.Text.Encoding.ASCII.GetBytes("RIFF").CopyTo(wav, 0);
+        BitConverter.GetBytes(fileSize).CopyTo(wav, 4);
+        System.Text.Encoding.ASCII.GetBytes("WAVE").CopyTo(wav, 8);
+
+        // fmt chunk
+        System.Text.Encoding.ASCII.GetBytes("fmt ").CopyTo(wav, 12);
+        BitConverter.GetBytes(16).CopyTo(wav, 16); // Subchunk1Size
+        BitConverter.GetBytes((short)1).CopyTo(wav, 20); // AudioFormat (PCM)
+        BitConverter.GetBytes((short)channels).CopyTo(wav, 22);
+        BitConverter.GetBytes(sampleRate).CopyTo(wav, 24);
+        BitConverter.GetBytes(sampleRate * channels * 2).CopyTo(wav, 28); // ByteRate
+        BitConverter.GetBytes((short)(channels * 2)).CopyTo(wav, 32); // BlockAlign
+        BitConverter.GetBytes((short)16).CopyTo(wav, 34); // BitsPerSample
+
+        // data chunk
+        System.Text.Encoding.ASCII.GetBytes("data").CopyTo(wav, 36);
+        BitConverter.GetBytes(audioData.Length).CopyTo(wav, 40);
+
+        // PCM data
+        audioData.CopyTo(wav, headerSize);
+
+        return wav;
     }
 }

@@ -8,6 +8,7 @@
   - Use descriptive variable and function names; adhere to naming conventions (e.g., PascalCase for public members, camelCase for private members).
   - Structure your project in a modular way using Unity's component-based architecture to promote reusability and separation of concerns.
   - Disregard formatting issues. 
+  - Don't write any comments or explanations unless explicitly requested.
 
   C#/Unity
   - Use MonoBehaviour for script components attached to GameObjects; prefer ScriptableObjects for data containers and shared resources.

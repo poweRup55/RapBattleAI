@@ -3,9 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using EpicRapBattle.Config;
-using EpicRapBattle.Managers;
-using Unity.PlasticSCM.Editor.WebApi;
-using UnityEditor.Compilation;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -38,7 +35,7 @@ namespace EpicRapBattle.Managers
         private AIConfig aiConfig;
 
         [SerializeField]
-        private AudioRecorder audioRecorder;
+        private MatchJudge matchJudge;
 
         [Header("Game Configuration")]
         [Tooltip("Total Rap Rounds")]
@@ -74,7 +71,7 @@ namespace EpicRapBattle.Managers
         private AudioClip playerClip;
         private string microphoneDevice;
         private bool isRecording = false;
-        private const int sampleRate = 16000;
+        private const int sampleRate = 24000;
         public BattleState CurrentState => currentState;
         private string npcResponseText;
         private OpenAIService openAIService;
@@ -146,7 +143,7 @@ namespace EpicRapBattle.Managers
                 }
             }
             uiManager.UpdateStatus("Finished! Let's wait for the judge to decide the winner!");
-            var wavByteRound = audioRecorder.Save(44100, 2, "./gameSound.wav");
+            matchJudge.SaveMatchRecording("./Assets/matchRecording.wav");
             uiManager.UpdateStatus("Game Over! Thanks for playing!");
         }
 
@@ -174,7 +171,6 @@ namespace EpicRapBattle.Managers
         private IEnumerator PlayerTurnWithRecording(int bars)
         {
             int totalBeats = bars * 4;
-            audioRecorder.StartRecording();
             StartMicrophoneRecording();
             for (int i = totalBeats; i > 0; i--)
             {
@@ -182,7 +178,7 @@ namespace EpicRapBattle.Managers
                 yield return new WaitForSeconds(secondsPerBeat);
             }
             StopMicrophoneRecording();
-            audioRecorder.StopRecording(WavUtility.FromAudioClip(playerClip));
+            matchJudge.RecordPlayerInput(WavUtility.FromAudioClip(playerClip));
             uiManager.UpdateStatus("Recording stopped.");
         }
 
@@ -289,7 +285,6 @@ namespace EpicRapBattle.Managers
             var playerRecordingBase64 = playerClip
                 ? Convert.ToBase64String(WavUtility.FromAudioClip(playerClip))
                 : null;
-
             if (string.IsNullOrEmpty(playerRecordingBase64))
             {
                 Debug.LogError("No audio recording found!");
@@ -408,8 +403,9 @@ namespace EpicRapBattle.Managers
                         yield break;
                     }
                 }
-                byte[] audioBytes = Convert.FromBase64String(npcResponseAudio);
-                AudioClip clip = WavUtility.AudioClipFromCorruptWav(audioBytes);
+                byte[] npcAudioBytes = Convert.FromBase64String(npcResponseAudio);
+                matchJudge.RecordNPCInput(npcAudioBytes);
+                AudioClip clip = WavUtility.AudioClipFromCorruptWav(npcAudioBytes, sampleRate);
                 uiManager.UpdateComputerText(npcResponseText);
                 npcAudioSource.clip = clip;
                 float timeToNextBar = secondsPerBar - (musicSource.time % secondsPerBar);
@@ -418,9 +414,7 @@ namespace EpicRapBattle.Managers
                     // Debug.Log($"Waiting {timeToNextBar:F2}s to sync NPC response to the beat.");
                     yield return new WaitForSeconds(timeToNextBar);
                 }
-                audioRecorder.StartRecording();
                 npcAudioSource.Play();
-                audioRecorder.StopRecording();
                 uiManager.UpdateStatus("Opponents turn!");
                 animationController.SetTrigger("StartRapping");
 
