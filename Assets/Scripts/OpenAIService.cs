@@ -109,6 +109,7 @@ public class OpenAIService
                 role = "user",
                 content = new MessageContent[]
                 {
+
                     new MessageContent
                     {
                         type = "input_audio",

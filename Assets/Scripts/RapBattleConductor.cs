@@ -79,7 +79,7 @@ namespace EpicRapBattle.Managers
 
         private void Start()
         {
-            animationController.SetTrigger("stopRapping");
+            animationController.SetTrigger("StopRapping");
             openAIService = new OpenAIService(aiConfig);
             uiManager.clearText();
             openAIService.AddSystemMessage(aiConfig.RapPersonality);

@@ -54,3 +54,4 @@
   
   Refer to Unity documentation and C# programming guides for best practices in scripting, game architecture, and performance optimization.
   
+  DON'T TRY TO FIX formatting issues
