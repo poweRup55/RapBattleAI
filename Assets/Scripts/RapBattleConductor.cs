@@ -21,6 +21,9 @@ namespace EpicRapBattle.Managers
         private AudioSource musicSource;
 
         [SerializeField]
+        private MicrophoneController microphoneController;
+
+        [SerializeField]
         private float bpm = 90f;
 
         [SerializeField]
@@ -86,12 +89,16 @@ namespace EpicRapBattle.Managers
             secondsPerBeat = 60f / bpm;
             secondsPerBar = secondsPerBeat * 4f;
             InitializeMicrophone();
+            if (musicSource != null)
+            {
+                musicSource.Play();
+            }
             StartCoroutine(BattleLoop());
         }
 
         private void InitializeMicrophone()
         {
-            microphoneDevice = Microphone.devices.Length > 0 ? Microphone.devices[0] : null;
+            microphoneDevice = microphoneController.GetMicrophoneDevice();
             if (microphoneDevice == null)
             {
                 Debug.LogError("No microphone detected! Please connect a microphone.");
@@ -99,8 +106,6 @@ namespace EpicRapBattle.Managers
                     "No microphone detected! Please connect a microphone."
                 );
             }
-            if (musicSource != null)
-                musicSource.Play();
         }
 
         private IEnumerator BattleLoop()

@@ -6,21 +6,10 @@ namespace EpicRapBattle.Managers
     public class UIManager : MonoBehaviour
     {
         [SerializeField]
-        private TextMeshProUGUI playerTextUI;
-
-        [SerializeField]
         private TextMeshProUGUI computerTextUI;
 
         [SerializeField]
         private TextMeshProUGUI statusTextUI;
-
-        public void UpdatePlayerText(string text)
-        {
-            if (playerTextUI != null)
-            {
-                playerTextUI.text = "You: " + text;
-            }
-        }
 
         public void UpdateComputerText(string text)
         {
@@ -41,14 +30,13 @@ namespace EpicRapBattle.Managers
 
         public void clearText()
         {
-            if (playerTextUI != null)
-            {
-                playerTextUI.text = "";
-            }
-
             if (computerTextUI != null)
             {
                 computerTextUI.text = "";
+            }
+            if (statusTextUI != null)
+            {
+                statusTextUI.text = "";
             }
         }
     }

@@ -1,0 +1,82 @@
+using System.Collections;
+using System.Collections.Generic;
+using TMPro;
+using UnityEngine;
+
+public class UIMenuController : MonoBehaviour
+{
+    private bool seenInstructions = false;
+
+    [SerializeField]
+    private MicrophoneController microphoneController;
+
+    [SerializeField]
+    private GameObject gameComponents;
+
+    [SerializeField]
+    private GameObject mainMenuPanel;
+
+    [SerializeField]
+    private GameObject instructionsPanel;
+
+    [SerializeField]
+    private GameObject popUpPanel;
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        if (gameComponents == null || mainMenuPanel == null || instructionsPanel == null)
+        {
+            Debug.LogError("UI components are not assigned in the inspector.");
+            return;
+        }
+
+        gameComponents.SetActive(false);
+        mainMenuPanel.SetActive(true);
+        instructionsPanel.SetActive(false);
+        popUpPanel.SetActive(false);
+    }
+
+    // Update is called once per frame
+    void Update() { }
+
+    public void StartGame()
+    {
+        if (!seenInstructions)
+        {
+            ShowInstructions();
+            return;
+        }
+        if (microphoneController.GetMicrophoneDevice() == null)
+        {
+            StartCoroutine(ShowPopUp("Please grant microphone access first."));
+            return;
+        }
+        this.gameObject.SetActive(false);
+        gameComponents.SetActive(true);
+    }
+
+    public void ShowInstructions()
+    {
+        mainMenuPanel.SetActive(false);
+        instructionsPanel.SetActive(true);
+        seenInstructions = true;
+    }
+
+    public void HideInstructions()
+    {
+        instructionsPanel.SetActive(false);
+        mainMenuPanel.SetActive(true);
+    }
+
+    public IEnumerator ShowPopUp(string message)
+    {
+        popUpPanel.GetComponentInChildren<TextMeshProUGUI>().text = message;
+
+        popUpPanel.SetActive(true);
+
+        yield return new WaitForSeconds(3f);
+
+        popUpPanel.SetActive(false);
+    }
+}
