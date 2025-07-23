@@ -89,11 +89,16 @@ namespace EpicRapBattle.Managers
             secondsPerBeat = 60f / bpm;
             secondsPerBar = secondsPerBeat * 4f;
             InitializeMicrophone();
+            PlayMusic();
+            StartCoroutine(BattleLoop());
+        }
+
+        private void PlayMusic()
+        {
             if (musicSource != null)
             {
                 musicSource.Play();
             }
-            StartCoroutine(BattleLoop());
         }
 
         private void InitializeMicrophone()
@@ -118,12 +123,29 @@ namespace EpicRapBattle.Managers
             while (totalRounds > currentRound)
             {
                 // Player Countdown
-                currentState = BattleState.PlayerCountdown;
-                yield return StartCoroutine(PlayerCountdown(countDownLenInBars));
+                // currentState = BattleState.PlayerCountdown;
+                // yield return StartCoroutine(PlayerCountdown(countDownLenInBars));
 
                 // Player Turn
                 currentState = BattleState.PlayerTurn;
-                yield return StartCoroutine(PlayerTurnWithRecording(playerTurnBars));
+                uiManager.UpdateStatus("Press and hold the space bar to start recording your rap!");
+
+                while (!Input.GetKeyDown(KeyCode.Space))
+                {
+                    yield return null;
+                }
+
+                StartMicrophoneRecording();
+                uiManager.UpdateStatus("Recording your rap! Release space to stop recording.");
+
+                while (!Input.GetKeyUp(KeyCode.Space))
+                {
+                    yield return null;
+                }
+
+                StopMicrophoneRecording();
+                matchJudge.RecordPlayerInput(WavUtility.FromAudioClip(playerClip));
+                uiManager.UpdateStatus("Recording stopped.");
 
                 // Waiting Turn
                 currentState = BattleState.WaitingTurn;

@@ -5466,7 +5466,7 @@ MonoBehaviour:
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
-  m_fontSizeMin: 30
+  m_fontSizeMin: 15
   m_fontSizeMax: 40
   m_fontStyle: 0
   m_HorizontalAlignment: 2
@@ -6264,7 +6264,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &279900413
 Transform:
   m_ObjectHideFlags: 0
@@ -46875,6 +46875,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   animationController: {fileID: 1232446896}
   musicSource: {fileID: 1706233415}
+  microphoneController: {fileID: 404512085}
   bpm: 90
   npcAudioSource: {fileID: 1632109473}
   uiManager: {fileID: 1670247406}
@@ -61234,7 +61235,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1587049341
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -63705,7 +63706,7 @@ Transform:
   m_GameObject: {fileID: 1907413598}
   serializedVersion: 2
   m_LocalRotation: {x: 0.03783649, y: -0.8673618, z: 0.06673981, w: 0.49172935}
-  m_LocalPosition: {x: 7.37, y: -5.5, z: 66.7}
+  m_LocalPosition: {x: 7.274, y: -5.479, z: 66.642}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
