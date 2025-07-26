@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Text;
 using EpicRapBattle.Config;
 using UnityEngine;
@@ -40,6 +41,9 @@ namespace EpicRapBattle.Managers
         [SerializeField]
         private MatchJudge matchJudge;
 
+        [SerializeField]
+        private int maxPlayerRecordingLengthInSeconds = 30;
+
         [Header("Game Configuration")]
         [Tooltip("Total Rap Rounds")]
         [SerializeField]
@@ -57,14 +61,23 @@ namespace EpicRapBattle.Managers
         [SerializeField]
         private int restTurnLenInBars = 2;
 
-        [Tooltip("Number of bars for the player turn.")]
-        [SerializeField]
-        private int playerTurnBars = 4;
+        // [Tooltip("Number of bars for the player turn.")]
+        // [SerializeField]
+        // private int playerTurnBars = 4;
 
         [Header("Debugging")]
         [Tooltip("Play back microphone recording after player turn.")]
         [SerializeField]
         private bool playBackRecording = false;
+
+        [Tooltip("Prompt for NPC speaking style.")]
+        [SerializeField]
+        private string npcSpeakingPrompt =
+            " Say it all like a rapper. Very Fast and with a flow. Use the instructions that stars with [] to guide your response.";
+
+        [Header("UI Controllers")]
+        [SerializeField]
+        private UIMenuController uIMenuController;
 
         private int currentRound = 0;
 
@@ -77,15 +90,16 @@ namespace EpicRapBattle.Managers
         private const int sampleRate = 24000;
         public BattleState CurrentState => currentState;
         private string npcResponseText;
-        private OpenAIService openAIService;
+        private string npcResponseAudio;
+        private OpenAIService gameAIService;
         private List<string> responseHistory = new List<string>();
 
-        private void Start()
+        public void BeginRapBattle()
         {
-            animationController.SetTrigger("StopRapping");
-            openAIService = new OpenAIService(aiConfig);
+            npcAudioSource.Stop();
+            gameAIService = new OpenAIService(aiConfig);
             uiManager.clearText();
-            openAIService.AddSystemMessage(aiConfig.RapPersonality);
+            gameAIService.AddSystemMessage(aiConfig.RapPersonality);
             secondsPerBeat = 60f / bpm;
             secondsPerBar = secondsPerBeat * 4f;
             InitializeMicrophone();
@@ -97,7 +111,16 @@ namespace EpicRapBattle.Managers
         {
             if (musicSource != null)
             {
+                musicSource.time = 0f;
                 musicSource.Play();
+            }
+        }
+
+        private void Update()
+        {
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                uIMenuController.ShowMainMenu();
             }
         }
 
@@ -136,16 +159,30 @@ namespace EpicRapBattle.Managers
                 }
 
                 StartMicrophoneRecording();
+                var startTime = Time.time;
                 uiManager.UpdateStatus("Recording your rap! Release space to stop recording.");
 
-                while (!Input.GetKeyUp(KeyCode.Space))
+                while (!Input.GetKeyUp(KeyCode.Space) && isRecording)
                 {
+                    if (Time.time - startTime >= maxPlayerRecordingLengthInSeconds - 10)
+                    {
+                        float secondsLeft =
+                            maxPlayerRecordingLengthInSeconds - (Time.time - startTime);
+                        uiManager.UpdateStatus(
+                            $"Stopping recording in {Mathf.CeilToInt(secondsLeft)} seconds. Start wrapping up!"
+                        );
+                    }
+                    else if (Time.time - startTime >= maxPlayerRecordingLengthInSeconds)
+                    {
+                        uiManager.UpdateStatus(
+                            "Maximum recording length reached. Stopping recording."
+                        );
+                        break;
+                    }
                     yield return null;
                 }
-
                 StopMicrophoneRecording();
                 matchJudge.RecordPlayerInput(WavUtility.FromAudioClip(playerClip));
-                uiManager.UpdateStatus("Recording stopped.");
 
                 // Waiting Turn
                 currentState = BattleState.WaitingTurn;
@@ -158,7 +195,6 @@ namespace EpicRapBattle.Managers
 
                 // Rest Turn
                 currentState = BattleState.Rest;
-                animationController.SetTrigger("StopRapping");
                 currentRound++;
                 if (totalRounds > currentRound)
                 {
@@ -170,8 +206,15 @@ namespace EpicRapBattle.Managers
                 }
             }
             uiManager.UpdateStatus("Finished! Let's wait for the judge to decide the winner!");
-            matchJudge.SaveMatchRecording("./Assets/matchRecording.wav");
-            uiManager.UpdateStatus("Game Over! Thanks for playing!");
+            // matchJudge.SaveMatchRecording("./Assets/matchRecording.wav");
+            yield return StartCoroutine(matchJudge.JudgeMatch());
+            uiManager.UpdateStatus("Press space to return to the main menu.");
+            uiManager.UpdateComputerText(matchJudge.GetJudgeVerdict());
+            while (!Input.GetKeyDown(KeyCode.Space))
+            {
+                yield return null;
+            }
+            uIMenuController.ShowMainMenu();
         }
 
         private IEnumerator WaitBars(int barCount)
@@ -219,7 +262,7 @@ namespace EpicRapBattle.Managers
             playerClip = Microphone.Start(
                 microphoneDevice,
                 false,
-                Mathf.CeilToInt(playerTurnBars * secondsPerBar),
+                maxPlayerRecordingLengthInSeconds,
                 sampleRate
             );
             isRecording = true;
@@ -256,7 +299,7 @@ namespace EpicRapBattle.Managers
             for (int attempt = 0; attempt < maxRetries; attempt++)
             {
                 yield return StartCoroutine(
-                    SendToOpenAICoroutine((res) => response = res, (ex) => error = ex)
+                    SendToChatCompletionCoroutine((res) => response = res, (ex) => error = ex)
                 );
 
                 if (response != null)
@@ -267,22 +310,29 @@ namespace EpicRapBattle.Managers
                 backoff *= 2f;
             }
 
-            if (response == null)
+            if (response == null || error != null)
             {
-                Debug.LogError("Failed to get a response from OpenAI after retries.");
+                if (error != null)
+                {
+                    uiManager.ShowError($"OpenAI API error: {error.Message}");
+                }
+                else
+                {
+                    uiManager.ShowError("Failed to get a response from OpenAI after retries.");
+                }
                 yield break;
             }
 
             npcResponseText = response.choices[0].message.content;
             responseHistory.Add(npcResponseText);
-            openAIService.ReplaceSystemMessage(
+            gameAIService.ReplaceSystemMessage(
                 $"{aiConfig.RapPersonality} - responses history divided by '|': {string.Join(" | ", responseHistory)}"
             );
             // Debug.Log($"NPC response text: {npcResponseText}");
             // Debug.Log($"NPC response audio: {npcResponseAudio}");
         }
 
-        private IEnumerator SendToOpenAICoroutine(
+        private IEnumerator SendToChatCompletionCoroutine(
             Action<OpenAIService.ChatCompletionResponse> onSuccess,
             Action<Exception> onError
         )
@@ -290,7 +340,7 @@ namespace EpicRapBattle.Managers
             OpenAIService.ChatCompletionResponse localResponse = null;
             Exception localError = null;
 
-            yield return openAIService.SendToOpenAI(
+            yield return gameAIService.SendToChatCompletion(
                 (res) =>
                 {
                     localResponse = res;
@@ -314,10 +364,10 @@ namespace EpicRapBattle.Managers
                 : null;
             if (string.IsNullOrEmpty(playerRecordingBase64))
             {
-                Debug.LogError("No audio recording found!");
+                uiManager.ShowError("No microphone audio recording found!");
             }
             // Add current user message
-            openAIService.AddUserAudioMessage(playerRecordingBase64);
+            gameAIService.AddUserAudioMessage(playerRecordingBase64);
         }
 
         private IEnumerator PlayBackRecording()
@@ -341,116 +391,112 @@ namespace EpicRapBattle.Managers
         {
             if (!string.IsNullOrEmpty(npcResponseText))
             {
-                string npcResponseAudio = null;
-                string geminiApiKey = aiConfig.GeminiApiKey;
-                string geminiTtsUrl =
-                    "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent";
-
-                var requestBody = new GeminiTtsRequest
+                yield return StartCoroutine(GenerateNpcResponseAudio());
+                if (!string.IsNullOrEmpty(npcResponseAudio))
                 {
-                    contents = new[]
-                    {
-                        new GeminiTtsRequest.Content
-                        {
-                            parts = new GeminiTtsRequest.Part[]
-                            {
-                                new GeminiTtsRequest.Part
-                                {
-                                    text =
-                                        $"[PROMPT: Say it all like a rapper. Very Fast and with a flow] {npcResponseText}",
-                                },
-                            },
-                        },
-                    },
-                    generationConfig = new GeminiTtsRequest.GenerationConfig
-                    {
-                        responseModalities = new[] { "AUDIO" },
-                        speechConfig = new GeminiTtsRequest.SpeechConfig
-                        {
-                            voiceConfig = new GeminiTtsRequest.VoiceConfig
-                            {
-                                prebuiltVoiceConfig = new GeminiTtsRequest.PrebuiltVoiceConfig
-                                {
-                                    voiceName = aiConfig.SelectedGeminiTtsVoice.ToString(),
-                                },
-                            },
-                        },
-                    },
-                    model = "gemini-2.5-flash-preview-tts",
-                };
-
-                string jsonBody = JsonUtility.ToJson(requestBody);
-                using (UnityWebRequest request = new UnityWebRequest(geminiTtsUrl, "POST"))
-                {
-                    byte[] bodyRaw = Encoding.UTF8.GetBytes(jsonBody);
-                    request.uploadHandler = new UploadHandlerRaw(bodyRaw);
-                    request.downloadHandler = new DownloadHandlerBuffer();
-                    request.SetRequestHeader("Content-Type", "application/json");
-                    request.SetRequestHeader("x-goog-api-key", geminiApiKey);
-
-                    yield return request.SendWebRequest();
-
-                    if (request.result != UnityWebRequest.Result.Success)
-                    {
-                        Debug.LogError(
-                            $"Gemini TTS with request: {jsonBody} \nfailed: {request.error} \nResponse: {request.downloadHandler.text}"
-                        );
-                        yield break;
-                    }
-
-                    try
-                    {
-                        // Parse the response to extract the base64 audio string
-                        var responseJson = request.downloadHandler.text;
-                        var response = JsonUtility.FromJson<GeminiTtsResponse>(responseJson);
-                        if (
-                            response.candidates != null
-                            && response.candidates.Length > 0
-                            && response.candidates[0].content.parts != null
-                            && response.candidates[0].content.parts.Length > 0
-                            && response.candidates[0].content.parts[0].inlineData != null
-                        )
-                        {
-                            npcResponseAudio = response
-                                .candidates[0]
-                                .content
-                                .parts[0]
-                                .inlineData
-                                .data;
-                        }
-                        else
-                        {
-                            Debug.LogError("Gemini TTS response missing audio data.");
-                            yield break;
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        Debug.LogError($"Failed to parse Gemini TTS response: {ex}");
-                        yield break;
-                    }
+                    byte[] npcAudioBytes = Convert.FromBase64String(npcResponseAudio);
+                    matchJudge.RecordNPCInput(npcAudioBytes);
+                    AudioClip clip = WavUtility.AudioClipFromCorruptWav(npcAudioBytes, sampleRate);
+                    uiManager.UpdateComputerText(npcResponseText);
+                    npcAudioSource.clip = clip;
+                    npcAudioSource.Play();
+                    uiManager.UpdateStatus("Opponents turn!");
+                    animationController.SetTrigger("StartRapping");
+                    yield return new WaitForSeconds(clip.length);
+                    animationController.SetTrigger("StopRapping");
                 }
-                byte[] npcAudioBytes = Convert.FromBase64String(npcResponseAudio);
-                matchJudge.RecordNPCInput(npcAudioBytes);
-                AudioClip clip = WavUtility.AudioClipFromCorruptWav(npcAudioBytes, sampleRate);
-                uiManager.UpdateComputerText(npcResponseText);
-                npcAudioSource.clip = clip;
-                float timeToNextBar = secondsPerBar - (musicSource.time % secondsPerBar);
-                if (timeToNextBar > 0.05f)
+                else
                 {
-                    // Debug.Log($"Waiting {timeToNextBar:F2}s to sync NPC response to the beat.");
-                    yield return new WaitForSeconds(timeToNextBar);
+                    uiManager.UpdateStatus("No audio response from NPC.");
+                    yield return StartCoroutine(WaitBars(countDownLenInBars));
                 }
-                npcAudioSource.Play();
-                uiManager.UpdateStatus("Opponents turn!");
-                animationController.SetTrigger("StartRapping");
-
-                yield return new WaitForSeconds(clip.length);
             }
-            else
+        }
+
+        private IEnumerator GenerateNpcResponseAudio()
+        {
+            npcResponseAudio = null;
+            string geminiApiKey = aiConfig.GeminiApiKey;
+            string geminiTtsUrl =
+                "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent";
+
+            var requestBody = new GeminiTtsRequest
             {
-                Debug.LogWarning("No audio response from NPC.");
-                yield return StartCoroutine(WaitBars(countDownLenInBars));
+                contents = new[]
+                {
+                    new GeminiTtsRequest.Content
+                    {
+                        parts = new GeminiTtsRequest.Part[]
+                        {
+                            new GeminiTtsRequest.Part
+                            {
+                                text = $"[PROMPT: {npcSpeakingPrompt}]: {npcResponseText}",
+                            },
+                        },
+                    },
+                },
+                generationConfig = new GeminiTtsRequest.GenerationConfig
+                {
+                    responseModalities = new[] { "AUDIO" },
+                    speechConfig = new GeminiTtsRequest.SpeechConfig
+                    {
+                        voiceConfig = new GeminiTtsRequest.VoiceConfig
+                        {
+                            prebuiltVoiceConfig = new GeminiTtsRequest.PrebuiltVoiceConfig
+                            {
+                                voiceName = aiConfig.SelectedGeminiTtsVoice.ToString(),
+                            },
+                        },
+                    },
+                },
+                model = "gemini-2.5-flash-preview-tts",
+            };
+
+            string jsonBody = JsonUtility.ToJson(requestBody);
+            using (UnityWebRequest request = new UnityWebRequest(geminiTtsUrl, "POST"))
+            {
+                byte[] bodyRaw = Encoding.UTF8.GetBytes(jsonBody);
+                request.uploadHandler = new UploadHandlerRaw(bodyRaw);
+                request.downloadHandler = new DownloadHandlerBuffer();
+                request.SetRequestHeader("Content-Type", "application/json");
+                request.SetRequestHeader("x-goog-api-key", geminiApiKey);
+
+                yield return request.SendWebRequest();
+
+                if (request.result != UnityWebRequest.Result.Success)
+                {
+                    uiManager.ShowError($"Gemini TTS failed: {request.error}");
+                    Debug.LogError(
+                        $"Gemini TTS with request: {jsonBody} \nfailed: {request.error} \nResponse: {request.downloadHandler.text}"
+                    );
+                    yield break;
+                }
+
+                try
+                {
+                    var responseJson = request.downloadHandler.text;
+                    var response = JsonUtility.FromJson<GeminiTtsResponse>(responseJson);
+                    if (
+                        response.candidates != null
+                        && response.candidates.Length > 0
+                        && response.candidates[0].content.parts != null
+                        && response.candidates[0].content.parts.Length > 0
+                        && response.candidates[0].content.parts[0].inlineData != null
+                    )
+                    {
+                        npcResponseAudio = response.candidates[0].content.parts[0].inlineData.data;
+                    }
+                    else
+                    {
+                        Debug.LogError("Gemini TTS response missing audio data.");
+                        yield break;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogError($"Failed to parse Gemini TTS response: {ex}");
+                    yield break;
+                }
             }
         }
     }

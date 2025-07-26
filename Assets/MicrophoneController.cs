@@ -1,9 +1,6 @@
 using System.Collections;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.iOS;
-using UnityEngine.UI;
 
 public class MicrophoneController : MonoBehaviour
 {

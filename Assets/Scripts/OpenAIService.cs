@@ -17,7 +17,7 @@ public class OpenAIService
 
     private List<Message> messages = new List<Message>();
 
-    public IEnumerator SendToOpenAI(
+    public IEnumerator SendToChatCompletion(
         Action<ChatCompletionResponse> onSuccess,
         Action<Exception> onError
     )
@@ -53,9 +53,6 @@ public class OpenAIService
             yield return req.SendWebRequest();
             if (req.result != UnityWebRequest.Result.Success)
             {
-                Debug.LogError(
-                    $"{aiConfig.SelectedProvider} API error: {req.error} \n{req.downloadHandler.text} \nRequest: {json}"
-                );
                 onError?.Invoke(
                     new Exception(
                         $"{aiConfig.SelectedProvider} API error: {req.error} \n{req.downloadHandler.text}"
@@ -109,7 +106,6 @@ public class OpenAIService
                 role = "user",
                 content = new MessageContent[]
                 {
-
                     new MessageContent
                     {
                         type = "input_audio",

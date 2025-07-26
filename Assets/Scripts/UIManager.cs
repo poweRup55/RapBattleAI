@@ -11,10 +11,14 @@ namespace EpicRapBattle.Managers
         [SerializeField]
         private TextMeshProUGUI statusTextUI;
 
+        [SerializeField]
+        private TextMeshProUGUI errorTextUI;
+
         public void UpdateComputerText(string text)
         {
             if (computerTextUI != null)
             {
+                text = System.Text.RegularExpressions.Regex.Replace(text, @"\[\w+\]", "");
                 computerTextUI.text = "NPC: " + text;
             }
         }
@@ -25,7 +29,7 @@ namespace EpicRapBattle.Managers
             {
                 statusTextUI.text = message;
             }
-            Debug.Log(message);
+            // Debug.Log(message);
         }
 
         public void clearText()
@@ -38,6 +42,19 @@ namespace EpicRapBattle.Managers
             {
                 statusTextUI.text = "";
             }
+            if (errorTextUI != null)
+            {
+                errorTextUI.text = "";
+            }
+        }
+
+        public void ShowError(string errorMessage)
+        {
+            if (errorTextUI != null)
+            {
+                errorTextUI.text = "Error: " + errorMessage;
+            }
+            Debug.LogError(errorMessage);
         }
     }
 }

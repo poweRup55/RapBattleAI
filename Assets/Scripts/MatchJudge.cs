@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using EpicRapBattle.Config;
 using UnityEngine;
 
 public class MatchJudge : MonoBehaviour
@@ -8,20 +9,37 @@ public class MatchJudge : MonoBehaviour
     private List<byte[]> MatchRecording = new List<byte[]>();
     private const int sampleRate = 24000;
 
-    void Start() { }
+    [SerializeField]
+    private AIConfig aiConfig;
+
+    [SerializeField]
+    private OpenAIService judgeAIService;
+
+    [SerializeField]
+    [TextArea(3, 10)]
+    private string judgePrompt =
+        "You are a judge for an epic rap battle. Analyze the audio recordings and provide a judgment on the match.";
+
+    private string judgeVerdict;
+
+    void Start()
+    {
+        judgeAIService = new OpenAIService(aiConfig);
+        judgeAIService.AddSystemMessage($"{judgePrompt}");
+    }
 
     void Update() { }
 
     public void RecordPlayerInput(byte[] playerInputAudio)
     {
-        MatchRecording.Add(WavUtility.RemoveHeaderFromWavByteArray(playerInputAudio));
         Add64ByteSineWaveToRecording(110f, 0.5f, 0.5f); // Low-pitched sine wave at 110Hz for 1 second
+        MatchRecording.Add(WavUtility.RemoveHeaderFromWavByteArray(playerInputAudio));
     }
 
     public void RecordNPCInput(byte[] npcInputAudio)
     {
-        MatchRecording.Add(WavUtility.RemoveHeaderFromWavByteArray(npcInputAudio));
         Add64ByteSineWaveToRecording(880f, 0.5f, 0.5f); // High-pitched sine wave at 880Hz for 1 second
+        MatchRecording.Add(WavUtility.RemoveHeaderFromWavByteArray(npcInputAudio));
     }
 
     private byte[] GenerateSineWave(float frequency, float durationSeconds, float amplitude = 0.5f)
@@ -70,21 +88,7 @@ public class MatchJudge : MonoBehaviour
     {
         try
         {
-            int totalDataLength = 0;
-            foreach (var audioData in MatchRecording)
-            {
-                totalDataLength += audioData.Length;
-            }
-
-            byte[] combinedAudioData = new byte[totalDataLength];
-            int offset = 0;
-            foreach (var audioData in MatchRecording)
-            {
-                Buffer.BlockCopy(audioData, 0, combinedAudioData, offset, audioData.Length);
-                offset += audioData.Length;
-            }
-
-            byte[] wavData = WavUtility.AddHeaderToWavByteArray(combinedAudioData, sampleRate, 1);
+            byte[] wavData = GetWavDataWithHeader();
 
             using (var fileStream = System.IO.File.Open(filePath, System.IO.FileMode.Create))
             {
@@ -96,5 +100,59 @@ public class MatchJudge : MonoBehaviour
         {
             Debug.LogError($"Failed to save match recording: {ex.Message}");
         }
+    }
+
+    private byte[] GetWavDataWithHeader()
+    {
+        byte[] combinedAudioData = GetCombinedAudioBytes();
+
+        byte[] wavData = WavUtility.AddHeaderToWavByteArray(combinedAudioData, sampleRate, 1);
+
+        return wavData;
+    }
+
+    private byte[] GetCombinedAudioBytes()
+    {
+        int totalDataLength = 0;
+        foreach (var audioData in MatchRecording)
+        {
+            totalDataLength += audioData.Length;
+        }
+
+        byte[] combinedAudioData = new byte[totalDataLength];
+        int offset = 0;
+        foreach (var audioData in MatchRecording)
+        {
+            Buffer.BlockCopy(audioData, 0, combinedAudioData, offset, audioData.Length);
+            offset += audioData.Length;
+        }
+
+        return combinedAudioData;
+    }
+
+    public IEnumerator JudgeMatch()
+    {
+        if (judgeAIService == null)
+        {
+            Debug.LogError("OpenAIService not found in the scene.");
+            yield break;
+        }
+        string base64Audio = Convert.ToBase64String(GetWavDataWithHeader());
+        judgeAIService.AddUserAudioMessage(base64Audio);
+        yield return judgeAIService.SendToChatCompletion(
+            response =>
+            {
+                judgeVerdict = response.choices[0].message.content;
+            },
+            exception =>
+            {
+                judgeVerdict = "Error: " + exception.Message;
+            }
+        );
+    }
+
+    public string GetJudgeVerdict()
+    {
+        return judgeVerdict;
     }
 }

@@ -1,5 +1,5 @@
 using System.Collections;
-using System.Collections.Generic;
+using EpicRapBattle.Managers;
 using TMPro;
 using UnityEngine;
 
@@ -22,6 +22,9 @@ public class UIMenuController : MonoBehaviour
     [SerializeField]
     private GameObject popUpPanel;
 
+    [SerializeField]
+    private RapBattleConductor rapBattleConductor;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -38,7 +41,13 @@ public class UIMenuController : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update() { }
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            Application.Quit();
+        }
+    }
 
     public void StartGame()
     {
@@ -54,6 +63,7 @@ public class UIMenuController : MonoBehaviour
         }
         this.gameObject.SetActive(false);
         gameComponents.SetActive(true);
+        rapBattleConductor.BeginRapBattle();
     }
 
     public void ShowInstructions()
@@ -77,6 +87,15 @@ public class UIMenuController : MonoBehaviour
 
         yield return new WaitForSeconds(3f);
 
+        popUpPanel.SetActive(false);
+    }
+
+    public void ShowMainMenu()
+    {
+        gameComponents.SetActive(false);
+        this.gameObject.SetActive(true);
+        mainMenuPanel.SetActive(true);
+        instructionsPanel.SetActive(false);
         popUpPanel.SetActive(false);
     }
 }
