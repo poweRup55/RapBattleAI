@@ -7011,7 +7011,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 404512084}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7f350d436db8556499357bd5a1d35f3c, type: 3}
+  m_Script: {fileID: 11500000, guid: eb9a81f6f7b4247f8b91b9481a8b9ab3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   micButtonText: {fileID: 1744187857}
@@ -47313,7 +47313,7 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: 208b155974e1fdc4a8a3970fce68e76c, type: 3}
+  m_audioClip: {fileID: 8300000, guid: 5e87a349b32314728a6f073d46fe44c0, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
@@ -60949,7 +60949,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1587049340}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ff051e25b3f1e184a85ad5f76e77a07d, type: 3}
+  m_Script: {fileID: 11500000, guid: 52c9bb9e2a2474a1f98fa32277daed04, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   microphoneController: {fileID: 404512085}
@@ -68619,6 +68619,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4630804737039076755}
   - component: {fileID: 7619184327543653673}
+  - component: {fileID: 7619184327543653674}
   m_Layer: 0
   m_Name: Music
   m_TagString: Untagged
@@ -70893,7 +70894,7 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: 7f462f7d1ee454712956b520e51d68e3, type: 3}
+  m_audioClip: {fileID: 0}
   m_PlayOnAwake: 0
   m_Volume: 0.401
   m_Pitch: 1
@@ -70979,6 +70980,19 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &7619184327543653674
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2601140093544526005}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8bd132f80ba884a34a717f917a02e8bb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  audioSource: {fileID: 7619184327543653673}
 --- !u!114 &7931956426227022025
 MonoBehaviour:
   m_ObjectHideFlags: 0
