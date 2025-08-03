@@ -95,5 +95,7 @@ Thumbs.db.meta
 # VS Code
 *.vscode
 
+.plastic
 *.plastic
 *.wktree
+*.mat
