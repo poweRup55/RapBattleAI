@@ -1,5 +1,12 @@
 {
   "dependencies": {
+    "com.bnco.unity-webgl-microphone": {
+      "version": "https://github.com/bnco-dev/unity-webgl-microphone.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "bad36244303305fcbdfcb764c30d5bc9be480676"
+    },
     "com.unity.burst": {
       "version": "1.8.21",
       "depth": 1,
