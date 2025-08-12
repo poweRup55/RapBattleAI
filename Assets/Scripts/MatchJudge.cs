@@ -70,7 +70,7 @@ public class MatchJudge : MonoBehaviour
     {
         var sineWaveData = GenerateSineWave(frequency, durationSeconds, amplitude);
         MatchRecording.Add(sineWaveData);
-        Debug.Log($"64-byte sine wave ({frequency}Hz) added to match recording");
+        // Debug.Log($"64-byte sine wave ({frequency}Hz) added to match recording");
     }
 
     public List<byte[]> GetMatchRecording()

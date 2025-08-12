@@ -127,7 +127,6 @@ namespace EpicRapBattle.Managers
         private IEnumerator BattleLoop()
         {
             uiManager.UpdateStatus("Get ready to rap!");
-            musicSource.Play();
             yield return StartCoroutine(WaitBars(startOfGameRestLenInBars));
             // Wait for the player to start the battle
 
@@ -147,7 +146,8 @@ namespace EpicRapBattle.Managers
 
                 // Waiting Turn
                 currentState = BattleState.WaitingTurn;
-                uiManager.UpdateStatus("Your Opponent is thinking...");
+                animationController.SetTrigger("StartThinking");
+                uiManager.UpdateStatus("Waiting for your opponent to respond...");
                 yield return StartCoroutine(ProcessSystemResponseTurn());
 
                 // NPC Turn
@@ -170,11 +170,21 @@ namespace EpicRapBattle.Managers
             // matchJudge.SaveMatchRecording("./Assets/matchRecording.wav");
             yield return StartCoroutine(matchJudge.JudgeMatch());
             uiManager.UpdateStatus("Press space to return to the main menu.");
-            uiManager.UpdateComputerText(matchJudge.GetJudgeVerdict());
+            var judgeVerdict = matchJudge.GetJudgeVerdict();
+            uiManager.UpdateComputerText(judgeVerdict);
+            if (judgeVerdict.StartsWith("AI"))
+            {
+                animationController.SetTrigger("StartCheering");
+            }
+            else if (judgeVerdict.StartsWith("Player"))
+            {
+                animationController.SetTrigger("StartCrying");
+            }
             while (!Input.GetKeyDown(KeyCode.Space))
             {
                 yield return null;
             }
+            animationController.SetTrigger("ReturnToIdle");
             uIMenuController.ShowMainMenu();
         }
 
@@ -425,7 +435,7 @@ namespace EpicRapBattle.Managers
                     uiManager.UpdateStatus("Opponents turn!");
                     animationController.SetTrigger("StartRapping");
                     yield return new WaitForSeconds(clip.length);
-                    animationController.SetTrigger("StopRapping");
+                    animationController.SetTrigger("ReturnToIdle");
                 }
                 else
                 {
