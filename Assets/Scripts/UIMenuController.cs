@@ -8,9 +8,6 @@ public class UIMenuController : MonoBehaviour
     private bool seenInstructions = false;
 
     [SerializeField]
-    private MicrophoneController microphoneController;
-
-    [SerializeField]
     private GameObject gameComponents;
 
     [SerializeField]
@@ -48,11 +45,6 @@ public class UIMenuController : MonoBehaviour
         if (!seenInstructions)
         {
             ShowInstructions();
-            return;
-        }
-        if (microphoneController.GetMicrophoneDevice() == null)
-        {
-            StartCoroutine(ShowPopUp("Please grant microphone access first."));
             return;
         }
         this.gameObject.SetActive(false);

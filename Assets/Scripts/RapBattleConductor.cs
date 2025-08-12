@@ -22,9 +22,6 @@ namespace EpicRapBattle.Managers
         private AudioSource musicSource;
 
         [SerializeField]
-        private MicrophoneController microphoneController;
-
-        [SerializeField]
         private float bpm = 90f;
 
         [SerializeField]
@@ -102,7 +99,6 @@ namespace EpicRapBattle.Managers
             gameAIService.AddSystemMessage(aiConfig.RapPersonality);
             secondsPerBeat = 60f / bpm;
             secondsPerBar = secondsPerBeat * 4f;
-            InitializeMicrophone();
             PlayMusic();
             StartCoroutine(BattleLoop());
         }
@@ -121,18 +117,6 @@ namespace EpicRapBattle.Managers
             if (Input.GetKeyDown(KeyCode.Escape))
             {
                 uIMenuController.ShowMainMenu();
-            }
-        }
-
-        private void InitializeMicrophone()
-        {
-            microphoneDevice = microphoneController.GetMicrophoneDevice();
-            if (microphoneDevice == null)
-            {
-                Debug.LogError("No microphone detected! Please connect a microphone.");
-                throw new InvalidOperationException(
-                    "No microphone detected! Please connect a microphone."
-                );
             }
         }
 
