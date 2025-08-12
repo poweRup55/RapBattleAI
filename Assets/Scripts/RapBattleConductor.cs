@@ -75,9 +75,8 @@ namespace EpicRapBattle.Managers
         [Header("UI Controllers")]
         [SerializeField]
         private UIMenuController uIMenuController;
-
         private int currentRound = 0;
-
+        private int submitRapPeriodInSeconds = 5;
         private float secondsPerBeat;
         private float secondsPerBar;
         private BattleState currentState = BattleState.WaitingStart;
@@ -94,6 +93,11 @@ namespace EpicRapBattle.Managers
         public void BeginRapBattle()
         {
             npcAudioSource.Stop();
+            currentRound = 0;
+            npcResponseText = string.Empty;
+            npcResponseAudio = string.Empty;
+            responseHistory.Clear();
+            currentState = BattleState.WaitingStart;
             gameAIService = new OpenAIService(aiConfig);
             uiManager.clearText();
             gameAIService.AddSystemMessage(aiConfig.RapPersonality);
@@ -137,35 +141,8 @@ namespace EpicRapBattle.Managers
                 currentState = BattleState.PlayerTurn;
                 uiManager.UpdateStatus("Press and hold the space bar to start recording your rap!");
 
-                while (!Input.GetKeyDown(KeyCode.Space))
-                {
-                    yield return null;
-                }
+                yield return StartCoroutine(HandleRapSubmission());
 
-                StartMicrophoneRecording();
-                var startTime = Time.time;
-                uiManager.UpdateStatus("Recording your rap! Release space to stop recording.");
-
-                while (!Input.GetKeyUp(KeyCode.Space) && isRecording)
-                {
-                    if (Time.time - startTime >= maxPlayerRecordingLengthInSeconds - 10)
-                    {
-                        float secondsLeft =
-                            maxPlayerRecordingLengthInSeconds - (Time.time - startTime);
-                        uiManager.UpdateStatus(
-                            $"Stopping recording in {Mathf.CeilToInt(secondsLeft)} seconds. Start wrapping up!"
-                        );
-                    }
-                    else if (Time.time - startTime >= maxPlayerRecordingLengthInSeconds)
-                    {
-                        uiManager.UpdateStatus(
-                            "Maximum recording length reached. Stopping recording."
-                        );
-                        break;
-                    }
-                    yield return null;
-                }
-                StopMicrophoneRecording();
                 matchJudge.RecordPlayerInput(WavUtility.FromAudioClip(playerClip));
 
                 // Waiting Turn
@@ -199,6 +176,67 @@ namespace EpicRapBattle.Managers
                 yield return null;
             }
             uIMenuController.ShowMainMenu();
+        }
+
+        private IEnumerator HandleRapSubmission()
+        {
+            uiManager.UpdateStatus("Press and hold space to record your rap.");
+            while (!Input.GetKeyDown(KeyCode.Space))
+            {
+                yield return null;
+            }
+
+            bool rapSubmitted = false;
+            while (!rapSubmitted)
+            {
+                yield return StartCoroutine(RecordPlayerRap());
+
+                float submitEndTime = Time.time + submitRapPeriodInSeconds;
+                bool retakeRequested = false;
+
+                while (Time.time < submitEndTime)
+                {
+                    uiManager.UpdateStatus(
+                        $"Submitting rap in {Mathf.CeilToInt(submitEndTime - Time.time)} seconds. Press and hold space to record again."
+                    );
+                    if (Input.GetKeyDown(KeyCode.Space))
+                    {
+                        retakeRequested = true;
+                        break;
+                    }
+                    yield return null;
+                }
+
+                if (!retakeRequested)
+                {
+                    rapSubmitted = true;
+                }
+            }
+        }
+
+        private IEnumerator RecordPlayerRap()
+        {
+            StartMicrophoneRecording();
+            var startTime = Time.time;
+            uiManager.UpdateStatus("Recording your rap! Release space to stop recording.");
+
+            while (!Input.GetKeyUp(KeyCode.Space) && isRecording)
+            {
+                if (Time.time - startTime >= maxPlayerRecordingLengthInSeconds)
+                {
+                    uiManager.UpdateStatus("Maximum recording length reached. Stopping recording.");
+                    break;
+                }
+                else if (Time.time - startTime >= maxPlayerRecordingLengthInSeconds - 10)
+                {
+                    float secondsLeft = maxPlayerRecordingLengthInSeconds - (Time.time - startTime);
+                    uiManager.UpdateStatus(
+                        $"Stopping recording in {Mathf.CeilToInt(secondsLeft)} seconds. Start wrapping up!"
+                    );
+                }
+                yield return null;
+            }
+            StopMicrophoneRecording();
         }
 
         private IEnumerator WaitBars(int barCount)
