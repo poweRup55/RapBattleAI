@@ -18,8 +18,14 @@ namespace EpicRapBattle.Managers
         {
             if (computerTextUI != null)
             {
+                // Detect RTL languages: Hebrew, Arabic, Syriac, Thaana, N'Ko, etc.
+                bool isRtl = System.Text.RegularExpressions.Regex.IsMatch(
+                    text,
+                    @"[\u0590-\u05FF\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\u0700-\u074F\u07C0-\u07FF\uFB50-\uFDFF\uFE70-\uFEFF]"
+                );
+                computerTextUI.isRightToLeftText = isRtl;
                 text = System.Text.RegularExpressions.Regex.Replace(text, @"\[\w+\]", "");
-                computerTextUI.text = "NPC: " + text;
+                computerTextUI.text = text;
             }
         }
 
