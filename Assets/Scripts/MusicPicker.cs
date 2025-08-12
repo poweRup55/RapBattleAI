@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Xml.Serialization;
 using UnityEngine;
 
 public class MusicPicker : MonoBehaviour
@@ -9,12 +10,16 @@ public class MusicPicker : MonoBehaviour
     private List<AudioClip> musicClips;
 
     // Start is called before the first frame update
-    void Start()
+
+    void Awake()
     {
         // Load all audio clips from Resources/Music
         AudioClip[] clips = Resources.LoadAll<AudioClip>("Music");
         musicClips = new List<AudioClip>(clips);
+    }
 
+    void OnEnable()
+    {
         if (musicClips.Count > 0)
         {
             PlayRandomSong();
