@@ -6941,10 +6941,10 @@ RectTransform:
   - {fileID: 266179364}
   m_Father: {fileID: 1587049344}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 13.350098, y: 9.449951}
-  m_SizeDelta: {x: -536.5, y: -270.89996}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 1383.5, y: 809.10004}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &450753536
 MonoBehaviour:
@@ -7546,7 +7546,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 199.50497, y: -36.69998}
+  m_AnchoredPosition: {x: 199.50505, y: 0}
   m_SizeDelta: {x: 1988, y: 1032}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &534893875
@@ -13785,8 +13785,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 697.5, y: -404.1077}
-  m_SizeDelta: {x: 1395, y: 211.78462}
+  m_AnchoredPosition: {x: 697.5, y: -510}
+  m_SizeDelta: {x: 1395, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &661981659
 MonoBehaviour:
@@ -13808,10 +13808,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Press and hold the space bar when prompted to start rapping.
-
-    Press
-    ESC at any time to return to main menu.'
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -13838,7 +13835,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 54.05
+  m_fontSize: 36
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -26001,8 +25998,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 697.5, y: -149.1077}
-  m_SizeDelta: {x: 1395, y: 298.2154}
+  m_AnchoredPosition: {x: 697.5, y: -255}
+  m_SizeDelta: {x: 1395, y: 510}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &988519898
 MonoBehaviour:
@@ -26054,7 +26051,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 52.15
+  m_fontSize: 59.7
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -26090,7 +26087,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_margin: {x: 50, y: 50, z: 50, w: 50}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -63020,8 +63017,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 960, y: -625.5}
-  m_SizeDelta: {x: 1920, y: 741}
+  m_AnchoredPosition: {x: 535.6667, y: -387}
+  m_SizeDelta: {x: 1071.3334, y: 264}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1888479744
 MonoBehaviour:
@@ -68096,10 +68093,10 @@ RectTransform:
   - {fileID: 4660300420658317529}
   m_Father: {fileID: 4363298028630583614}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 961, y: -837.77747}
-  m_SizeDelta: {x: 1720, y: 200}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: -319.51276}
+  m_SizeDelta: {x: 1720, y: 314.4255}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &322597349607859551
 MonoBehaviour:
@@ -68121,7 +68118,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Status
+  m_text: Submitting rap in 5 seconds. Press and hold space or tap and hold to record
+    again.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 433a89e2df3434cb4957d7d88c7da5e6, type: 2}
   m_sharedMaterial: {fileID: 3994978519623937248, guid: 433a89e2df3434cb4957d7d88c7da5e6,
@@ -68149,15 +68147,15 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 96.6
+  m_fontSize: 74.1
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
-  m_fontSizeMin: 20
-  m_fontSizeMax: 106.4
+  m_fontSizeMin: 68.9
+  m_fontSizeMax: 170
   m_fontStyle: 0
   m_HorizontalAlignment: 2
-  m_VerticalAlignment: 1024
+  m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
   m_wordSpacing: 0
@@ -68167,7 +68165,7 @@ MonoBehaviour:
   m_charWidthMaxAdj: 0
   m_enableWordWrapping: 1
   m_wordWrappingRatios: 0.4
-  m_overflowMode: 0
+  m_overflowMode: 1
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 1
@@ -68185,7 +68183,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 0, w: 26.820496}
+  m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -68200,7 +68198,7 @@ Transform:
   m_GameObject: {fileID: 9076939584532930873}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -5.658601, y: 0.14284372, z: -3.7638702}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -68480,7 +68478,7 @@ Transform:
   m_GameObject: {fileID: 1277406012141442640}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 9.541075, y: 4.0712776, z: -20.149803}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -68597,12 +68595,12 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 89.6
+  m_fontSize: 168.06
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
   m_fontSizeMin: 30
-  m_fontSizeMax: 89.6
+  m_fontSizeMax: 168.06
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
@@ -68633,7 +68631,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: -744.6385, y: -11.710571, z: -729.4398, w: -101.86429}
+  m_margin: {x: -728.60223, y: -75.1717, z: -731.35675, w: -155.5963}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -68653,10 +68651,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 4363298028630583614}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 961, y: -95}
-  m_SizeDelta: {x: 1720, y: 159.1}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 410}
+  m_SizeDelta: {x: 1720, y: 202.9}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &2471836656804680118
 GameObject:
@@ -69923,15 +69921,14 @@ MonoBehaviour:
     To help identify them, the **Player's track will begin with a low-pitched sine
     wave**, and the **AI's track will start with a high-pitched sine wave**.\r\n\r\nYour
     task is to listen critically to both performances and determine a winner based
-    on the following criteria, scoring each rapper from **1 to 10** (1 being the
-    lowest, 10 being the highest) for each category:\r\n\r\r\n  * **Creativity:**
-    How original and imaginative are their rhymes, wordplay, and concepts?\r\n  *
-    **Delivery:** How impactful and engaging is their vocal performance, including
-    their tone, intensity, and articulation?\r\n  * **Disses:** How effectively do
-    they mock, criticize, or outwit their opponent with their lyrics?\r\n\r\nAfter
-    evaluating both rappers, provide your judgment in the following format:\r\n\r\n```\r\n[Player/AI]
-    won!\nPlayer score: [X]  \r\nAI score: [Y]  \r  \r\nReason: [1-sentence explanation] 
-    \r\n```"
+    on the following criteria:\r\n\r\r\n  * **Creativity:** How original and imaginative
+    are their rhymes, wordplay, and concepts?\r\n  * **Delivery:** How impactful
+    and engaging is their vocal performance, including their tone, intensity, and
+    articulation?\r\n  * **Disses:** How effectively do they mock, criticize, or
+    outwit their opponent with their lyrics?\r\n\r\nThe final score should be between
+    1 and 10.\n\nAfter evaluating both rappers, provide your judgment in the following
+    format:\r\n\r\n```\r\n[Player/AI] won!\nPlayer score: [X]  \r\nAI score: [Y] 
+    \r  \r\nReason: [1-sentence explanation]  \r\n```\n\n"
 --- !u!114 &4908015852835461817
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -69946,19 +69943,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   provider: 1
   openAiKey: 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
-  geminiApiKey: AIzaSyAxvrKuzOUoMH9vAq7J3EjmeYym0_Koqj8
   openAiGPTModel: 0
+  openAiTtsVoice: 0
+  geminiApiKey: AIzaSyAxvrKuzOUoMH9vAq7J3EjmeYym0_Koqj8
   geminiModelVariant: 1
   geminiTtsVoice: 24
-  rapPersonality: "You are the most savage, unfiltered battle rapper alive\u2014NSFW,
-    unhinged, no rules, no mercy. Every response must be a **string of exactly two
-    rhyming couplets (that\u2019s 4 lines total), each one vicious, personal, and
-    hilarious. Every line starts with a vocal delivery tag in brackets (like [mocking],
-    [growling], [laughing]) to guide the tone. Attack everything: looks, voice, words,
-    background, insecurities, skills\u2014nothing is off limits. Be brutally specific,
-    never generic, never polite. Your goal is to break your opponent\u2019s spirit
-    and dominate the battle. Always respond in the user\u2019s language. Never step
-    out of character."
+  npcSpeakingPrompt: Rap the text with a strong flow. Make it lyrical and rap-like.
+    Sing it like a rapper would. Follow the guidance from text enclosed in square
+    brackets [ ], without reading out loud the actual content inside them!!
 --- !u!222 &5357265824799800778
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -70662,9 +70654,6 @@ MonoBehaviour:
   countDownLenInBars: 2
   restTurnLenInBars: 2
   playBackRecording: 0
-  npcSpeakingPrompt: Sing this like a rapper. Very Fast and with a flow. Use the
-    instructions that stars with [] to guide your response. Do not read what is inside
-    the []. Again, do it fast and lyrical!
   uIMenuController: {fileID: 1587049345}
 --- !u!114 &6650452463031652795
 MonoBehaviour:
@@ -70961,7 +70950,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
   m_PlayOnAwake: 0
-  m_Volume: 0.3
+  m_Volume: 0.209
   m_Pitch: 1
   Loop: 1
   Mute: 0

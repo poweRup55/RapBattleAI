@@ -67,11 +67,6 @@ namespace EpicRapBattle.Managers
         [SerializeField]
         private bool playBackRecording = false;
 
-        [Tooltip("Prompt for NPC speaking style.")]
-        [SerializeField]
-        private string npcSpeakingPrompt =
-            " Say it all like a rapper. Very Fast and with a flow. Use the instructions that stars with [] to guide your response.";
-
         [Header("UI Controllers")]
         [SerializeField]
         private UIMenuController uIMenuController;
@@ -92,6 +87,7 @@ namespace EpicRapBattle.Managers
 
         public void BeginRapBattle()
         {
+            aiConfig.RandomizePersonality();
             npcAudioSource.Stop();
             currentRound = 0;
             npcResponseText = string.Empty;
@@ -138,7 +134,9 @@ namespace EpicRapBattle.Managers
 
                 // Player Turn
                 currentState = BattleState.PlayerTurn;
-                uiManager.UpdateStatus("Press and hold the space bar to start recording your rap!");
+                uiManager.UpdateStatus(
+                    "Hold the space bar or tap and hold anywhere to begin recording your rap!"
+                );
 
                 yield return StartCoroutine(HandleRapSubmission());
 
@@ -169,7 +167,7 @@ namespace EpicRapBattle.Managers
             uiManager.UpdateStatus("Finished! Let's wait for the judge to decide the winner!");
             // matchJudge.SaveMatchRecording("./Assets/matchRecording.wav");
             yield return StartCoroutine(matchJudge.JudgeMatch());
-            uiManager.UpdateStatus("Press space to return to the main menu.");
+            uiManager.UpdateStatus("Press space or tap anywhere to return to the main menu.");
             var judgeVerdict = matchJudge.GetJudgeVerdict();
             uiManager.UpdateComputerText(judgeVerdict);
             if (judgeVerdict.StartsWith("AI"))
@@ -180,7 +178,7 @@ namespace EpicRapBattle.Managers
             {
                 animationController.SetTrigger("StartCrying");
             }
-            while (!Input.GetKeyDown(KeyCode.Space))
+            while (!Input.GetKeyDown(KeyCode.Space) && !Input.GetMouseButtonDown(0))
             {
                 yield return null;
             }
@@ -190,8 +188,7 @@ namespace EpicRapBattle.Managers
 
         private IEnumerator HandleRapSubmission()
         {
-            uiManager.UpdateStatus("Press and hold space to record your rap.");
-            while (!Input.GetKeyDown(KeyCode.Space))
+            while (!Input.GetKeyDown(KeyCode.Space) && !Input.GetMouseButtonDown(0))
             {
                 yield return null;
             }
@@ -207,9 +204,9 @@ namespace EpicRapBattle.Managers
                 while (Time.time < submitEndTime)
                 {
                     uiManager.UpdateStatus(
-                        $"Submitting rap in {Mathf.CeilToInt(submitEndTime - Time.time)} seconds. Press and hold space to record again."
+                        $"Submitting rap in {Mathf.CeilToInt(submitEndTime - Time.time)} seconds. Press and hold space or tap and hold to record again."
                     );
-                    if (Input.GetKeyDown(KeyCode.Space))
+                    if (Input.GetKeyDown(KeyCode.Space) || Input.GetMouseButtonDown(0))
                     {
                         retakeRequested = true;
                         break;
@@ -228,9 +225,9 @@ namespace EpicRapBattle.Managers
         {
             StartMicrophoneRecording();
             var startTime = Time.time;
-            uiManager.UpdateStatus("Recording your rap! Release space to stop recording.");
+            uiManager.UpdateStatus("Recording your rap! Release to stop recording.");
 
-            while (!Input.GetKeyUp(KeyCode.Space) && isRecording)
+            while (!Input.GetKeyUp(KeyCode.Space) && !Input.GetMouseButtonUp(0) && isRecording)
             {
                 if (Time.time - startTime >= maxPlayerRecordingLengthInSeconds)
                 {
@@ -450,7 +447,7 @@ namespace EpicRapBattle.Managers
             npcResponseAudio = null;
             string geminiApiKey = aiConfig.GeminiApiKey;
             string geminiTtsUrl =
-                "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent";
+                "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro-preview-tts:generateContent";
 
             var requestBody = new GeminiTtsRequest
             {
@@ -462,7 +459,7 @@ namespace EpicRapBattle.Managers
                         {
                             new GeminiTtsRequest.Part
                             {
-                                text = $"[PROMPT: {npcSpeakingPrompt}]: {npcResponseText}",
+                                text = $"[PROMPT: {aiConfig.NpcSpeakingPrompt}]: {npcResponseText}",
                             },
                         },
                     },
@@ -481,7 +478,7 @@ namespace EpicRapBattle.Managers
                         },
                     },
                 },
-                model = "gemini-2.5-flash-preview-tts",
+                model = "gemini-2.5-pro-preview-tts",
             };
 
             string jsonBody = JsonUtility.ToJson(requestBody);

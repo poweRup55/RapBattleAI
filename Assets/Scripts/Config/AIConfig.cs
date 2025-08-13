@@ -1,3 +1,4 @@
+using System.Linq;
 using UnityEngine;
 
 namespace EpicRapBattle.Config
@@ -8,17 +9,13 @@ namespace EpicRapBattle.Config
     /// </summary>
     public class AIConfig : MonoBehaviour
     {
-        // --- Enums ---
+        #region Enums
+
         public enum Provider
         {
             OpenAI,
             Gemini,
         }
-
-        [Header("Provider Selection")]
-        [Tooltip("Select the AI provider (OpenAI or Gemini)")]
-        [SerializeField]
-        private Provider provider = Provider.Gemini;
 
         public enum GptModel
         {
@@ -31,18 +28,18 @@ namespace EpicRapBattle.Config
             gpt_4o_audio_preview,
         }
 
-        public enum TtsVoice
+        public enum OpenAITtsVoice
         {
-            alloy,
-            ash,
-            ballad,
-            coral,
-            echo,
-            fable,
-            nova,
-            onyx,
-            sage,
-            shimmer,
+            Alloy,
+            Ash,
+            Ballad,
+            Coral,
+            Echo,
+            Fable,
+            Nova,
+            Onyx,
+            Sage,
+            Shimmer,
         }
 
         public enum GeminiModelVariant
@@ -71,72 +68,98 @@ namespace EpicRapBattle.Config
 
         public enum GeminiTtsVoice
         {
-            achernar,
-            achird,
-            algenib,
-            algieba,
-            alnilam,
-            aoede,
-            autonoe,
-            callirrhoe,
-            charon,
-            despina,
-            enceladus,
-            erinome,
-            fenrir,
-            gacrux,
-            iapetus,
-            kore,
-            laomedeia,
-            leda,
-            orus,
-            puck,
-            pulcherrima,
-            rasalgethi,
-            sadachbia,
-            sadaltager,
-            schedar,
-            sulafat,
-            umbriel,
-            vindemiatrix,
-            zephyr,
-            zubenelgenubi,
+            Achernar,
+            Achird,
+            Algenib,
+            Algieba,
+            Alnilam,
+            Aoede,
+            Autonoe,
+            Callirrhoe,
+            Charon,
+            Despina,
+            Enceladus,
+            Erinome,
+            Fenrir,
+            Gacrux,
+            Iapetus,
+            Kore,
+            Laomedeia,
+            Leda,
+            Orus,
+            Puck,
+            Pulcherrima,
+            Rasalgethi,
+            Sadachbia,
+            Sadaltager,
+            Schedar,
+            Sulafat,
+            Umbriel,
+            Vindemiatrix,
+            Zephyr,
+            Zubenelgenubi,
         }
 
-        // --- Serialized Fields ---
-        [Header("Open AI API Configuration")]
-        [Tooltip("Your secret API key from OpenAI.")]
+        #endregion
+
+        #region Serialized Fields
+
+        [Header("Provider Selection")]
+        [Tooltip("Select the AI provider (OpenAI or Gemini)")]
+        [SerializeField]
+        private Provider provider = Provider.Gemini;
+
+        [Header("OpenAI Configuration")]
+        [Tooltip("Your secret API key from OpenAI")]
         [SerializeField]
         private string openAiKey;
 
-        [Header("Gemini API Configuration")]
-        [Tooltip("Your Gemini API key from Google AI Studio.")]
-        [SerializeField]
-        private string geminiApiKey;
-
-        [Header("Model & Voice Selection")]
-        [Tooltip("The GPT model to use for generating responses.")]
+        [Tooltip("The GPT model to use for generating responses")]
         [SerializeField]
         private GptModel openAiGPTModel = GptModel.gpt_4o_mini_audio_preview;
 
-        [Header("Gemini Model Variant")]
+        [Tooltip("Select the OpenAI TTS voice for speech synthesis")]
+        [SerializeField]
+        private OpenAITtsVoice openAiTtsVoice = OpenAITtsVoice.Alloy;
+
+        [Header("Gemini Configuration")]
+        [Tooltip("Your Gemini API key from Google AI Studio")]
+        [SerializeField]
+        private string geminiApiKey;
+
         [Tooltip("Select the Gemini model variant (only those supporting audio input are listed)")]
         [SerializeField]
         private GeminiModelVariant geminiModelVariant = GeminiModelVariant.gemini_2_5_flash;
 
-        [Header("Gemini TTS Voice")]
-        [Tooltip("Select the Gemini TTS voice for speech synthesis.")]
+        [Tooltip("Select the Gemini TTS voice for speech synthesis")]
         [SerializeField]
-        private GeminiTtsVoice geminiTtsVoice = GeminiTtsVoice.achernar;
+        private GeminiTtsVoice geminiTtsVoice = GeminiTtsVoice.Achernar;
 
-        [Tooltip("The personality and context for the AI. This guides its responses.")]
+        private string[] rapPersonalities = new string[]
+        {
+            "You are the most savage, unfiltered battle rapper alive—NSFW, unhinged, no rules, no mercy. Every response must be a string of exactly two rhyming couplets (that's 4 lines total), each one vicious, personal, and hilarious. Every line starts with a vocal delivery tag in brackets (like [mocking], [growling], [laughing]) to guide the tone. Attack everything: looks, voice, words, background, insecurities, skills—nothing is off limits. Be brutally specific, never generic, never polite. Your goal is to break your opponent's spirit and dominate the battle. Always respond in the user's language. Never step out of character.",
+        };
+        private int rapPersonalityIndex = 0;
+
+        [Tooltip("Prompt for AI speaking style.")]
         [TextArea(3, 10)]
         [SerializeField]
-        private string rapPersonality =
-            "You are a legendary old-school rapper. Your one and only rule is this: you MUST answer every single question in rhyming couplets. Your flow is untouchable, your wordplay is clever, and your confidence is sky-high. Never break character. Let's begin.";
+        private string npcSpeakingPrompt =
+            " Say it all like a rapper. Very Fast and with a flow. Use the instructions that stars with [] to guide your response.";
 
-        // --- Properties ---
+        #endregion
+
+        #region Public Properties
+
         public string ApiKey => provider == Provider.OpenAI ? openAiKey : geminiApiKey;
+
+        public string RapPersonality => rapPersonalities[rapPersonalityIndex];
+        public Provider SelectedProvider => provider;
+        public string GeminiApiKey => geminiApiKey;
+        public GeminiModelVariant SelectedGeminiModelVariant => geminiModelVariant;
+        public OpenAITtsVoice SelectedOpenAITtsVoice => openAiTtsVoice;
+        public string NpcSpeakingPrompt => npcSpeakingPrompt;
+
         public string GptModelString
         {
             get
@@ -152,10 +175,7 @@ namespace EpicRapBattle.Config
                 }
             }
         }
-        public string RapPersonality => rapPersonality;
-        public Provider SelectedProvider => provider;
-        public string GeminiApiKey => geminiApiKey;
-        public GeminiModelVariant SelectedGeminiModelVariant => geminiModelVariant;
+
         public string GeminiModelVariantString
         {
             get
@@ -178,5 +198,20 @@ namespace EpicRapBattle.Config
             }
         }
         public GeminiTtsVoice SelectedGeminiTtsVoice => geminiTtsVoice;
+
+        #endregion
+
+        public void RandomizePersonality()
+        {
+            if (rapPersonalities.Length <= 1)
+            {
+                rapPersonalities = Resources
+                    .LoadAll<TextAsset>("RapperAIInstructions")
+                    .Select(asset => asset.text)
+                    .ToArray();
+            }
+
+            rapPersonalityIndex = Random.Range(0, rapPersonalities.Length);
+        }
     }
 }
