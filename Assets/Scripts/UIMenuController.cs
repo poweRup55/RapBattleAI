@@ -35,6 +35,7 @@ public class UIMenuController : MonoBehaviour
         mainMenuPanel.SetActive(true);
         instructionsPanel.SetActive(false);
         popUpPanel.SetActive(false);
+        Microphone.IsRecording(null);
     }
 
     // Update is called once per frame
