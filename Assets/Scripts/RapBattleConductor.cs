@@ -124,14 +124,9 @@ namespace EpicRapBattle.Managers
         {
             uiManager.UpdateStatus("Get ready to rap!");
             yield return StartCoroutine(WaitBars(startOfGameRestLenInBars));
-            // Wait for the player to start the battle
 
             while (totalRounds > currentRound)
             {
-                // Player Countdown
-                // currentState = BattleState.PlayerCountdown;
-                // yield return StartCoroutine(PlayerCountdown(countDownLenInBars));
-
                 // Player Turn
                 currentState = BattleState.PlayerTurn;
                 uiManager.UpdateStatus(
@@ -257,37 +252,8 @@ namespace EpicRapBattle.Managers
             }
         }
 
-        private IEnumerator PlayerCountdown(int bars)
-        {
-            int beats = bars * 4;
-            for (int i = beats; i > 0; i--)
-            {
-                uiManager.UpdateStatus($"Your turn in: {i} beats");
-                yield return new WaitForSeconds(secondsPerBeat);
-            }
-        }
-
-        private IEnumerator PlayerTurnWithRecording(int bars)
-        {
-            int totalBeats = bars * 4;
-            StartMicrophoneRecording();
-            for (int i = totalBeats; i > 0; i--)
-            {
-                uiManager.UpdateStatus($"Your turn! Time left: {i} beats");
-                yield return new WaitForSeconds(secondsPerBeat);
-            }
-            StopMicrophoneRecording();
-            matchJudge.RecordPlayerInput(WavUtility.FromAudioClip(playerClip));
-            uiManager.UpdateStatus("Recording stopped.");
-        }
-
         private void StartMicrophoneRecording()
         {
-            if (Microphone.devices.Length == 0)
-            {
-                Debug.LogError("No microphone detected!");
-                return;
-            }
             playerClip = Microphone.Start(
                 microphoneDevice,
                 false,

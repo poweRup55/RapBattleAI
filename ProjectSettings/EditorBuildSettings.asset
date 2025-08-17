@@ -6,6 +6,6 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/LeartesSudios/Stylized Sci-Fi Modern City/Scene/URP_Scifi_ModernCity.unity
+    path: Assets/Scenes/Main Game.unity
     guid: 800bb266b7fa1427aa36ed05a46f54d6
   m_configObjects: {}

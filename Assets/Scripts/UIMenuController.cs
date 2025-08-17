@@ -35,7 +35,6 @@ public class UIMenuController : MonoBehaviour
         mainMenuPanel.SetActive(true);
         instructionsPanel.SetActive(false);
         popUpPanel.SetActive(false);
-        Microphone.IsRecording(null);
     }
 
     // Update is called once per frame
@@ -45,12 +44,26 @@ public class UIMenuController : MonoBehaviour
     {
         if (!seenInstructions)
         {
+            StartCoroutine(MicCheck());
             ShowInstructions();
             return;
         }
         this.gameObject.SetActive(false);
         gameComponents.SetActive(true);
         rapBattleConductor.BeginRapBattle();
+    }
+
+    private IEnumerator MicCheck()
+    {
+        Microphone.Start(null, false, 10, 24000);
+        Debug.Log("Microphone check started");
+        while (!Microphone.IsRecording(null))
+        {
+            yield return null;
+        }
+        Debug.Log("Microphone is working");
+        Microphone.End(null);
+        Debug.Log("Microphone check ended");
     }
 
     public void ShowInstructions()
