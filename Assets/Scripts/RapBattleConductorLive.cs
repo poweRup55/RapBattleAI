@@ -1,15 +1,12 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Data.Common;
-using System.Text;
 using EpicRapBattle.Config;
 using UnityEngine;
-using UnityEngine.Networking;
 using UnityEngine.UI;
 
 public class RapBattleConductorLive : MonoBehaviour
 {
+    private const int sampleRate = 16000;
+
     [Header("Animation Controller")]
     [Tooltip("Animation controller for the rapper.")]
     [SerializeField]
@@ -36,24 +33,35 @@ public class RapBattleConductorLive : MonoBehaviour
     [Header("Game Configuration")]
     [Tooltip("Total Rap Rounds")]
     [SerializeField]
-    private int totalRounds = 3;
+    private const int totalRounds = 3;
+
+    [Tooltip("Rap submission Time")]
+    [SerializeField]
+    private const int submitRapPeriodInSeconds = 5;
 
     [Header("UI")]
     [SerializeField]
     private UIMenuController uIMenuController;
 
+    [Header("Dev and Debugging")]
     [SerializeField]
-    private Button recordButton;
-    private int currentRound = 0;
-    private int submitRapPeriodInSeconds = 5;
+    private bool playBackRecording;
+
+    [SerializeField]
+    private bool useFileSubmission = false;
+
+    [SerializeField]
+    private AudioClip fileSubmissionClip;
+
     private BattleState currentState = BattleState.WaitingStart;
     public BattleState CurrentState => currentState;
-    private AudioClip playerClip;
-    private string microphoneDevice;
-    private bool isRecording = false;
-    private const int sampleRate = 16000;
-
+    private readonly Button recordButton;
+    private AudioClip playerRecordingClip;
     private float recordingLengthInSeconds;
+
+    private readonly string microphoneDevice;
+    private bool isRecording = false;
+    private int currentRound = 0;
 
     private void Start()
     {
@@ -109,9 +117,9 @@ public class RapBattleConductorLive : MonoBehaviour
             Debug.Log("NPC is rapping...");
             var createAudioCoroutine = StartCoroutine(geminiLiveWebRTC.CreateAudioCoroutines());
             var playAudioCoroutine = StartCoroutine(geminiLiveWebRTC.PlayAudioCoroutine());
-            yield return new WaitForSeconds(1f); // Wait for the NPC rap to start
+            yield return new WaitForSeconds(1f);
             yield return StartCoroutine(geminiLiveWebRTC.waitForAudioStreamFinish());
-            yield return new WaitForSeconds(2f); // Wait for the NPC rap to finish
+            yield return new WaitForSeconds(2f);
             animationController.SetTrigger("ReturnToIdle");
             StopCoroutine(createAudioCoroutine);
             StopCoroutine(playAudioCoroutine);
@@ -146,14 +154,23 @@ public class RapBattleConductorLive : MonoBehaviour
             uiManager.UpdateStatus(
                 "Hold the space bar or tap and hold anywhere to begin recording your rap!"
             );
-            yield return StartCoroutine(HandleRapSubmission());
+            if (useFileSubmission && fileSubmissionClip != null)
+            {
+                uiManager.UpdateStatus("Using file submission for this round.");
+                playerRecordingClip = fileSubmissionClip;
+            }
+            else
+            {
+                yield return StartCoroutine(GetRapRecording());
+            }
+
             // Waiting Turn
             currentState = BattleState.WaitingTurn;
             animationController.SetTrigger("StartThinking");
             uiManager.UpdateStatus("Waiting for your opponent to respond...");
 
             yield return StartCoroutine(
-                geminiLiveWebRTC.SendAudioToGeminiCoroutine(playerClip, recordingLengthInSeconds)
+                geminiLiveWebRTC.SendAudioToGeminiCoroutine(playerRecordingClip)
             );
 
             float timeout = 60f; // Increased timeout for AI processing
@@ -180,7 +197,7 @@ public class RapBattleConductorLive : MonoBehaviour
         }
     }
 
-    private IEnumerator HandleRapSubmission()
+    private IEnumerator GetRapRecording()
     {
         uiManager.UpdateStatus(
             "Press and hold space or tap and hold the button to record your rap."
@@ -219,6 +236,11 @@ public class RapBattleConductorLive : MonoBehaviour
                 rapSubmitted = true;
             }
         }
+        TrimRecordingToActualLength();
+        if (playBackRecording)
+        {
+            yield return PlayBackRecording();
+        }
     }
 
     private IEnumerator RecordPlayerRap()
@@ -252,7 +274,7 @@ public class RapBattleConductorLive : MonoBehaviour
 
     private void StartMicrophoneRecording()
     {
-        playerClip = Microphone.Start(
+        playerRecordingClip = Microphone.Start(
             microphoneDevice,
             false,
             maxPlayerRecordingLengthInSeconds,
@@ -274,17 +296,31 @@ public class RapBattleConductorLive : MonoBehaviour
     private IEnumerator PlayBackRecording()
     {
         uiManager.UpdateStatus("Playing back your recording...");
-        if (playerClip != null)
+        if (playerRecordingClip != null)
         {
             musicSource.Pause();
             AudioSource playbackSource = gameObject.AddComponent<AudioSource>();
-            playbackSource.clip = playerClip;
             playbackSource.Play();
-            // Debug.Log("CLip length: " + playerClip.length);
-            yield return new WaitForSeconds(playerClip.length);
+            yield return new WaitForSeconds(playerRecordingClip.length);
             Destroy(playbackSource);
             musicSource.UnPause();
         }
         yield break;
+    }
+
+    private void TrimRecordingToActualLength()
+    {
+        playerRecordingClip = AudioClip.Create(
+            "PlayerRecordingTrimmed",
+            Mathf.FloorToInt(recordingLengthInSeconds * sampleRate),
+            playerRecordingClip.channels,
+            playerRecordingClip.frequency,
+            false
+        );
+        float[] samples = new float[
+            Mathf.FloorToInt(recordingLengthInSeconds * sampleRate) * playerRecordingClip.channels
+        ];
+        playerRecordingClip.GetData(samples, 0);
+        playerRecordingClip.SetData(samples, 0);
     }
 }

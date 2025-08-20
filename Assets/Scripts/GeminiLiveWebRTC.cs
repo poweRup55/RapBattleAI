@@ -586,7 +586,7 @@ public class GeminiLiveWebRTC : MonoBehaviour
         receivingAudioStreamIn = false;
     }
 
-    public IEnumerator SendAudioToGeminiCoroutine(AudioClip recordingClip, float actualClipDuration)
+    public IEnumerator SendAudioToGeminiCoroutine(AudioClip recordingClip)
     {
         if (recordingClip == null)
         {
@@ -614,11 +614,7 @@ public class GeminiLiveWebRTC : MonoBehaviour
             );
         }
 
-        int actualSamples =
-            Mathf.FloorToInt(actualClipDuration * recordingClip.frequency) * recordingClip.channels;
-        actualSamples = Mathf.Min(actualSamples, recordingClip.samples * recordingClip.channels);
-
-        float[] samples = new float[actualSamples];
+        float[] samples = new float[recordingClip.samples * recordingClip.channels];
         recordingClip.GetData(samples, 0);
         byte[] pcmData = WavUtility.ConvertToPCM16(samples);
 
