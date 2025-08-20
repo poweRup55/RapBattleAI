@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Net.WebSockets;
 using System.Text;
 using EpicRapBattle.Config;
+using Newtonsoft.Json;
 using Unity.WebRTC;
 using UnityEngine;
 
@@ -14,10 +15,10 @@ public class GeminiLiveWebRTC : MonoBehaviour
 
     [Header("Configuration")]
     [SerializeField]
-    private AIConfig aiConfig;
+    private AILiveConfig aiConfig;
 
     [SerializeField]
-    private const int audioBufferFlushThreshold = 70;
+    private int audioBufferFlushThreshold = 70;
 
     [Header("Audio")]
     [SerializeField]
@@ -27,7 +28,9 @@ public class GeminiLiveWebRTC : MonoBehaviour
     [SerializeField]
     private bool enableDebugLogs = true;
 
-    private const int sampleRate = 16000;
+    [SerializeField]
+    private const int maxChunkSize = 1024;
+
     private RTCPeerConnection localConnection;
     private RTCDataChannel sendChannel;
     private RTCDataChannel receiveChannel;
@@ -48,65 +51,40 @@ public class GeminiLiveWebRTC : MonoBehaviour
     private Queue<IEnumerator> audioCoroutineQueue = new Queue<IEnumerator>();
 
     private const string GEMINI_WEBSOCKET_URL =
-        "wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent";
+        "wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContentConstrained";
+    private const string ConfigurationError = "CONFIGURATION_ERROR";
+    private const string DefaultStunServer = "stun:stun.l.google.com:19302";
+
+    public bool IsPlaying => audioSource.isPlaying;
 
     public IEnumerator Initialize()
     {
-        if (!ValidateConfiguration())
+        if (!aiConfig)
         {
-            string errorMessage = "Invalid configuration. Please check AIConfig settings.";
-            Debug.LogError($"GeminiLiveWebRTC: {errorMessage}");
-            throw new GeminiLiveException(
-                "CONFIGURATION_ERROR",
-                "Initialize",
-                "ValidateConfiguration",
-                errorMessage
-            );
+            string errorMessage = "AIConfig is not assigned!";
+            ThrowGeminiLiveException(errorMessage);
         }
-
+        ResetConnectionState();
+        aiConfig.GenerateEphemeralKey();
         InitializeWebRTC();
         yield return StartCoroutine(ConnectWebSocketCoroutine());
     }
 
-    private bool ValidateConfiguration()
+    private void ResetConnectionState()
     {
-        if (aiConfig == null)
-        {
-            string errorMessage = "AIConfig is not assigned!";
-            Debug.LogError($"GeminiLiveWebRTC: {errorMessage}");
-            throw new GeminiLiveException(
-                "CONFIGURATION_ERROR",
-                "ValidateConfiguration",
-                "CheckAIConfigAssignment",
-                errorMessage
-            );
-        }
+        isConnected = false;
+        isSetupComplete = false;
+        receivingAudioStreamIn = false;
+        finishedAudioStreamIn = false;
+        audioResponseQueue = new Queue<byte[]>();
+        audioCoroutineQueue = new Queue<IEnumerator>();
+    }
 
-        if (aiConfig.SelectedProvider != AIConfig.Provider.Gemini)
-        {
-            string errorMessage = "AIConfig must be set to Gemini provider!";
-            Debug.LogError($"GeminiLiveWebRTC: {errorMessage}");
-            throw new GeminiLiveException(
-                "CONFIGURATION_ERROR",
-                "ValidateConfiguration",
-                "CheckProviderSelection",
-                errorMessage
-            );
-        }
-
-        if (string.IsNullOrEmpty(aiConfig.GeminiApiKey))
-        {
-            string errorMessage = "Gemini API key is not set in AIConfig!";
-            Debug.LogError($"GeminiLiveWebRTC: {errorMessage}");
-            throw new GeminiLiveException(
-                "CONFIGURATION_ERROR",
-                "ValidateConfiguration",
-                "CheckApiKey",
-                errorMessage
-            );
-        }
-
-        return true;
+    private void ThrowGeminiLiveException(string errorMessage)
+    {
+        if (enableDebugLogs)
+            Debug.LogError(errorMessage);
+        throw new GeminiLiveException(errorMessage);
     }
 
     private bool IsWebSocketConnected()
@@ -119,7 +97,7 @@ public class GeminiLiveWebRTC : MonoBehaviour
         RTCConfiguration config = default;
         config.iceServers = new RTCIceServer[]
         {
-            new RTCIceServer { urls = new string[] { "stun:stun.l.google.com:19302" } },
+            new RTCIceServer { urls = new string[] { DefaultStunServer } },
         };
 
         localConnection = new RTCPeerConnection(ref config);
@@ -143,8 +121,9 @@ public class GeminiLiveWebRTC : MonoBehaviour
         webSocket = new ClientWebSocket();
 
         webSocket.Options.SetRequestHeader("User-Agent", "Rap-Against-The-Machine");
+        webSocket.Options.SetRequestHeader("Authorization", $"Token {aiConfig.EphemeralKey}");
 
-        string url = $"{GEMINI_WEBSOCKET_URL}?key={aiConfig.GeminiApiKey}";
+        string url = $"{GEMINI_WEBSOCKET_URL}";
         Uri uri = new Uri(url);
 
         if (enableDebugLogs)
@@ -156,17 +135,11 @@ public class GeminiLiveWebRTC : MonoBehaviour
         {
             if (enableDebugLogs)
                 Debug.Log("WebSocket connection established successfully");
-
             yield return new WaitForSeconds(0.1f);
-
             SendSetupMessage();
-
             yield return new WaitForSeconds(1f);
-
             StartCoroutine(ReceiveMessagesCoroutine());
-
             isConnected = true;
-
             if (enableDebugLogs)
                 Debug.Log("Connected to Gemini Live API");
         }
@@ -174,14 +147,7 @@ public class GeminiLiveWebRTC : MonoBehaviour
         {
             string errorMessage =
                 $"Connection to Gemini Live API timed out. Final state: {webSocket?.State}";
-            Debug.LogError(errorMessage);
-            isConnected = false;
-            throw new GeminiLiveException(
-                "WEBSOCKET_TIMEOUT_ERROR",
-                "ConnectWebSocketCoroutine",
-                "EstablishConnection",
-                errorMessage
-            );
+            ThrowGeminiLiveException(errorMessage);
         }
     }
 
@@ -241,7 +207,7 @@ public class GeminiLiveWebRTC : MonoBehaviour
             Debug.Log("Preparing setup message for Gemini Live API");
 
         // Get the appropriate model string for live API
-        string modelString = GetLiveApiModelString();
+        string modelString = aiConfig.GeminiLiveModel;
         string voiceName = aiConfig.SelectedGeminiTtsVoice.ToString();
 
         if (enableDebugLogs)
@@ -269,9 +235,9 @@ public class GeminiLiveWebRTC : MonoBehaviour
             Debug.Log("Setup message sent to Gemini Live API");
     }
 
-    private BidiGenerateContentSetupMessage GetSetupMessage(string modelString, string voiceName)
+    private BidiGenerateContentClientMessage GetSetupMessage(string modelString, string voiceName)
     {
-        return new BidiGenerateContentSetupMessage
+        return new BidiGenerateContentClientMessage
         {
             setup = new BidiGenerateContentSetup
             {
@@ -293,18 +259,11 @@ public class GeminiLiveWebRTC : MonoBehaviour
                 },
                 systemInstruction = new Content
                 {
-                    parts = new Part[]
-                    {
-                        new Part { text = aiConfig.RapPersonality + aiConfig.NpcSpeakingPrompt },
-                    },
+                    parts = new Part[] { new Part { text = aiConfig.AIPrompt } },
                 },
+                proactivity = new ProactivityConfig { proactiveAudio = false },
             },
         };
-    }
-
-    private string GetLiveApiModelString()
-    {
-        return "gemini-2.5-flash-exp-native-audio-thinking-dialog";
     }
 
     private IEnumerator ReceiveMessagesCoroutine()
@@ -350,7 +309,7 @@ public class GeminiLiveWebRTC : MonoBehaviour
                         ParseWebSocketBinaryMessage(buffer, result);
                         break;
                     case WebSocketMessageType.Close:
-                        throwWebSocketClosureDetails(result);
+                        ThrowWebSocketClosureDetails(result);
                         break;
                 }
             }
@@ -442,12 +401,11 @@ public class GeminiLiveWebRTC : MonoBehaviour
         }
     }
 
-    private void throwWebSocketClosureDetails(WebSocketReceiveResult result)
+    private void ThrowWebSocketClosureDetails(WebSocketReceiveResult result)
     {
         string closeDescription = result.CloseStatusDescription ?? "No description provided";
-        Debug.LogWarning(
-            $"WebSocket connection closed by server. Status: {result.CloseStatus}, Description: {closeDescription}"
-        );
+        Debug.LogWarning($"WebSocket connection closed by server. Status: {result.CloseStatus}");
+        Debug.LogWarning($" Description: {closeDescription}");
 
         // Provide more specific error information
         if (result.CloseStatus == WebSocketCloseStatus.InvalidPayloadData) { }
@@ -467,7 +425,11 @@ public class GeminiLiveWebRTC : MonoBehaviour
                 );
 
             // Parse JSON into object
-            GeminiResponse response = JsonUtility.FromJson<GeminiResponse>(json);
+            BidiGenerateContentServerMessage response =
+                JsonConvert.DeserializeObject<BidiGenerateContentServerMessage>(
+                    json,
+                    new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore }
+                );
 
             if (response == null)
             {
@@ -484,11 +446,11 @@ public class GeminiLiveWebRTC : MonoBehaviour
             }
 
             // Check for setup completion
-            if (response.setupComplete != null)
+            if (response.setupComplete != null && !isSetupComplete)
             {
                 isSetupComplete = true;
                 if (enableDebugLogs)
-                    Debug.Log("Setup completed by Gemini Live API");
+                    Debug.Log($"Setup completed by Gemini Live API {response.setupComplete}");
             }
             Debug.Log($"Text Response? : {response.serverContent?.outputTranscription?.text}");
             if (!string.IsNullOrEmpty(response.serverContent?.outputTranscription?.text))
@@ -620,25 +582,29 @@ public class GeminiLiveWebRTC : MonoBehaviour
 
         string base64Audio = Convert.ToBase64String(pcmData);
 
-        var activityStartMessage = new BidiGenerateContentActivityStartMessage
+        var activityStartMessage = new BidiGenerateContentClientMessage
         {
-            realtimeInput = new BidiGenerateContentActivityStartInput
+            realtimeInput = new BidiGenerateContentRealtimeInput
             {
                 activityStart = new ActivityStart(),
             },
         };
 
-        var message = new BidiGenerateContentAudioMessage
+        var message = new BidiGenerateContentClientMessage
         {
-            realtimeInput = new BidiGenerateContentAudioInput
+            realtimeInput = new BidiGenerateContentRealtimeInput
             {
-                audio = new Blob { data = base64Audio, mimeType = $"audio/pcm;rate={sampleRate}" },
+                audio = new Blob
+                {
+                    data = base64Audio,
+                    mimeType = $"audio/pcm;rate={AILiveConfig.inputSampleRate}",
+                },
             },
         };
 
-        var activityEndMessage = new BidiGenerateContentActivityEndMessage
+        var activityEndMessage = new BidiGenerateContentClientMessage
         {
-            realtimeInput = new BidiGenerateContentActivityEndInput
+            realtimeInput = new BidiGenerateContentRealtimeInput
             {
                 activityEnd = new ActivityEnd(),
             },
@@ -685,13 +651,45 @@ public class GeminiLiveWebRTC : MonoBehaviour
             );
         }
 
-        string json = JsonUtility.ToJson(message);
+        string json = JsonConvert.SerializeObject(
+            message,
+            new JsonSerializerSettings
+            {
+                NullValueHandling = NullValueHandling.Ignore,
+                DefaultValueHandling = DefaultValueHandling.Ignore,
+                Formatting = Formatting.None,
+            }
+        );
+
+        if (enableDebugLogs)
+            Debug.Log($"Sending message to Gemini: {json}...");
+
         byte[] bytes = Encoding.UTF8.GetBytes(json);
 
+        if (enableDebugLogs)
+        {
+            Debug.Log($"Sending {bytes.Length} bytes to Gemini");
+        }
+        int totalBytes = bytes.Length;
+        int offset = 0;
+
+        while (offset < totalBytes)
+        {
+            int chunkSize = Math.Min(maxChunkSize, totalBytes - offset);
+            bool endOfMessage = (offset + chunkSize) >= totalBytes;
+            var chunk = new ArraySegment<byte>(bytes, offset, chunkSize);
+
+            yield return StartCoroutine(SendWebSocketMessageChunk(endOfMessage, chunk));
+            offset += chunkSize;
+        }
+    }
+
+    private IEnumerator SendWebSocketMessageChunk(bool endOfMessage, ArraySegment<byte> chunk)
+    {
         var sendTask = webSocket.SendAsync(
-            new ArraySegment<byte>(bytes),
+            chunk,
             WebSocketMessageType.Text,
-            true,
+            endOfMessage,
             cancellationTokenSource.Token
         );
 
@@ -702,23 +700,17 @@ public class GeminiLiveWebRTC : MonoBehaviour
 
         if (sendTask.IsFaulted)
         {
-            Exception baseException = sendTask.Exception?.GetBaseException();
-            string errorMessage = $"Error sending WebSocket message: {baseException?.Message}";
-
-            if (enableDebugLogs)
-                Debug.LogError(errorMessage);
-
             throw new GeminiLiveException(
                 "WEBSOCKET_SEND_ERROR",
                 "SendWebSocketMessageCoroutine",
                 "SendMessage",
-                errorMessage,
-                baseException
+                $"Error sending WebSocket message: {sendTask.Exception?.GetBaseException()?.Message}",
+                sendTask.Exception
             );
         }
-        else if (sendTask.IsCompletedSuccessfully && enableDebugLogs)
+        else if (enableDebugLogs)
         {
-            Debug.Log($"Successfully sent {bytes.Length} bytes to Gemini");
+            Debug.Log($"Successfully sent {chunk.Count} bytes to Gemini");
         }
     }
 
@@ -726,14 +718,14 @@ public class GeminiLiveWebRTC : MonoBehaviour
     {
         while (IsWebSocketConnected())
         {
-            IEnumerator coroutine = null;
+            IEnumerator audioCoroutine = null;
             lock (audioCoroutineQueue)
             {
                 if (audioCoroutineQueue.Count > 0)
-                    coroutine = audioCoroutineQueue.Dequeue();
+                    audioCoroutine = audioCoroutineQueue.Dequeue();
             }
-            if (coroutine != null)
-                yield return StartCoroutine(coroutine);
+            if (audioCoroutine != null)
+                yield return StartCoroutine(audioCoroutine);
             else
                 yield return null;
         }
@@ -742,9 +734,9 @@ public class GeminiLiveWebRTC : MonoBehaviour
     public IEnumerator CreateAudioCoroutines()
     {
         finishedAudioStreamIn = false;
+        var lastTimeFlushed = Time.time;
         var elapsedTime = 0f;
-        var waitTime = 0.05f;
-        var maxWaitTime = 0.1f;
+        var maxWaitTime = 8f;
         while (IsWebSocketConnected())
         {
             lock (audioResponseQueue)
@@ -752,14 +744,12 @@ public class GeminiLiveWebRTC : MonoBehaviour
                 if (audioResponseQueue.Count > audioBufferFlushThreshold)
                 {
                     StartCoroutine(ProcessAudioQueue());
-                    elapsedTime = 0f;
-                    yield return new WaitForSeconds(waitTime);
+                    lastTimeFlushed = Time.time;
                     continue;
                 }
             }
 
-            yield return new WaitForSeconds(waitTime);
-            elapsedTime += waitTime;
+            elapsedTime += Time.time - lastTimeFlushed;
             lock (audioResponseQueue)
             {
                 if (elapsedTime >= maxWaitTime && audioResponseQueue.Count > 0)
@@ -768,7 +758,9 @@ public class GeminiLiveWebRTC : MonoBehaviour
                     elapsedTime = 0f;
                 }
             }
+            yield return null;
         }
+        yield return null;
     }
 
     private IEnumerator ProcessAudioQueue()
@@ -867,7 +859,7 @@ public class GeminiLiveWebRTC : MonoBehaviour
     {
         while (IsAudioActive())
         {
-            yield return new WaitForSeconds(0.1f);
+            yield return new WaitForSeconds(5f);
         }
         yield return null;
     }

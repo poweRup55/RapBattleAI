@@ -1,60 +1,37 @@
 using System;
 
 [Serializable]
-public class BidiGenerateContentSetupMessage
+public class BidiGenerateContentClientMessage
 {
     public BidiGenerateContentSetup setup;
-}
-
-[Serializable]
-public class BidiGenerateContentRealtimeMessage
-{
+    public BidiGenerateContentClientContent clientContent;
     public BidiGenerateContentRealtimeInput realtimeInput;
-}
-
-[Serializable]
-public class BidiGenerateContentActivityStartMessage
-{
-    public BidiGenerateContentActivityStartInput realtimeInput;
-}
-
-[Serializable]
-public class BidiGenerateContentActivityEndMessage
-{
-    public BidiGenerateContentActivityEndInput realtimeInput;
-}
-
-[Serializable]
-public class BidiGenerateContentAudioMessage
-{
-    public BidiGenerateContentAudioInput realtimeInput;
+    public BidiGenerateContentToolResponse toolResponse;
 }
 
 [Serializable]
 public class BidiGenerateContentRealtimeInput
 {
+    public Blob[] mediaChunks;
+    public Blob audio;
+    public Blob video;
     public ActivityStart activityStart;
     public ActivityEnd activityEnd;
-    public Blob audio;
+    public bool audioStreamEnd;
     public string text;
 }
 
 [Serializable]
-public class BidiGenerateContentActivityStartInput
+public class BidiGenerateContentClientContent
 {
-    public ActivityStart activityStart;
+    public Content[] turns;
+    public bool turnComplete;
 }
 
 [Serializable]
-public class BidiGenerateContentActivityEndInput
+public class BidiGenerateContentToolResponse
 {
-    public ActivityEnd activityEnd;
-}
-
-[Serializable]
-public class BidiGenerateContentAudioInput
-{
-    public Blob audio;
+    public FunctionResponse[] functionResponses;
 }
 
 [Serializable]
@@ -69,9 +46,14 @@ public class BidiGenerateContentSetup
 {
     public string model;
     public GenerationConfig generationConfig;
-    public RealtimeInputConfig realtimeInputConfig;
     public Content systemInstruction;
+    public Tool[] tools;
+    public RealtimeInputConfig realtimeInputConfig;
+    public SessionResumptionConfig sessionResumption;
+    public ContextWindowCompressionConfig contextWindowCompression;
+    public AudioTranscriptionConfig inputAudioTranscription;
     public AudioTranscriptionConfig outputAudioTranscription;
+    public ProactivityConfig proactivity;
 }
 
 [Serializable]
@@ -80,8 +62,16 @@ public class AudioTranscriptionConfig { }
 [Serializable]
 public class GenerationConfig
 {
+    public int candidateCount;
+    public int maxOutputTokens;
+    public float temperature;
+    public float topP;
+    public int topK;
+    public float presencePenalty;
+    public float frequencyPenalty;
     public string[] responseModalities;
     public SpeechConfig speechConfig;
+    public MediaResolution mediaResolution;
 }
 
 [Serializable]
@@ -106,12 +96,18 @@ public class PrebuiltVoiceConfig
 public class RealtimeInputConfig
 {
     public AutomaticActivityDetection automaticActivityDetection;
+    public ActivityHandling activityHandling;
+    public TurnCoverage turnCoverage;
 }
 
 [Serializable]
 public class AutomaticActivityDetection
 {
     public bool disabled;
+    public StartSensitivity startOfSpeechSensitivity;
+    public int prefixPaddingMs;
+    public EndSensitivity endOfSpeechSensitivity;
+    public int silenceDurationMs;
 }
 
 [Serializable]
@@ -134,33 +130,192 @@ public class Part
 
 // Response types for parsing Gemini responses
 [Serializable]
-public class GeminiResponse
+public class BidiGenerateContentServerMessage
 {
-    public ServerContent serverContent;
-    public SetupComplete setupComplete;
+    public UsageMetadata usageMetadata;
+    public BidiGenerateContentSetupComplete setupComplete;
+    public BidiGenerateContentServerContent serverContent;
+    public BidiGenerateContentToolCall toolCall;
+    public BidiGenerateContentToolCallCancellation toolCallCancellation;
+    public GoAway goAway;
+    public SessionResumptionUpdate sessionResumptionUpdate;
     public bool turnComplete;
     public bool interrupted;
 }
 
 [Serializable]
-public class SetupComplete
-{
-    // Empty class to match Gemini's response format
-}
+public class BidiGenerateContentSetupComplete { }
 
 [Serializable]
-public class ServerContent
+public class BidiGenerateContentServerContent
 {
     public ModelTurn modelTurn;
+    public bool generationComplete;
     public bool turnComplete;
     public bool interrupted;
-    public OutputTranscription outputTranscription;
+    public GroundingMetadata groundingMetadata;
+    public BidiGenerateContentTranscription inputTranscription;
+    public BidiGenerateContentTranscription outputTranscription;
+    public UrlContextMetadata urlContextMetadata;
 }
 
 [Serializable]
-public class OutputTranscription
+public class BidiGenerateContentTranscription
 {
     public string text;
+}
+
+// Missing types that need to be defined
+[Serializable]
+public class FunctionResponse
+{
+    public string name;
+    public object response;
+}
+
+[Serializable]
+public class Tool
+{
+    public FunctionDeclaration functionDeclaration;
+}
+
+[Serializable]
+public class FunctionDeclaration
+{
+    public string name;
+    public string description;
+    public object parameters;
+}
+
+[Serializable]
+public class SessionResumptionConfig
+{
+    public string handle;
+}
+
+[Serializable]
+public class ContextWindowCompressionConfig
+{
+    public SlidingWindow slidingWindow;
+    public long triggerTokens;
+}
+
+[Serializable]
+public class SlidingWindow
+{
+    public long targetTokens;
+}
+
+[Serializable]
+public class ProactivityConfig
+{
+    public bool proactiveAudio;
+}
+
+[Serializable]
+public class MediaResolution { }
+
+[Serializable]
+public enum ActivityHandling
+{
+    ACTIVITY_HANDLING_UNSPECIFIED,
+    START_OF_ACTIVITY_INTERRUPTS,
+    NO_INTERRUPTION,
+}
+
+[Serializable]
+public enum TurnCoverage
+{
+    TURN_COVERAGE_UNSPECIFIED,
+    TURN_INCLUDES_ONLY_ACTIVITY,
+    TURN_INCLUDES_ALL_INPUT,
+}
+
+[Serializable]
+public enum StartSensitivity
+{
+    START_SENSITIVITY_UNSPECIFIED,
+    START_SENSITIVITY_HIGH,
+    START_SENSITIVITY_LOW,
+}
+
+[Serializable]
+public enum EndSensitivity
+{
+    END_SENSITIVITY_UNSPECIFIED,
+    END_SENSITIVITY_HIGH,
+    END_SENSITIVITY_LOW,
+}
+
+[Serializable]
+public class UsageMetadata
+{
+    public int promptTokenCount;
+    public int cachedContentTokenCount;
+    public int responseTokenCount;
+    public int toolUsePromptTokenCount;
+    public int thoughtsTokenCount;
+    public int totalTokenCount;
+    public ModalityTokenCount[] promptTokensDetails;
+    public ModalityTokenCount[] cacheTokensDetails;
+    public ModalityTokenCount[] responseTokensDetails;
+    public ModalityTokenCount[] toolUsePromptTokensDetails;
+}
+
+[Serializable]
+public class ModalityTokenCount
+{
+    public string modality;
+    public int tokenCount;
+}
+
+[Serializable]
+public class BidiGenerateContentToolCall
+{
+    public FunctionCall[] functionCalls;
+}
+
+[Serializable]
+public class FunctionCall
+{
+    public string name;
+    public object args;
+    public string id;
+}
+
+[Serializable]
+public class BidiGenerateContentToolCallCancellation
+{
+    public string[] ids;
+}
+
+[Serializable]
+public class GoAway
+{
+    public string timeLeft;
+}
+
+[Serializable]
+public class SessionResumptionUpdate
+{
+    public string newHandle;
+    public bool resumable;
+}
+
+[Serializable]
+public class GroundingMetadata { }
+
+[Serializable]
+public class UrlContextMetadata
+{
+    public UrlMetadata[] urlMetadata;
+}
+
+[Serializable]
+public class UrlMetadata
+{
+    public string url;
+    public string title;
 }
 
 [Serializable]

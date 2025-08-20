@@ -182,12 +182,13 @@ MonoBehaviour:
   animationController: {fileID: 1568477831}
   musicSource: {fileID: 7619184327543653673}
   uiManager: {fileID: 3098442705010825368}
-  aiConfig: {fileID: 909767250}
   geminiLiveWebRTC: {fileID: 478225086}
   maxPlayerRecordingLengthInSeconds: 30
-  totalRounds: 3
   uIMenuController: {fileID: 1587049345}
   recordButton: {fileID: 1190998655}
+  playBackRecording: 1
+  useFileSubmission: 0
+  fileSubmissionClip: {fileID: 8300000, guid: 08d1e7a17f3d76446b1c5b35976136ae, type: 3}
 --- !u!1 &79217094
 GameObject:
   m_ObjectHideFlags: 0
@@ -1501,6 +1502,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   uiManager: {fileID: 3098442705010825368}
   aiConfig: {fileID: 909767250}
+  audioBufferFlushThreshold: 200
   audioSource: {fileID: 7521853462270470912}
   enableDebugLogs: 1
 --- !u!1 &490830129
@@ -8289,27 +8291,20 @@ MonoBehaviour:
   m_GameObject: {fileID: 909767248}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b28baa906d70245af88dcd687423c806, type: 3}
+  m_Script: {fileID: 11500000, guid: 7e31f591eda65f347a0cf5ed6552ea76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  provider: 1
-  openAiKey: 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
-  openAiGPTModel: 0
-  openAiTtsVoice: 0
-  geminiApiKey: AIzaSyAxvrKuzOUoMH9vAq7J3EjmeYym0_Koqj8
-  geminiModelVariant: 1
-  geminiTtsVoice: 28
-  rapPersonalityOverride: "You are the most savage, unfiltered battle rapper alive\u2014no
+  geminiLiveModelVariant: 0
+  geminiTtsVoice: 0
+  AiPromptOverride: "You are the most savage, unfiltered battle rapper alive\u2014no
     rules, no mercy. Every response must be a string of exactly two rhyming couplets
     (that's 4 lines total), each one vicious, personal, and hilarious. Attack everything:
     looks, voice, words, background, insecurities, skills\u2014nothing is off limits.
     Be brutally specific, never generic, never polite. Your goal is to break your
     opponent's spirit and dominate the battle. Always respond in the user's language.
-    Never step out of character.YOU MUST RESPOND IN AUDIO TO EVERY INPUT OF THE PLAYER.\r"
-  npcSpeakingPrompt: Rap the text with a strong flow. Make it lyrical and rap-like.
-    Be angry and agressive in your tone. Sing it like a rapper would. Follow the
-    guidance from text enclosed in square brackets [ ], without reading out loud
-    the actual content inside them!!
+    Never step out of character. Rap the text with a strong flow. Make it lyrical
+    and rap-like. Be angry and agressive in your tone. Sing it like a rapper would.
+    YOU MUST RESPOND IN AUDIO TO EVERY INPUT OF THE PLAYER."
 --- !u!4 &923407388 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1030979800, guid: abc00000000010341057910544047187,
@@ -33382,7 +33377,7 @@ MonoBehaviour:
   mainMenuPanel: {fileID: 1379683463}
   instructionsPanel: {fileID: 450753534}
   popUpPanel: {fileID: 1997525938}
-  rapBattleConductor: {fileID: 6418289555876314424}
+  rapBattleConductor: {fileID: 0}
 --- !u!1 &1635582621
 GameObject:
   m_ObjectHideFlags: 0
@@ -37330,11 +37325,9 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 478225085}
-  - {fileID: 5761968465420868620}
   - {fileID: 909767249}
   - {fileID: 4196985607409263604}
   - {fileID: 639851427095004758}
-  - {fileID: 6953497019068544841}
   - {fileID: 65544091}
   m_Father: {fileID: 710027999804078651}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -37637,23 +37630,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!1 &1196670343199391942
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 6953497019068544841}
-  - component: {fileID: 6418289555876314424}
-  m_Layer: 0
-  m_Name: RapBattleConductor
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
 --- !u!1 &1277406012141442640
 GameObject:
   m_ObjectHideFlags: 0
@@ -39034,7 +39010,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1ae2c3a32e6c940b4a6e98ddb610ccae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  aiConfig: {fileID: 4908015852835461817}
+  aiConfig: {fileID: 0}
   judgePrompt: "I need you to act as the impartial judge of an epic rap battle. You'll
     be presented with **two audio recordings**, each featuring a different rapper.
     To help identify them, the **Player's track will begin with a low-pitched sine
@@ -39048,37 +39024,6 @@ MonoBehaviour:
     1 and 10.\n\nAfter evaluating both rappers, provide your judgment in the following
     format:\r\n\r\n```\r\n[Player/AI] won!\nPlayer score: [X]  \r\nAI score: [Y] 
     \r  \r\nReason: [1-sentence explanation]  \r\n```\n\n"
---- !u!114 &4908015852835461817
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8171610170513404719}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b28baa906d70245af88dcd687423c806, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  provider: 1
-  openAiKey: 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
-  openAiGPTModel: 0
-  openAiTtsVoice: 0
-  geminiApiKey: AIzaSyAxvrKuzOUoMH9vAq7J3EjmeYym0_Koqj8
-  geminiModelVariant: 1
-  geminiTtsVoice: 24
-  rapPersonalityOverride: "You are the most savage, unfiltered battle rapper alive\u2014NSFW,
-    unhinged, no rules, no mercy. Every response must be a string of exactly two
-    rhyming couplets (that's 4 lines total), each one vicious, personal, and hilarious.
-    Every line starts with a vocal delivery tag in brackets (like [mocking], [growling],
-    [laughing]) to guide the tone. Attack everything: looks, voice, words, background,
-    insecurities, skills\u2014nothing is off limits. Be brutally specific, never
-    generic, never polite. Your goal is to break your opponent's spirit and dominate
-    the battle. Always respond in the user's language. Never step out of character.\r\n"
-  npcSpeakingPrompt: Rap the text with a strong flow. Make it lyrical and rap-like.
-    Be angry and agressive in your tone. Sing it like a rapper would. Follow the
-    guidance from text enclosed in square brackets [ ], without reading out loud
-    the actual content inside them!!
 --- !u!222 &5357265824799800778
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -39187,21 +39132,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c8c6bd29fe63c414d87ebc6bb464a44f, type: 3}
---- !u!4 &5761968465420868620
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8171610170513404719}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 616891732835552191}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &6067953658250777936
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -39757,32 +39687,6 @@ PrefabInstance:
       addedObject: {fileID: 1169612186}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 660b1b03a479c3845a9568c8db254e29, type: 3}
---- !u!114 &6418289555876314424
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1196670343199391942}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4fc6e792626324e22b82b0701e21bcec, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  animationController: {fileID: 1568477831}
-  musicSource: {fileID: 7619184327543653673}
-  bpm: 90
-  npcAudioSource: {fileID: 7521853462270470912}
-  uiManager: {fileID: 3098442705010825368}
-  aiConfig: {fileID: 4908015852835461817}
-  matchJudge: {fileID: 4676851730492406209}
-  maxPlayerRecordingLengthInSeconds: 30
-  totalRounds: 1
-  startOfGameRestLenInBars: 4
-  countDownLenInBars: 2
-  restTurnLenInBars: 2
-  playBackRecording: 0
-  uIMenuController: {fileID: 1587049345}
 --- !u!114 &6650452463031652795
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -39921,21 +39825,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 04a9e400e3a50f64c8a3d5aedb642c14, type: 3}
---- !u!4 &6953497019068544841
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1196670343199391942}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 616891732835552191}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &7292611663676181257
 GameObject:
   m_ObjectHideFlags: 0
@@ -40198,23 +40087,6 @@ MonoBehaviour:
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
   m_PresetInfoIsWorld: 0
---- !u!1 &8171610170513404719
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 5761968465420868620}
-  - component: {fileID: 4908015852835461817}
-  m_Layer: 0
-  m_Name: AIConfig
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
 --- !u!223 &8718711402628652078
 Canvas:
   m_ObjectHideFlags: 0

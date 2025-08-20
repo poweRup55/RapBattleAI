@@ -5,8 +5,6 @@ using UnityEngine.UI;
 
 public class RapBattleConductorLive : MonoBehaviour
 {
-    private const int sampleRate = 16000;
-
     [Header("Animation Controller")]
     [Tooltip("Animation controller for the rapper.")]
     [SerializeField]
@@ -19,10 +17,6 @@ public class RapBattleConductorLive : MonoBehaviour
 
     [SerializeField]
     private UIManager uiManager;
-
-    [Header("AI Integration")]
-    [SerializeField]
-    private AIConfig aiConfig;
 
     [SerializeField]
     private GeminiLiveWebRTC geminiLiveWebRTC;
@@ -43,6 +37,9 @@ public class RapBattleConductorLive : MonoBehaviour
     [SerializeField]
     private UIMenuController uIMenuController;
 
+    [SerializeField]
+    private Button recordButton;
+
     [Header("Dev and Debugging")]
     [SerializeField]
     private bool playBackRecording;
@@ -55,7 +52,6 @@ public class RapBattleConductorLive : MonoBehaviour
 
     private BattleState currentState = BattleState.WaitingStart;
     public BattleState CurrentState => currentState;
-    private readonly Button recordButton;
     private AudioClip playerRecordingClip;
     private float recordingLengthInSeconds;
 
@@ -65,6 +61,13 @@ public class RapBattleConductorLive : MonoBehaviour
 
     private void Start()
     {
+        if (useFileSubmission)
+        {
+            fileSubmissionClip = AudioClipResampler.ResampleAudio(
+                fileSubmissionClip,
+                AILiveConfig.inputSampleRate
+            );
+        }
         BeginRapBattle();
     }
 
@@ -112,12 +115,13 @@ public class RapBattleConductorLive : MonoBehaviour
 
             // NPC Turn
             currentState = BattleState.NPCTurn;
-            uiManager.UpdateStatus($"NPC is rapping!");
-            animationController.SetTrigger("StartRapping");
+
             Debug.Log("NPC is rapping...");
             var createAudioCoroutine = StartCoroutine(geminiLiveWebRTC.CreateAudioCoroutines());
             var playAudioCoroutine = StartCoroutine(geminiLiveWebRTC.PlayAudioCoroutine());
-            yield return new WaitForSeconds(1f);
+            yield return new WaitUntil(() => geminiLiveWebRTC.IsPlaying);
+            uiManager.UpdateStatus($"NPC is rapping!");
+            animationController.SetTrigger("StartRapping");
             yield return StartCoroutine(geminiLiveWebRTC.waitForAudioStreamFinish());
             yield return new WaitForSeconds(2f);
             animationController.SetTrigger("ReturnToIdle");
@@ -164,6 +168,10 @@ public class RapBattleConductorLive : MonoBehaviour
                 yield return StartCoroutine(GetRapRecording());
             }
 
+            if (playBackRecording)
+            {
+                yield return PlayBackRecording();
+            }
             // Waiting Turn
             currentState = BattleState.WaitingTurn;
             animationController.SetTrigger("StartThinking");
@@ -237,10 +245,6 @@ public class RapBattleConductorLive : MonoBehaviour
             }
         }
         TrimRecordingToActualLength();
-        if (playBackRecording)
-        {
-            yield return PlayBackRecording();
-        }
     }
 
     private IEnumerator RecordPlayerRap()
@@ -278,7 +282,7 @@ public class RapBattleConductorLive : MonoBehaviour
             microphoneDevice,
             false,
             maxPlayerRecordingLengthInSeconds,
-            sampleRate
+            AILiveConfig.inputSampleRate
         );
         isRecording = true;
         // Debug.Log("Microphone recording started.");
@@ -300,6 +304,7 @@ public class RapBattleConductorLive : MonoBehaviour
         {
             musicSource.Pause();
             AudioSource playbackSource = gameObject.AddComponent<AudioSource>();
+            playbackSource.clip = playerRecordingClip;
             playbackSource.Play();
             yield return new WaitForSeconds(playerRecordingClip.length);
             Destroy(playbackSource);
@@ -310,17 +315,27 @@ public class RapBattleConductorLive : MonoBehaviour
 
     private void TrimRecordingToActualLength()
     {
-        playerRecordingClip = AudioClip.Create(
+        if (playerRecordingClip == null || recordingLengthInSeconds <= 0f)
+            return;
+
+        int trimmedSamples = Mathf.FloorToInt(
+            recordingLengthInSeconds * playerRecordingClip.frequency
+        );
+        trimmedSamples = Mathf.Min(trimmedSamples, playerRecordingClip.samples); // Don't exceed original
+        if (trimmedSamples <= 0)
+            trimmedSamples = playerRecordingClip.samples;
+
+        float[] samples = new float[trimmedSamples * playerRecordingClip.channels];
+        playerRecordingClip.GetData(samples, 0);
+
+        var newPlayerRecordingClip = AudioClip.Create(
             "PlayerRecordingTrimmed",
-            Mathf.FloorToInt(recordingLengthInSeconds * sampleRate),
+            trimmedSamples,
             playerRecordingClip.channels,
             playerRecordingClip.frequency,
             false
         );
-        float[] samples = new float[
-            Mathf.FloorToInt(recordingLengthInSeconds * sampleRate) * playerRecordingClip.channels
-        ];
-        playerRecordingClip.GetData(samples, 0);
-        playerRecordingClip.SetData(samples, 0);
+        newPlayerRecordingClip.SetData(samples, 0);
+        playerRecordingClip = newPlayerRecordingClip;
     }
 }
