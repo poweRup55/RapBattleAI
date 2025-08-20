@@ -638,4 +638,32 @@ public class WavUtility
 
         return wav;
     }
+
+    public static byte[] ConvertToPCM16(float[] samples)
+    {
+        byte[] pcmData = new byte[samples.Length * 2];
+
+        for (int i = 0; i < samples.Length; i++)
+        {
+            short sample = (short)(samples[i] * 32767f);
+            byte[] bytes = BitConverter.GetBytes(sample);
+            pcmData[i * 2] = bytes[0];
+            pcmData[i * 2 + 1] = bytes[1];
+        }
+
+        return pcmData;
+    }
+
+    public static float[] ConvertPCMToFloat(byte[] pcmData)
+    {
+        float[] samples = new float[pcmData.Length / 2];
+
+        for (int i = 0; i < samples.Length; i++)
+        {
+            short sample = BitConverter.ToInt16(pcmData, i * 2);
+            samples[i] = sample / 32767f;
+        }
+
+        return samples;
+    }
 }

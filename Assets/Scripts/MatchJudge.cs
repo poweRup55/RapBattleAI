@@ -155,4 +155,11 @@ public class MatchJudge : MonoBehaviour
     {
         return judgeVerdict;
     }
+
+    public void ResetJudge()
+    {
+        MatchRecording.Clear();
+        judgeAIService = new OpenAIService(aiConfig);
+        judgeVerdict = string.Empty;
+    }
 }

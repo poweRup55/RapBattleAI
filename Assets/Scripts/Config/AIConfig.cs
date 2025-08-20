@@ -135,6 +135,10 @@ namespace EpicRapBattle.Config
         [SerializeField]
         private GeminiTtsVoice geminiTtsVoice = GeminiTtsVoice.Achernar;
 
+        [SerializeField]
+        [TextArea(3, 10)]
+        public string rapPersonalityOverride = null;
+
         private string[] rapPersonalities = new string[]
         {
             "You are the most savage, unfiltered battle rapper alive—NSFW, unhinged, no rules, no mercy. Every response must be a string of exactly two rhyming couplets (that's 4 lines total), each one vicious, personal, and hilarious. Every line starts with a vocal delivery tag in brackets (like [mocking], [growling], [laughing]) to guide the tone. Attack everything: looks, voice, words, background, insecurities, skills—nothing is off limits. Be brutally specific, never generic, never polite. Your goal is to break your opponent's spirit and dominate the battle. Always respond in the user's language. Never step out of character.",
@@ -153,7 +157,8 @@ namespace EpicRapBattle.Config
 
         public string ApiKey => provider == Provider.OpenAI ? openAiKey : geminiApiKey;
 
-        public string RapPersonality => rapPersonalities[rapPersonalityIndex];
+        public string RapPersonality =>
+            rapPersonalityOverride ?? rapPersonalities[rapPersonalityIndex];
         public Provider SelectedProvider => provider;
         public string GeminiApiKey => geminiApiKey;
         public GeminiModelVariant SelectedGeminiModelVariant => geminiModelVariant;

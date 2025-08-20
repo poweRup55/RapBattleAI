@@ -1,0 +1,225 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &5728552142939227645
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5728552142939227646}
+  m_Layer: 0
+  m_Name: BP_StreetBlockade
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5728552142939227646
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5728552142939227645}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 5728552142722147469}
+  - {fileID: 5728552142722129931}
+  - {fileID: 5728552142722147496}
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &5728552142939275470
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 5728552142939227646}
+    m_Modifications:
+    - target: {fileID: 1030972482, guid: abc00000000006179656767717145726, type: 3}
+      propertyPath: m_Name
+      value: BP_StreetBlockade_C_1_SM_TrafficPole_3_396
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972483, guid: abc00000000006179656767717145726, type: 3}
+      propertyPath: m_RootOrder
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972483, guid: abc00000000006179656767717145726, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1.2070916
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972483, guid: abc00000000006179656767717145726, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1.207091
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972483, guid: abc00000000006179656767717145726, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1.2070916
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972483, guid: abc00000000006179656767717145726, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972483, guid: abc00000000006179656767717145726, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972483, guid: abc00000000006179656767717145726, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972483, guid: abc00000000006179656767717145726, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972483, guid: abc00000000006179656767717145726, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972483, guid: abc00000000006179656767717145726, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972483, guid: abc00000000006179656767717145726, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: abc00000000006179656767717145726, type: 3}
+--- !u!4 &5728552142722147469 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1030972483, guid: abc00000000006179656767717145726,
+    type: 3}
+  m_PrefabInstance: {fileID: 5728552142939275470}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &5728552142939275479
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 5728552142939227646}
+    m_Modifications:
+    - target: {fileID: 1030987995, guid: abc00000000012983052241087814100, type: 3}
+      propertyPath: m_Name
+      value: BP_StreetBlockade_C_1_Plane_2_395
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987996, guid: abc00000000012983052241087814100, type: 3}
+      propertyPath: m_RootOrder
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987996, guid: abc00000000012983052241087814100, type: 3}
+      propertyPath: m_LocalScale.x
+      value: -0.14079699
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987996, guid: abc00000000012983052241087814100, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987996, guid: abc00000000012983052241087814100, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987996, guid: abc00000000012983052241087814100, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987996, guid: abc00000000012983052241087814100, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.658905
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987996, guid: abc00000000012983052241087814100, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987996, guid: abc00000000012983052241087814100, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987996, guid: abc00000000012983052241087814100, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987996, guid: abc00000000012983052241087814100, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030987996, guid: abc00000000012983052241087814100, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0.7071068
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: abc00000000012983052241087814100, type: 3}
+--- !u!4 &5728552142722129931 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1030987996, guid: abc00000000012983052241087814100,
+    type: 3}
+  m_PrefabInstance: {fileID: 5728552142939275479}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &5728552142939275499
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 5728552142939227646}
+    m_Modifications:
+    - target: {fileID: 1030972482, guid: abc00000000006179656767717145726, type: 3}
+      propertyPath: m_Name
+      value: BP_StreetBlockade_C_1_SM_TrafficPole_1_394
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972483, guid: abc00000000006179656767717145726, type: 3}
+      propertyPath: m_RootOrder
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972483, guid: abc00000000006179656767717145726, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1.2070916
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972483, guid: abc00000000006179656767717145726, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1.207091
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972483, guid: abc00000000006179656767717145726, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1.2070916
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972483, guid: abc00000000006179656767717145726, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972483, guid: abc00000000006179656767717145726, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972483, guid: abc00000000006179656767717145726, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972483, guid: abc00000000006179656767717145726, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972483, guid: abc00000000006179656767717145726, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972483, guid: abc00000000006179656767717145726, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030972483, guid: abc00000000006179656767717145726, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: abc00000000006179656767717145726, type: 3}
+--- !u!4 &5728552142722147496 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1030972483, guid: abc00000000006179656767717145726,
+    type: 3}
+  m_PrefabInstance: {fileID: 5728552142939275499}
+  m_PrefabAsset: {fileID: 0}
