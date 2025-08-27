@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "com.bnco.unity-webgl-microphone": "https://github.com/bnco-dev/unity-webgl-microphone.git",
+    "com.unity.2d.sprite": "1.0.0",
     "com.unity.collab-proxy": "2.8.2",
     "com.unity.connect.share": "4.2.3",
     "com.unity.device-simulator.devices": "1.0.0",

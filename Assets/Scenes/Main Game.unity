@@ -186,7 +186,7 @@ MonoBehaviour:
   maxPlayerRecordingLengthInSeconds: 30
   uIMenuController: {fileID: 1587049345}
   recordButton: {fileID: 1190998655}
-  playBackRecording: 1
+  playBackRecording: 0
   useFileSubmission: 0
   fileSubmissionClip: {fileID: 8300000, guid: 08d1e7a17f3d76446b1c5b35976136ae, type: 3}
 --- !u!1 &79217094
@@ -1502,7 +1502,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   uiManager: {fileID: 3098442705010825368}
   aiConfig: {fileID: 909767250}
-  audioBufferFlushThreshold: 200
+  temperature: 1.2
+  topP: 0.95
+  maxOutputTokens: 6000
+  candidateCount: 1
+  audioBufferFlushThreshold: 30
   audioSource: {fileID: 7521853462270470912}
   enableDebugLogs: 1
 --- !u!1 &490830129
@@ -8295,7 +8299,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   geminiLiveModelVariant: 0
-  geminiTtsVoice: 0
+  geminiTtsVoice: 24
   AiPromptOverride: "You are the most savage, unfiltered battle rapper alive\u2014no
     rules, no mercy. Every response must be a string of exactly two rhyming couplets
     (that's 4 lines total), each one vicious, personal, and hilarious. Attack everything:
