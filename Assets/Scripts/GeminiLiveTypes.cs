@@ -62,15 +62,24 @@ public class AudioTranscriptionConfig { }
 [Serializable]
 public class GenerationConfig
 {
+    public string[] stopSequences;
+    public string responseMimeType;
+    public Schema responseSchema;
+    public object responseJsonSchema;
+    public string[] responseModalities;
     public int candidateCount;
     public int maxOutputTokens;
     public float temperature;
     public float topP;
     public int topK;
+    public int seed;
     public float presencePenalty;
     public float frequencyPenalty;
-    public string[] responseModalities;
+    public bool responseLogprobs;
+    public int logprobs;
+    public bool enableEnhancedCivicAnswers;
     public SpeechConfig speechConfig;
+    public ThinkingConfig thinkingConfig;
     public MediaResolution mediaResolution;
 }
 
@@ -212,8 +221,12 @@ public class ProactivityConfig
     public bool proactiveAudio;
 }
 
-[Serializable]
-public class MediaResolution { }
+public enum MediaResolution
+{
+    LOW,
+    MEDIUM,
+    HIGH,
+}
 
 [Serializable]
 public enum ActivityHandling
@@ -337,3 +350,27 @@ public class InlineData
     public string mimeType;
     public string data;
 }
+
+[Serializable]
+public class Schema
+{
+    public string type;
+    public object properties;
+    public object items;
+    public string format;
+    public string title;
+    public string description;
+    public string[] enumValues;
+    public object additionalProperties;
+    public string[] required;
+}
+
+public enum Modality
+{
+    TEXT,
+    AUDIO,
+    VIDEO,
+}
+
+[Serializable]
+public class ThinkingConfig { }

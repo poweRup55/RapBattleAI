@@ -11,6 +11,8 @@ namespace EpicRapBattle.Config
         {
             gemini_2_5_flash_preview_native_audio_dialog,
             gemini_2_5_flash_exp_native_audio_thinking_dialog,
+            gemini_live_2_5_flash_preview,
+            gemini_2_0_flash_live_001,
         };
 
         public enum GeminiTtsVoice
@@ -50,7 +52,7 @@ namespace EpicRapBattle.Config
         [Tooltip("Select the Gemini model variant (only those supporting audio input are listed)")]
         [SerializeField]
         private GeminiLiveModels geminiLiveModelVariant =
-            GeminiLiveModels.gemini_2_5_flash_exp_native_audio_thinking_dialog;
+            GeminiLiveModels.gemini_live_2_5_flash_preview;
 
         [Tooltip("Select the Gemini TTS voice for speech synthesis")]
         [SerializeField]
@@ -108,8 +110,12 @@ namespace EpicRapBattle.Config
                         return "gemini-2.5-flash-preview-native-audio-dialog";
                     case GeminiLiveModels.gemini_2_5_flash_exp_native_audio_thinking_dialog:
                         return "gemini-2.5-flash-exp-native-audio-thinking-dialog";
+                    case GeminiLiveModels.gemini_live_2_5_flash_preview:
+                        return "gemini-live-2.5-flash-preview";
+                    case GeminiLiveModels.gemini_2_0_flash_live_001:
+                        return "gemini-2.0-flash-live-001";
                     default:
-                        return "gemini-2.5-flash-exp-native-audio-thinking-dialog";
+                        return "gemini-live-2.5-flash-preview";
                 }
             }
         }
