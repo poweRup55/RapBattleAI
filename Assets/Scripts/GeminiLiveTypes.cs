@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 [Serializable]
 public class BidiGenerateContentClientMessage
@@ -185,7 +186,7 @@ public class FunctionResponse
 [Serializable]
 public class Tool
 {
-    public FunctionDeclaration functionDeclaration;
+    public FunctionDeclaration[] functionDeclarations;
 }
 
 [Serializable]
@@ -193,7 +194,7 @@ public class FunctionDeclaration
 {
     public string name;
     public string description;
-    public object parameters;
+    public Schema parameters;
 }
 
 [Serializable]
@@ -354,15 +355,42 @@ public class InlineData
 [Serializable]
 public class Schema
 {
-    public string type;
-    public object properties;
-    public object items;
+    public TYPE type;
     public string format;
     public string title;
     public string description;
+    public bool nullable;
+    public Dictionary<string, Schema> properties;
+    public Schema items;
     public string[] enumValues;
     public object additionalProperties;
     public string[] required;
+    public string maxItems;
+    public string minItems;
+    public string minProperties;
+    public string maxProperties;
+    public string minLength;
+    public string maxLength;
+    public string pattern;
+    public object example;
+    public Schema[] anyOf;
+    public string[] propertyOrdering;
+    public object defaultValue;
+    public float minimum;
+    public float maximum;
+}
+
+[Serializable]
+public enum TYPE
+{
+    TYPE_UNSPECIFIED,
+    STRING,
+    NUMBER,
+    INTEGER,
+    BOOLEAN,
+    ARRAY,
+    OBJECT,
+    NULL,
 }
 
 public enum Modality

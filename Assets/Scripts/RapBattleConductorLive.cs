@@ -19,7 +19,10 @@ public class RapBattleConductorLive : MonoBehaviour
     private UIManager uiManager;
 
     [SerializeField]
-    private GeminiLiveWebRTC geminiLiveWebRTC;
+    private GeminiLiveWebRTCAudio geminiLiveAIRapper;
+
+    [SerializeField]
+    private GeminiLiveWebRTC geminiLiveAIJudge;
 
     [SerializeField]
     private float maxPlayerRecordingLengthInSeconds = 30f;
@@ -71,6 +74,8 @@ public class RapBattleConductorLive : MonoBehaviour
                 AILiveConfig.inputSampleRate
             );
         }
+        geminiLiveAIRapper.textGUIUpdater = uiManager.AppendComputerText;
+        geminiLiveAIJudge.textGUIUpdater = uiManager.UpdateAIJudgeText;
         BeginRapBattle();
     }
 
@@ -103,7 +108,8 @@ public class RapBattleConductorLive : MonoBehaviour
     private void TerminateLiveSession()
     {
         animationController.SetTrigger("ReturnToIdle");
-        geminiLiveWebRTC.Destroy();
+        geminiLiveAIRapper.Destroy();
+        geminiLiveAIJudge.Destroy();
         uIMenuController.ShowMainMenu();
     }
 
@@ -120,12 +126,17 @@ public class RapBattleConductorLive : MonoBehaviour
             currentState = BattleState.NPCTurn;
 
             Debug.Log("NPC is rapping...");
-            var createAudioCoroutine = StartCoroutine(geminiLiveWebRTC.CreateAudioCoroutines());
-            var playAudioCoroutine = StartCoroutine(geminiLiveWebRTC.PlayAudioCoroutine());
-            yield return new WaitUntil(() => geminiLiveWebRTC.IsPlaying);
+            var createAudioCoroutine = StartCoroutine(geminiLiveAIRapper.CreateAudioCoroutines());
+            var playAudioCoroutine = StartCoroutine(geminiLiveAIRapper.PlayAudioCoroutine());
+            yield return new WaitUntil(() => geminiLiveAIRapper.IsPlaying);
             uiManager.UpdateStatus($"NPC is rapping!");
             animationController.SetTrigger("StartRapping");
-            yield return StartCoroutine(geminiLiveWebRTC.waitForAudioStreamFinish());
+            yield return StartCoroutine(geminiLiveAIRapper.waitForAudioStreamFinish());
+            StartCoroutine(
+                geminiLiveAIJudge.SendAudioToGeminiCoroutine(
+                    WavUtility.ConcatenateAudioClips(geminiLiveAIRapper.responseAudioClips)
+                )
+            );
             yield return new WaitForSeconds(2f);
             animationController.SetTrigger("ReturnToIdle");
             StopCoroutine(createAudioCoroutine);
@@ -154,9 +165,11 @@ public class RapBattleConductorLive : MonoBehaviour
     private IEnumerator InitializeWithStatus()
     {
         uiManager.UpdateStatus("Connecting...");
-        Coroutine init = StartCoroutine(geminiLiveWebRTC.Initialize());
+        Coroutine init = StartCoroutine(geminiLiveAIRapper.Initialize());
+        Coroutine initJudge = StartCoroutine(geminiLiveAIJudge.Initialize());
         yield return new WaitForSeconds(2f);
         yield return init;
+        yield return initJudge;
         uiManager.UpdateStatus("Connected to Rap Battle Servers!");
         yield return new WaitForSeconds(2f);
     }
@@ -185,14 +198,15 @@ public class RapBattleConductorLive : MonoBehaviour
             currentState = BattleState.WaitingTurn;
             animationController.SetTrigger("StartThinking");
             uiManager.UpdateStatus("Waiting for your opponent to respond...");
+            StartCoroutine(geminiLiveAIJudge.SendAudioToGeminiCoroutine(playerRecordingClip));
             yield return StartCoroutine(
-                geminiLiveWebRTC.SendAudioToGeminiCoroutine(playerRecordingClip)
+                geminiLiveAIRapper.SendAudioToGeminiCoroutine(playerRecordingClip)
             );
             float startTime = Time.time;
-            geminiLiveWebRTC.WaitForAudioReception();
+            geminiLiveAIRapper.WaitForAudioReception();
             while (Time.time - startTime < 60f)
             {
-                if (geminiLiveWebRTC.IsReceivingAudioData)
+                if (geminiLiveAIRapper.IsReceivingAudioData)
                 {
                     yield break;
                 }

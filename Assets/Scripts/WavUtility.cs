@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using UnityEngine;
@@ -665,5 +666,39 @@ public class WavUtility
         }
 
         return samples;
+    }
+
+    public static AudioClip ConcatenateAudioClips(List<AudioClip> audioClipList)
+    {
+        if (audioClipList == null || audioClipList.Count == 0)
+        {
+            return null;
+        }
+        AudioClip firstClip = audioClipList[0];
+        int frequency = firstClip.frequency;
+        int channels = firstClip.channels;
+        int totalSamples = 0;
+        foreach (var clip in audioClipList)
+        {
+            totalSamples += clip.samples;
+        }
+        float[] combinedSamples = new float[totalSamples * channels];
+        int offset = 0;
+        foreach (var clip in audioClipList)
+        {
+            float[] samples = new float[clip.samples * channels];
+            clip.GetData(samples, 0);
+            Array.Copy(samples, 0, combinedSamples, offset, samples.Length);
+            offset += samples.Length;
+        }
+        AudioClip combinedClip = AudioClip.Create(
+            "CombinedResponse",
+            totalSamples,
+            channels,
+            frequency,
+            false
+        );
+        combinedClip.SetData(combinedSamples, 0);
+        return combinedClip;
     }
 }

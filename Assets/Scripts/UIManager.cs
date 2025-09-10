@@ -1,3 +1,4 @@
+using System.Collections;
 using TMPro;
 using UnityEngine;
 
@@ -11,6 +12,9 @@ public class UIManager : MonoBehaviour
 
     [SerializeField]
     private TextMeshProUGUI errorTextUI;
+
+    [SerializeField]
+    private TextMeshProUGUI aiJudgeTextUI;
 
     public void UpdateComputerText(string text)
     {
@@ -73,6 +77,10 @@ public class UIManager : MonoBehaviour
         {
             errorTextUI.text = "";
         }
+        if (aiJudgeTextUI != null)
+        {
+            aiJudgeTextUI.text = "";
+        }
     }
 
     public void ShowError(string errorMessage)
@@ -82,5 +90,19 @@ public class UIManager : MonoBehaviour
             errorTextUI.text = "Error: " + errorMessage;
         }
         Debug.LogError(errorMessage);
+    }
+
+    public void UpdateAIJudgeText(string text)
+    {
+        if (aiJudgeTextUI != null)
+        {
+            // Detect RTL languages: Hebrew, Arabic, Syriac, Thaana, N'Ko, etc.
+            bool isRtl = System.Text.RegularExpressions.Regex.IsMatch(
+                text,
+                @"[\u0590-\u05FF\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\u0700-\u074F\u07C0-\u07FF\uFB50-\uFDFF\uFE70-\uFEFF]"
+            );
+            aiJudgeTextUI.isRightToLeftText = isRtl;
+            aiJudgeTextUI.text += text;
+        }
     }
 }

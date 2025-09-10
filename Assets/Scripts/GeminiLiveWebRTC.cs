@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Net.WebSockets;
 using System.Text;
 using EpicRapBattle.Config;
@@ -10,64 +9,58 @@ using UnityEngine;
 
 public class GeminiLiveWebRTC : MonoBehaviour
 {
-    [SerializeField]
-    UIManager uiManager;
+    static RTCIceServer[] iceServers = new RTCIceServer[]
+    {
+        new RTCIceServer { urls = new string[] { "stun:stun.l.google.com:19302" } },
+        new RTCIceServer { urls = new string[] { "stun:stun.l.google.com:5349" } },
+        new RTCIceServer { urls = new string[] { "stun:stun1.l.google.com:3478" } },
+        new RTCIceServer { urls = new string[] { "stun:stun1.l.google.com:5349" } },
+        new RTCIceServer { urls = new string[] { "stun:stun2.l.google.com:19302" } },
+        new RTCIceServer { urls = new string[] { "stun:stun2.l.google.com:5349" } },
+        new RTCIceServer { urls = new string[] { "stun:stun3.l.google.com:3478" } },
+        new RTCIceServer { urls = new string[] { "stun:stun3.l.google.com:5349" } },
+        new RTCIceServer { urls = new string[] { "stun:stun4.l.google.com:19302" } },
+        new RTCIceServer { urls = new string[] { "stun:stun4.l.google.com:5349" } },
+    };
+
+    public Action<string> textGUIUpdater { get; set; }
 
     [Header("Configuration")]
     [SerializeField]
-    private AILiveConfig aiConfig;
+    protected AILiveConfig aiConfig;
 
     [Header("Gemini Generation Config")]
     [Tooltip("Controls randomness of generation. Typical range: 0.0 - 2.0")]
-    public float temperature = 0.8f;
+    protected float temperature = 0.8f;
 
     [Tooltip("Controls nucleus sampling. Typical range: 0.0 - 1.0")]
-    public float topP = 0.9f;
+    protected float topP = 0.9f;
 
     [Tooltip("Maximum output tokens for Gemini response")]
-    public int maxOutputTokens = 6000;
+    protected int maxOutputTokens = 6000;
 
     [Tooltip("Number of candidates to generate")]
-    public int candidateCount = 1;
-
-    [SerializeField]
-    private int audioBufferFlushThreshold = 70;
-
-    [Header("Audio")]
-    [SerializeField]
-    private AudioSource audioSource;
+    protected int candidateCount = 1;
 
     [Header("Debug")]
     [SerializeField]
-    private bool enableDebugLogs = true;
+    protected bool enableDebugLogs = true;
 
     [SerializeField]
-    private const int maxChunkSize = 1024;
+    protected const int maxChunkSize = 1024;
 
-    private RTCPeerConnection localConnection;
-    private RTCDataChannel sendChannel;
-    private RTCDataChannel receiveChannel;
-    private ClientWebSocket webSocket;
-    private System.Threading.CancellationTokenSource cancellationTokenSource;
-    private bool isConnected = false;
-    private bool isSetupComplete = false;
+    protected RTCPeerConnection localConnection;
+    protected RTCDataChannel sendChannel;
+    protected RTCDataChannel receiveChannel;
+    protected ClientWebSocket webSocket;
+    protected System.Threading.CancellationTokenSource cancellationTokenSource;
+    protected bool isConnected = false;
+    protected bool isSetupComplete = false;
     public bool IsConnected => isConnected;
     public bool IsSetupComplete => isSetupComplete;
 
-    private bool receivingAudioStreamIn { get; set; } = false;
-
-    public bool IsReceivingAudioData => receivingAudioStreamIn;
-
-    private bool finishedAudioStreamIn = false;
-    private Queue<byte[]> audioResponseQueue = new Queue<byte[]>();
-    private Queue<IEnumerator> audioCoroutineQueue = new Queue<IEnumerator>();
-    private List<AudioClip> activeAudioClips = new List<AudioClip>();
-
     private const string GEMINI_WEBSOCKET_URL =
         "wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContentConstrained";
-    private const string DefaultStunServer = "stun:stun.l.google.com:19302";
-
-    public bool IsPlaying => audioSource.isPlaying;
 
     public IEnumerator Initialize()
     {
@@ -76,36 +69,21 @@ public class GeminiLiveWebRTC : MonoBehaviour
             string errorMessage = "AIConfig is not assigned!";
             ThrowGeminiLiveException(errorMessage);
         }
+        if (textGUIUpdater == null)
+        {
+            string errorMessage = "Text GUI Updater callback is not assigned!";
+            ThrowGeminiLiveException(errorMessage);
+        }
         ResetConnectionState();
         aiConfig.GenerateEphemeralKey();
         InitializeWebRTC();
         yield return StartCoroutine(ConnectWebSocketCoroutine());
     }
 
-    private void ResetConnectionState()
+    protected virtual void ResetConnectionState()
     {
         isConnected = false;
         isSetupComplete = false;
-        receivingAudioStreamIn = false;
-        finishedAudioStreamIn = false;
-        audioResponseQueue = new Queue<byte[]>();
-        audioCoroutineQueue = new Queue<IEnumerator>();
-        CleanupActiveAudioClips();
-    }
-
-    private void CleanupActiveAudioClips()
-    {
-        lock (activeAudioClips)
-        {
-            foreach (var clip in activeAudioClips)
-            {
-                if (clip != null)
-                {
-                    DestroyImmediate(clip);
-                }
-            }
-            activeAudioClips.Clear();
-        }
     }
 
     private void ThrowGeminiLiveException(string errorMessage)
@@ -115,7 +93,7 @@ public class GeminiLiveWebRTC : MonoBehaviour
         throw new GeminiLiveException(errorMessage);
     }
 
-    private bool IsWebSocketConnected()
+    protected bool IsWebSocketConnected()
     {
         return webSocket != null && webSocket.State == WebSocketState.Open && isConnected;
     }
@@ -123,10 +101,7 @@ public class GeminiLiveWebRTC : MonoBehaviour
     private void InitializeWebRTC()
     {
         RTCConfiguration config = default;
-        config.iceServers = new RTCIceServer[]
-        {
-            new RTCIceServer { urls = new string[] { DefaultStunServer } },
-        };
+        config.iceServers = iceServers;
 
         localConnection = new RTCPeerConnection(ref config);
 
@@ -263,7 +238,10 @@ public class GeminiLiveWebRTC : MonoBehaviour
             Debug.Log("Setup message sent to Gemini Live API");
     }
 
-    private BidiGenerateContentClientMessage GetSetupMessage(string modelString, string voiceName)
+    protected virtual BidiGenerateContentClientMessage GetSetupMessage(
+        string modelString,
+        string voiceName
+    )
     {
         return new BidiGenerateContentClientMessage
         {
@@ -272,14 +250,7 @@ public class GeminiLiveWebRTC : MonoBehaviour
                 model = $"models/{modelString}",
                 generationConfig = new GenerationConfig
                 {
-                    responseModalities = new string[] { Modality.AUDIO.ToString() },
-                    speechConfig = new SpeechConfig
-                    {
-                        voiceConfig = new VoiceConfig
-                        {
-                            prebuiltVoiceConfig = new PrebuiltVoiceConfig { voiceName = voiceName },
-                        },
-                    },
+                    responseModalities = new string[] { "text" },
                     temperature = temperature,
                     // topP = topP,
                     // topK = topK,
@@ -295,8 +266,6 @@ public class GeminiLiveWebRTC : MonoBehaviour
                 {
                     parts = new Part[] { new Part { text = aiConfig.AIPrompt } },
                 },
-                proactivity = new ProactivityConfig { proactiveAudio = false },
-                outputAudioTranscription = new AudioTranscriptionConfig { },
             },
         };
     }
@@ -450,7 +419,7 @@ public class GeminiLiveWebRTC : MonoBehaviour
         else { }
     }
 
-    private void ProcessGeminiResponse(string json)
+    protected virtual void ProcessGeminiResponse(string json)
     {
         try
         {
@@ -490,7 +459,7 @@ public class GeminiLiveWebRTC : MonoBehaviour
             if (!string.IsNullOrEmpty(response.serverContent?.outputTranscription?.text))
             {
                 Debug.Log($"Transcription : {response.serverContent?.outputTranscription?.text}");
-                uiManager?.AppendComputerText(response.serverContent.outputTranscription.text);
+                textGUIUpdater?.Invoke(response.serverContent.outputTranscription.text);
                 return;
             }
 
@@ -509,40 +478,7 @@ public class GeminiLiveWebRTC : MonoBehaviour
                         // uiManager?.UpdateComputerText(part.text);
                         if (enableDebugLogs)
                             Debug.Log($"Received text response: {part.text}");
-                    }
-
-                    // Handle audio response
-                    if (part.inlineData != null && !string.IsNullOrEmpty(part.inlineData.data))
-                    {
-                        receivingAudioStreamIn = true;
-                        try
-                        {
-                            byte[] audioData = Convert.FromBase64String(part.inlineData.data);
-
-                            lock (audioResponseQueue)
-                            {
-                                audioResponseQueue.Enqueue(audioData);
-                            }
-
-                            if (enableDebugLogs)
-                                Debug.Log(
-                                    $"Received audio data: {audioData.Length} bytes, MIME: {part.inlineData.mimeType}, queue size: {audioResponseQueue.Count}"
-                                );
-                        }
-                        catch (Exception e)
-                        {
-                            string errorMessage = $"Error decoding audio data: {e.Message}";
-                            if (enableDebugLogs)
-                                Debug.LogError(errorMessage);
-
-                            throw new GeminiLiveException(
-                                "AUDIO_DECODE_ERROR",
-                                "ProcessGeminiResponse",
-                                "DecodeBase64Audio",
-                                errorMessage,
-                                e
-                            );
-                        }
+                        textGUIUpdater?.Invoke(part.text);
                     }
                 }
             }
@@ -552,7 +488,6 @@ public class GeminiLiveWebRTC : MonoBehaviour
             {
                 if (enableDebugLogs)
                     Debug.Log("Gemini turn complete");
-                finishedAudioStreamIn = true;
             }
 
             // Check for interrupted responses
@@ -576,11 +511,6 @@ public class GeminiLiveWebRTC : MonoBehaviour
                 e
             );
         }
-    }
-
-    public void WaitForAudioReception()
-    {
-        receivingAudioStreamIn = false;
     }
 
     public IEnumerator SendAudioToGeminiCoroutine(AudioClip recordingClip)
@@ -670,7 +600,7 @@ public class GeminiLiveWebRTC : MonoBehaviour
         yield return StartCoroutine(SendWebSocketMessageCoroutine(message));
     }
 
-    private IEnumerator SendWebSocketMessageCoroutine(object message)
+    protected IEnumerator SendWebSocketMessageCoroutine(object message)
     {
         if (webSocket == null || webSocket.State != WebSocketState.Open)
         {
@@ -748,155 +678,6 @@ public class GeminiLiveWebRTC : MonoBehaviour
         }
     }
 
-    public IEnumerator PlayAudioCoroutine()
-    {
-        while (IsWebSocketConnected())
-        {
-            IEnumerator audioCoroutine = null;
-            lock (audioCoroutineQueue)
-            {
-                if (audioCoroutineQueue.Count > 0)
-                    audioCoroutine = audioCoroutineQueue.Dequeue();
-            }
-            if (audioCoroutine != null)
-                yield return StartCoroutine(audioCoroutine);
-            else
-                yield return null;
-        }
-    }
-
-    public IEnumerator CreateAudioCoroutines()
-    {
-        finishedAudioStreamIn = false;
-        float timeSinceLastFlush = 0f;
-        const float maxWaitTime = 1f;
-
-        while (IsWebSocketConnected())
-        {
-            bool shouldProcess = false;
-            int queueCount = 0;
-
-            lock (audioResponseQueue)
-            {
-                queueCount = audioResponseQueue.Count;
-                shouldProcess =
-                    queueCount > audioBufferFlushThreshold
-                    || (timeSinceLastFlush >= maxWaitTime && queueCount > 0);
-            }
-
-            if (shouldProcess)
-            {
-                StartCoroutine(ProcessAudioQueue());
-                timeSinceLastFlush = 0f;
-            }
-            else
-            {
-                timeSinceLastFlush += Time.deltaTime;
-            }
-
-            yield return null;
-        }
-    }
-
-    private IEnumerator ProcessAudioQueue()
-    {
-        int totalBytes = 0;
-        byte[][] audioChunks;
-
-        lock (audioResponseQueue)
-        {
-            if (audioResponseQueue.Count == 0)
-            {
-                yield break;
-            }
-
-            audioChunks = new byte[audioResponseQueue.Count][];
-            int index = 0;
-
-            while (audioResponseQueue.Count > 0)
-            {
-                byte[] chunk = audioResponseQueue.Dequeue();
-                audioChunks[index] = chunk;
-                totalBytes += chunk.Length;
-                index++;
-            }
-        }
-
-        if (totalBytes > 0)
-        {
-            byte[] audioData = new byte[totalBytes];
-            int offset = 0;
-
-            for (int i = 0; i < audioChunks.Length; i++)
-            {
-                if (audioChunks[i] != null)
-                {
-                    Buffer.BlockCopy(audioChunks[i], 0, audioData, offset, audioChunks[i].Length);
-                    offset += audioChunks[i].Length;
-                }
-            }
-
-            try
-            {
-                float[] samples = WavUtility.ConvertPCMToFloat(audioData);
-
-                AudioClip responseClip = AudioClip.Create(
-                    "GeminiResponse",
-                    samples.Length,
-                    1,
-                    24000,
-                    false
-                );
-                responseClip.SetData(samples, 0);
-
-                lock (activeAudioClips)
-                {
-                    activeAudioClips.Add(responseClip);
-                }
-
-                lock (audioCoroutineQueue)
-                {
-                    audioCoroutineQueue.Enqueue(PlayAudioResponse(responseClip));
-                }
-            }
-            catch (Exception e)
-            {
-                if (enableDebugLogs)
-                    Debug.LogError($"Error processing audio data: {e.Message}");
-            }
-        }
-
-        yield return null;
-    }
-
-    private IEnumerator PlayAudioResponse(AudioClip responseClip)
-    {
-        if (responseClip == null)
-        {
-            if (enableDebugLogs)
-                Debug.LogWarning("Attempted to play null AudioClip");
-            yield break;
-        }
-
-        audioSource.clip = responseClip;
-        audioSource.Play();
-
-        yield return new WaitForSeconds(responseClip.length);
-
-        if (enableDebugLogs)
-            Debug.Log("Played audio response from Gemini");
-
-        lock (activeAudioClips)
-        {
-            activeAudioClips.Remove(responseClip);
-        }
-
-        if (responseClip != null)
-        {
-            DestroyImmediate(responseClip);
-        }
-    }
-
     private void OnIceCandidate(RTCIceCandidate candidate)
     {
         if (enableDebugLogs)
@@ -943,38 +724,6 @@ public class GeminiLiveWebRTC : MonoBehaviour
         Destroy();
     }
 
-    public IEnumerator waitForAudioStreamFinish()
-    {
-        while (IsAudioActive())
-        {
-            yield return new WaitForSeconds(5f);
-        }
-        yield return null;
-    }
-
-    private bool IsAudioActive()
-    {
-        bool isPlaying = audioSource != null && audioSource.isPlaying;
-
-        int coroutineQueueCount = 0;
-        int responseQueueCount = 0;
-
-        lock (audioCoroutineQueue)
-        {
-            coroutineQueueCount = audioCoroutineQueue.Count;
-        }
-
-        lock (audioResponseQueue)
-        {
-            responseQueueCount = audioResponseQueue.Count;
-        }
-
-        return isPlaying
-            || coroutineQueueCount > 0
-            || responseQueueCount > 0
-            || !finishedAudioStreamIn;
-    }
-
     public async void Destroy()
     {
         if (webSocket != null && webSocket.State == WebSocketState.Open)
@@ -1008,8 +757,6 @@ public class GeminiLiveWebRTC : MonoBehaviour
         sendChannel?.Close();
         receiveChannel?.Close();
         localConnection?.Close();
-
-        CleanupActiveAudioClips();
 
         isConnected = false;
         isSetupComplete = false;
