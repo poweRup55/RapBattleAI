@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using UnityEngine;
 
-public class GeminiLiveWebRTCAudio : GeminiLiveWebRTC
+public abstract class GeminiLiveWebRTCAudio : GeminiLiveWebRTC
 {
     [SerializeField]
     private int audioBufferFlushThreshold = 70;

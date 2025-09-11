@@ -6,10 +6,9 @@ using System.Text;
 using EpicRapBattle.Config;
 using Newtonsoft.Json;
 using Unity.WebRTC;
-using UnityEditor.VersionControl;
 using UnityEngine;
 
-public class GeminiLiveWebRTC : MonoBehaviour
+public abstract class GeminiLiveWebRTC : MonoBehaviour
 {
     static RTCIceServer[] iceServers = new RTCIceServer[]
     {
@@ -24,10 +23,6 @@ public class GeminiLiveWebRTC : MonoBehaviour
         new RTCIceServer { urls = new string[] { "stun:stun4.l.google.com:19302" } },
         new RTCIceServer { urls = new string[] { "stun:stun4.l.google.com:5349" } },
     };
-
-    public Action<string> textGUIUpdater { get; set; }
-
-    public Action textGUIReset { get; set; }
 
     [Header("Configuration")]
     [SerializeField]
@@ -72,11 +67,6 @@ public class GeminiLiveWebRTC : MonoBehaviour
         if (!aiConfig)
         {
             string errorMessage = "AIConfig is not assigned!";
-            ThrowGeminiLiveException(errorMessage);
-        }
-        if (textGUIUpdater == null)
-        {
-            string errorMessage = "Text GUI Updater callback is not assigned!";
             ThrowGeminiLiveException(errorMessage);
         }
         ResetConnectionState();
@@ -475,10 +465,11 @@ public class GeminiLiveWebRTC : MonoBehaviour
                 if (enableDebugLogs)
                     Debug.Log($"Setup completed by Gemini Live API {response.setupComplete}");
             }
+
             if (!string.IsNullOrEmpty(response.serverContent?.outputTranscription?.text))
             {
                 Debug.Log($"Transcription : {response.serverContent?.outputTranscription?.text}");
-                textGUIUpdater?.Invoke(response.serverContent.outputTranscription.text);
+                OnTranscriptionReceived(response.serverContent?.outputTranscription?.text);
                 return;
             }
 
@@ -497,7 +488,7 @@ public class GeminiLiveWebRTC : MonoBehaviour
                         // uiManager?.UpdateComputerText(part.text);
                         if (enableDebugLogs)
                             Debug.Log($"Received text response: {part.text}");
-                        textGUIUpdater?.Invoke(part.text);
+                        OnTextResponseReceived(part.text);
                     }
                 }
             }
@@ -505,7 +496,6 @@ public class GeminiLiveWebRTC : MonoBehaviour
             // Check for turn completion
             if (response.turnComplete || (response.serverContent?.turnComplete == true))
             {
-                StartCoroutine(WaitAndDeleteText(5f));
                 if (enableDebugLogs)
                     Debug.Log("Gemini turn complete");
             }
@@ -533,11 +523,9 @@ public class GeminiLiveWebRTC : MonoBehaviour
         }
     }
 
-    private IEnumerator WaitAndDeleteText(float duration)
-    {
-        yield return new WaitForSeconds(duration);
-        textGUIReset?.Invoke();
-    }
+    protected abstract void OnTextResponseReceived(string text);
+
+    protected abstract void OnTranscriptionReceived(string text);
 
     public IEnumerator SendAudioToGeminiCoroutine(AudioClip recordingClip)
     {

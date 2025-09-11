@@ -702,7 +702,7 @@ public class WavUtility
         return combinedClip;
     }
 
-    internal static AudioClip GetAudioClipSegment(
+    public static AudioClip GetAudioClipSegment(
         AudioClip playerRecordingClip,
         float fromTime,
         float toTime

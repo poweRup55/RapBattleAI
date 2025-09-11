@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using TMPro;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class UIManager : MonoBehaviour
 {
@@ -16,6 +17,12 @@ public class UIManager : MonoBehaviour
 
     [SerializeField]
     private TextMeshProUGUI aiJudgeTextUI;
+
+    [SerializeField]
+    private GameObject MainBattleUI;
+
+    [SerializeField]
+    private GameObject JudgePanelUI;
 
     public void UpdateComputerText(string text)
     {
@@ -107,11 +114,37 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    internal void ClearAIJudgeText()
+    public void ClearAIJudgeText()
     {
         if (aiJudgeTextUI != null)
         {
             aiJudgeTextUI.text = "";
+        }
+    }
+
+    public void ShowPopUp(string message)
+    {
+        GameObject popUpObj = Instantiate(
+            Resources.Load<GameObject>("PopUpGameText"),
+            MainBattleUI.transform
+        );
+        popUpObj.GetComponent<RectTransform>().anchoredPosition = new Vector2(
+            Random.Range(-50f, 50f),
+            Random.Range(-50f, 50f)
+        );
+        PopUpGameText popUpGameText = popUpObj.GetComponent<PopUpGameText>();
+        popUpGameText.ShowText(message);
+    }
+
+    public IEnumerator ShowJudgePanelTemporarily(float duration)
+    {
+        if (JudgePanelUI != null)
+        {
+            JudgePanelUI.SetActive(true);
+            MainBattleUI.SetActive(false);
+            yield return new WaitForSeconds(duration);
+            JudgePanelUI.SetActive(false);
+            MainBattleUI.SetActive(true);
         }
     }
 }

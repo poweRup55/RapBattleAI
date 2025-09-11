@@ -67,7 +67,7 @@ public class RapBattleConductor : MonoBehaviour
 
     [Header("UI Controllers")]
     [SerializeField]
-    private UIMenuController uIMenuController;
+    private UIMainMenuController uIMenuController;
     private int currentRound = 0;
     private int submitRapPeriodInSeconds = 5;
     private float secondsPerBeat;

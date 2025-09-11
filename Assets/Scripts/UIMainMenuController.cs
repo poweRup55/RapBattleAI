@@ -2,7 +2,7 @@ using System.Collections;
 using TMPro;
 using UnityEngine;
 
-public class UIMenuController : MonoBehaviour
+public class UIMainMenuController : MonoBehaviour
 {
     private bool seenInstructions = false;
 
