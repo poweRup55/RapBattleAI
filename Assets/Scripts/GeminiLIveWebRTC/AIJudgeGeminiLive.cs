@@ -8,6 +8,38 @@ public class AIJudgeGeminiLive : GeminiLiveWebRTC
 
     private string responseBuffer = "";
 
+    protected override BidiGenerateContentClientMessage GetSetupMessage(
+        string modelString,
+        string voiceName
+    )
+    {
+        {
+            return new BidiGenerateContentClientMessage
+            {
+                setup = new BidiGenerateContentSetup
+                {
+                    model = $"models/{modelString}",
+                    generationConfig = new GenerationConfig
+                    {
+                        responseModalities = new string[] { "text" },
+                    },
+                    // realtimeInputConfig = new RealtimeInputConfig
+                    // {
+                    //     automaticActivityDetection = new AutomaticActivityDetection
+                    //     {
+                    //         disabled = true,
+                    //     },
+                    //     activityHandling = ActivityHandling.NO_INTERRUPTION,
+                    // },
+                    systemInstruction = new Content
+                    {
+                        parts = new Part[] { new Part { text = aiConfig.AIPrompt } },
+                    },
+                },
+            };
+        }
+    }
+
     protected override void OnTextResponseReceived(string text)
     {
         Debug.Log($"OnTextResponseReceived: {text}");

@@ -252,32 +252,10 @@ public abstract class GeminiLiveWebRTC : MonoBehaviour
             Debug.Log("Setup message sent to Gemini Live API");
     }
 
-    protected virtual BidiGenerateContentClientMessage GetSetupMessage(
+    protected abstract BidiGenerateContentClientMessage GetSetupMessage(
         string modelString,
         string voiceName
-    )
-    {
-        return new BidiGenerateContentClientMessage
-        {
-            setup = new BidiGenerateContentSetup
-            {
-                model = $"models/{modelString}",
-                generationConfig = new GenerationConfig
-                {
-                    responseModalities = new string[] { "text" },
-                },
-                realtimeInputConfig = new RealtimeInputConfig
-                {
-                    automaticActivityDetection = new AutomaticActivityDetection { disabled = true },
-                    activityHandling = ActivityHandling.NO_INTERRUPTION,
-                },
-                systemInstruction = new Content
-                {
-                    parts = new Part[] { new Part { text = aiConfig.AIPrompt } },
-                },
-            },
-        };
-    }
+    );
 
     private IEnumerator ReceiveMessagesCoroutine()
     {
@@ -527,11 +505,11 @@ public abstract class GeminiLiveWebRTC : MonoBehaviour
 
     protected abstract void OnTranscriptionReceived(string text);
 
-    public IEnumerator SendAudioToGeminiCoroutine(AudioClip recordingClip)
+    public IEnumerator SendAudioToGeminiCoroutine(float[] samples)
     {
-        if (recordingClip == null)
+        if (samples == null || samples.Length == 0)
         {
-            string errorMessage = "Recording clip is null";
+            string errorMessage = "Recording clip is null or empty";
             Debug.LogError($"GeminiLiveWebRTC: {errorMessage}");
 
             throw new GeminiLiveException(
@@ -542,32 +520,9 @@ public abstract class GeminiLiveWebRTC : MonoBehaviour
             );
         }
 
-        if (recordingClip.samples == 0)
-        {
-            string errorMessage = "Recording clip has no audio samples";
-            Debug.LogError($"GeminiLiveWebRTC: {errorMessage}");
-
-            throw new GeminiLiveException(
-                "AUDIO_INPUT_ERROR",
-                "SendAudioToGeminiCoroutine",
-                "ValidateAudioSamples",
-                errorMessage
-            );
-        }
-
-        float[] samples = new float[recordingClip.samples * recordingClip.channels];
-        recordingClip.GetData(samples, 0);
         byte[] pcmData = WavUtility.ConvertToPCM16(samples);
 
         string base64Audio = Convert.ToBase64String(pcmData);
-
-        var activityStartMessage = new BidiGenerateContentClientMessage
-        {
-            realtimeInput = new BidiGenerateContentRealtimeInput
-            {
-                activityStart = new ActivityStart(),
-            },
-        };
 
         var message = new BidiGenerateContentClientMessage
         {
@@ -581,6 +536,26 @@ public abstract class GeminiLiveWebRTC : MonoBehaviour
             },
         };
 
+        messagesQueue.Enqueue(message);
+        yield return null;
+    }
+
+    public IEnumerator SendActivityStartToGeminiCoroutine()
+    {
+        var activityStartMessage = new BidiGenerateContentClientMessage
+        {
+            realtimeInput = new BidiGenerateContentRealtimeInput
+            {
+                activityStart = new ActivityStart(),
+            },
+        };
+
+        messagesQueue.Enqueue(activityStartMessage);
+        yield return null;
+    }
+
+    public IEnumerator SendActivityEndToGeminiCoroutine()
+    {
         var activityEndMessage = new BidiGenerateContentClientMessage
         {
             realtimeInput = new BidiGenerateContentRealtimeInput
@@ -589,8 +564,6 @@ public abstract class GeminiLiveWebRTC : MonoBehaviour
             },
         };
 
-        messagesQueue.Enqueue(activityStartMessage);
-        messagesQueue.Enqueue(message);
         messagesQueue.Enqueue(activityEndMessage);
         yield return null;
     }
