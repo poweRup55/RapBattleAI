@@ -1,10 +1,12 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Net.WebSockets;
 using System.Text;
 using EpicRapBattle.Config;
 using Newtonsoft.Json;
 using Unity.WebRTC;
+using UnityEditor.VersionControl;
 using UnityEngine;
 
 public class GeminiLiveWebRTC : MonoBehaviour
@@ -60,6 +62,7 @@ public class GeminiLiveWebRTC : MonoBehaviour
     protected bool isSetupComplete = false;
     public bool IsConnected => isConnected;
     public bool IsSetupComplete => isSetupComplete;
+    private Queue<object> messagesQueue = new Queue<object>();
 
     private const string GEMINI_WEBSOCKET_URL =
         "wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContentConstrained";
@@ -80,6 +83,25 @@ public class GeminiLiveWebRTC : MonoBehaviour
         aiConfig.GenerateEphemeralKey();
         InitializeWebRTC();
         yield return StartCoroutine(ConnectWebSocketCoroutine());
+        StartCoroutine(ProcessMessagesQueue());
+    }
+
+    private IEnumerator ProcessMessagesQueue()
+    {
+        while (webSocket.State == WebSocketState.Open)
+        {
+            yield return new WaitUntil(() => messagesQueue.Count > 0);
+            object message = null;
+            lock (messagesQueue)
+            {
+                message = messagesQueue.Dequeue();
+            }
+            if (message != null)
+            {
+                yield return StartCoroutine(SendWebSocketMessageCoroutine(message));
+            }
+            message = null;
+        }
     }
 
     protected virtual void ResetConnectionState()
@@ -234,7 +256,7 @@ public class GeminiLiveWebRTC : MonoBehaviour
             );
         }
 
-        StartCoroutine(SendWebSocketMessageCoroutine(setupMessage));
+        messagesQueue.Enqueue(setupMessage);
 
         if (enableDebugLogs)
             Debug.Log("Setup message sent to Gemini Live API");
@@ -579,9 +601,10 @@ public class GeminiLiveWebRTC : MonoBehaviour
             },
         };
 
-        yield return StartCoroutine(SendWebSocketMessageCoroutine(activityStartMessage));
-        yield return StartCoroutine(SendWebSocketMessageCoroutine(message));
-        yield return StartCoroutine(SendWebSocketMessageCoroutine(activityEndMessage));
+        messagesQueue.Enqueue(activityStartMessage);
+        messagesQueue.Enqueue(message);
+        messagesQueue.Enqueue(activityEndMessage);
+        yield return null;
     }
 
     public IEnumerator SendTextToGeminiCoroutine(string inputText)
@@ -604,7 +627,8 @@ public class GeminiLiveWebRTC : MonoBehaviour
             realtimeInput = new BidiGenerateContentRealtimeInput { text = inputText },
         };
 
-        yield return StartCoroutine(SendWebSocketMessageCoroutine(message));
+        messagesQueue.Enqueue(message);
+        yield return null;
     }
 
     protected IEnumerator SendWebSocketMessageCoroutine(object message)
