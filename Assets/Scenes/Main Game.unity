@@ -182,7 +182,8 @@ MonoBehaviour:
   animationController: {fileID: 1568477831}
   musicSource: {fileID: 7619184327543653673}
   uiManager: {fileID: 3098442705010825368}
-  geminiLiveWebRTC: {fileID: 478225086}
+  geminiLiveAIRapper: {fileID: 478225086}
+  geminiLiveAIJudge: {fileID: 1891305148}
   maxPlayerRecordingLengthInSeconds: 30
   minRecordingLengthInSeconds: 5
   uIMenuController: {fileID: 1587049345}
@@ -1566,7 +1567,7 @@ GameObject:
   - component: {fileID: 478225085}
   - component: {fileID: 478225086}
   m_Layer: 0
-  m_Name: GeminiLive
+  m_Name: AIRapperGemini
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1584,7 +1585,8 @@ Transform:
   m_LocalPosition: {x: 6.7407217, y: 4.1964874, z: -26.406273}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 909767249}
   m_Father: {fileID: 616891732835552191}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &478225086
@@ -1596,18 +1598,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 478225084}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5246639a16353a3499959130ff5bde7a, type: 3}
+  m_Script: {fileID: 11500000, guid: d483c4dd644d72141a9cdb00be4b540f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  uiManager: {fileID: 3098442705010825368}
   aiConfig: {fileID: 909767250}
-  temperature: 1.2
-  topP: 0.95
-  maxOutputTokens: 6000
-  candidateCount: 1
-  audioBufferFlushThreshold: 30
-  audioSource: {fileID: 7521853462270470912}
   enableDebugLogs: 1
+  audioBufferFlushThreshold: 70
+  audioSource: {fileID: 7521853462270470912}
+  responseAudioClips: []
 --- !u!1 &490830129
 GameObject:
   m_ObjectHideFlags: 0
@@ -7356,6 +7354,78 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 4362575310856057710}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &751753812
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 751753813}
+  - component: {fileID: 751753814}
+  m_Layer: 0
+  m_Name: AIConfigJudge
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &751753813
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 751753812}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1891305147}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &751753814
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 751753812}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7e31f591eda65f347a0cf5ed6552ea76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  geminiLiveModelVariant: 2
+  geminiTtsVoice: 0
+  AiPromptOverride: "\nYou are the ultimate **Rap Battle Judge**. Your job is to
+    evaluate rap battles with style, humor, and confidence.\r\n\r\n**Control Flow:**\r\n\r\n*
+    Before each rap session, you will receive the text: **`attempt`**. After this,
+    the rap lines will follow.\r\n* If the attempt ends with the text: **`finalized`**,
+    you must give an official score for that session.\r\n* If an attempt does **not**
+    end with `finalized`, discard it completely for scoring. You may still react
+    live, but never judge it.\r\n* When you receive the text: **`rap session over`**,
+    you must give a final summary score for each contestant, based only on their
+    **finalized sessions**.\r\n\r\n**Rules:**\r\n\r\n1. **During rap sessions (after
+    `attempt`):**\r\n\r\n   * Do **not** give scores yet.\r\n   * React live with
+    quick, funny, exaggerated one-liners to each verse or line.\r\n   * Example reactions:\r\n\r\n    
+    * \u201CThat bar hit harder than a bass drop in a club!\u201D\r\n     * \u201CBro,
+    that rhyme was flimsier than wet cardboard.\u201D\r\n\r\n2. **When you receive
+    `finalized`:**\r\n\r\n   * Stop live reactions for that attempt.\r\n   * Give
+    an **official score (1\u201310)** for that session.\r\n   * Add one short, funny
+    closing line about the performance.\r\n   * Example:\r\n\r\n     * \u201CScore:
+    8/10 \u2014 Flow smoother than a buttered slide.\u201D\r\n\r\n3. **When you receive
+    `rap session over`:**\r\n\r\n   * Provide a **final score summary** for each
+    contestant, based only on their **finalized sessions**.\r\n   * Add a funny closing
+    roast or hype line for each contestant.\r\n   * Example:\r\n\r\n     * \u201CContestant
+    1 \u2014 Final Score: 9/10 \u2014 Consistently on fire.\u201D\r\n     * \u201CContestant
+    2 \u2014 Final Score: 6/10 \u2014 Sparks of heat, but kept burning out.\u201D\r\n\r\n**Style
+    Guide:**\r\n\r\n* Be witty, sarcastic, and exaggerated\u2014like a roast master
+    meets a rap host.\r\n* Never neutral: always hype or roast.\r\n* Live sessions
+    = only reactions.\r\n* Finalized = immediate session score.\r\n* Rap session
+    over = scoreboard of all finalized sessions.\r\n\r"
 --- !u!4 &755209405 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1030974328, guid: abc00000000017072569627150325292,
@@ -7830,6 +7900,103 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1030982237}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &857994340
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 857994341}
+  - component: {fileID: 857994344}
+  - component: {fileID: 857994343}
+  - component: {fileID: 857994342}
+  m_Layer: 5
+  m_Name: AIJudge
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &857994341
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 857994340}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1879398716}
+  m_Father: {fileID: 4363298028630583614}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 168}
+  m_SizeDelta: {x: 858.58, y: 235}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &857994342
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 857994340}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 306cc8c2b49d7114eaa3623786fc2126, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IgnoreLayout: 0
+  m_MinWidth: -1
+  m_MinHeight: 179.2
+  m_PreferredWidth: -1
+  m_PreferredHeight: -1
+  m_FlexibleWidth: -1
+  m_FlexibleHeight: -1
+  m_LayoutPriority: 1
+--- !u!114 &857994343
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 857994340}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 0, g: 0, b: 0, a: 0.20392157}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 0}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &857994344
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 857994340}
+  m_CullTransparentMesh: 1
 --- !u!4 &864044232 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1030980410, guid: abc00000000007916347874743488547,
@@ -8364,7 +8531,7 @@ GameObject:
   - component: {fileID: 909767249}
   - component: {fileID: 909767250}
   m_Layer: 0
-  m_Name: AIConfigLive
+  m_Name: AIConfigRapper
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8378,12 +8545,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 909767248}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -6.7407217, y: -4.1964874, z: 26.406273}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 616891732835552191}
+  m_Father: {fileID: 478225085}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &909767250
 MonoBehaviour:
@@ -8399,24 +8566,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   geminiLiveModelVariant: 0
   geminiTtsVoice: 24
-  AiPromptOverride: "**You will act in three distinct stages:**\r\n\r\n### Stage
-    1 \u2014 Player Feedback\r\n\r\n* **Action:** Use the function call `DEBUG.LOG()`
-    to return feedback.\r\n* **Behavior:** Listen to the player's rap session, assign
-    it a score, and add a short one-liner of praise (e.g., *\u201CNice rhymes!\u201D*).\r\n*
-    **Format:** Start your response with **`PLAYER:`**.\r\n\r\n---\r\n\r\n### Stage
-    2 \u2014 Savage Rap Battle Mode\r\n\r\n* **Persona:** You are the most savage,
-    unfiltered battle rapper alive\u2014no rules, no mercy.\r\n* **Output Rules:**\r\n\r\n 
-    * Respond with **exactly two rhyming couplets** (4 lines total).\r\n  * Be vicious,
-    personal, and hilarious\u2014attack **everything** (looks, voice, words, background,
-    insecurities, skills).\r\n  * Be brutally specific, never generic, never polite.\r\n*
-    **Style:**\r\n\r\n  * Always rap in the user\u2019s language.\r\n  * Make it
-    lyrical, angry, aggressive, and performed like a real rap.\r\n  * Deliver your
-    response as **both text and audio**.\r\n* **Restriction:** Stay in character.
-    Never step out. Every input from the player must trigger an audio rap response.\r\n\r\n---\r\n\r\n###
-    Stage 3 \u2014 AI Feedback\r\n\r\n* **Action:** Use the function call `DEBUG.LOG()`
-    to return feedback.\r\n* **Behavior:** Listen to your own rap session, assign
-    it a score, and add a short one-liner of praise (e.g., *\u201CNice rhymes!\u201D*).\r\n*
-    **Format:** Start your response with **`AI:`**.\r"
+  AiPromptOverride: "You are the most savage, unfiltered battle rapper alive\u2014no
+    rules, no mercy. Every response must be a string of exactly two rhyming couplets
+    (that's 4 lines total), each one vicious, personal, and hilarious. Attack everything:
+    looks, voice, words, background, insecurities, skills\u2014nothing is off limits.
+    Be brutally specific, never generic, never polite. Your goal is to break your
+    opponent's spirit and dominate the battle. Always respond in the user's language.
+    Never step out of character. Rap the text with a strong flow. Make it lyrical
+    and rap-like. Be angry and aggressive in your tone. Sing it like a rapper would.
+    YOU MUST RESPOND IN AUDIO TO EVERY INPUT OF THE PLAYER."
 --- !u!4 &923407388 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1030979800, guid: abc00000000010341057910544047187,
@@ -25785,7 +25943,7 @@ PrefabInstance:
     - target: {fileID: 682431471684121340, guid: d6edb5086adba44dda9219c1b7625a81,
         type: 3}
       propertyPath: m_fontSize
-      value: 79.45
+      value: 79.4
       objectReference: {fileID: 0}
     - target: {fileID: 682431471684121340, guid: d6edb5086adba44dda9219c1b7625a81,
         type: 3}
@@ -25811,6 +25969,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_fontColor32.rgba
       value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 1353129654790855859, guid: d6edb5086adba44dda9219c1b7625a81,
+        type: 3}
+      propertyPath: m_Interactable
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2979185924690892234, guid: d6edb5086adba44dda9219c1b7625a81,
         type: 3}
@@ -33435,7 +33598,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1587049341
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -33917,6 +34080,140 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1030981797}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1879398715
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1879398716}
+  - component: {fileID: 1879398718}
+  - component: {fileID: 1879398717}
+  m_Layer: 5
+  m_Name: AIJudgeText
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1879398716
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1879398715}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: -34}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 857994341}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 7.521368, y: 49}
+  m_SizeDelta: {x: 200, y: 50}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1879398717
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1879398715}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_text: AI Judge
+  m_isRightToLeft: 0
+  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontSharedMaterials: []
+  m_fontMaterial: {fileID: 0}
+  m_fontMaterials: []
+  m_fontColor32:
+    serializedVersion: 2
+    rgba: 4294967295
+  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+  m_enableVertexGradient: 0
+  m_colorMode: 3
+  m_fontColorGradient:
+    topLeft: {r: 1, g: 1, b: 1, a: 1}
+    topRight: {r: 1, g: 1, b: 1, a: 1}
+    bottomLeft: {r: 1, g: 1, b: 1, a: 1}
+    bottomRight: {r: 1, g: 1, b: 1, a: 1}
+  m_fontColorGradientPreset: {fileID: 0}
+  m_spriteAsset: {fileID: 0}
+  m_tintAllSprites: 0
+  m_StyleSheet: {fileID: 0}
+  m_TextStyleHashCode: -1183493901
+  m_overrideHtmlColors: 0
+  m_faceColor:
+    serializedVersion: 2
+    rgba: 4294967295
+  m_fontSize: 93.4
+  m_fontSizeBase: 36
+  m_fontWeight: 400
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 30
+  m_fontSizeMax: 93.4
+  m_fontStyle: 0
+  m_HorizontalAlignment: 2
+  m_VerticalAlignment: 512
+  m_textAlignment: 65535
+  m_characterSpacing: 0
+  m_wordSpacing: 0
+  m_lineSpacing: 0
+  m_lineSpacingMax: 0
+  m_paragraphSpacing: 0
+  m_charWidthMaxAdj: 0
+  m_enableWordWrapping: 1
+  m_wordWrappingRatios: 0.4
+  m_overflowMode: 0
+  m_linkedTextComponent: {fileID: 0}
+  parentLinkedComponent: {fileID: 0}
+  m_enableKerning: 1
+  m_enableExtraPadding: 0
+  checkPaddingRequired: 0
+  m_isRichText: 1
+  m_parseCtrlCharacters: 1
+  m_isOrthographic: 1
+  m_isCullingEnabled: 0
+  m_horizontalMapping: 0
+  m_verticalMapping: 0
+  m_uvLineOffset: 0
+  m_geometrySortingOrder: 0
+  m_IsTextObjectScaleStatic: 0
+  m_VertexBufferAutoSizeReduction: 0
+  m_useMaxVisibleDescender: 1
+  m_pageToDisplay: 1
+  m_margin: {x: -380.16467, y: -20.903694, z: -303.2431, w: -155.5963}
+  m_isUsingLegacyAnimationComponent: 0
+  m_isVolumetricText: 0
+  m_hasFontAssetChanged: 0
+  m_baseMaterial: {fileID: 0}
+  m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!222 &1879398718
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1879398715}
+  m_CullTransparentMesh: 1
 --- !u!1 &1888479742
 GameObject:
   m_ObjectHideFlags: 0
@@ -33950,10 +34247,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 2047609463}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 1920, y: -1165.5}
-  m_SizeDelta: {x: 3840, y: 1821}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1888479744
 MonoBehaviour:
@@ -34072,6 +34369,53 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1888479742}
   m_CullTransparentMesh: 1
+--- !u!1 &1891305146
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1891305147}
+  - component: {fileID: 1891305148}
+  m_Layer: 0
+  m_Name: GameJudgeLive
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1891305147
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1891305146}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 751753813}
+  m_Father: {fileID: 616891732835552191}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1891305148
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1891305146}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5246639a16353a3499959130ff5bde7a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  aiConfig: {fileID: 751753814}
+  enableDebugLogs: 1
 --- !u!224 &1893869478 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 2979185924690892234, guid: d6edb5086adba44dda9219c1b7625a81,
@@ -37508,11 +37852,11 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 478225085}
-  - {fileID: 909767249}
   - {fileID: 4196985607409263604}
   - {fileID: 639851427095004758}
+  - {fileID: 1891305147}
   - {fileID: 65544091}
+  - {fileID: 478225085}
   m_Father: {fileID: 710027999804078651}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &618179749281626835
@@ -37809,7 +38153,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!222 &1645820201273452780
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -37996,6 +38340,7 @@ MonoBehaviour:
   computerTextUI: {fileID: 1823067140006300707}
   statusTextUI: {fileID: 322597349607859551}
   errorTextUI: {fileID: 1888479745}
+  aiJudgeTextUI: {fileID: 1879398717}
 --- !u!222 &3256497840140037071
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -39120,6 +39465,7 @@ RectTransform:
   m_Children:
   - {fileID: 1899165971690922393}
   - {fileID: 31366027764842183}
+  - {fileID: 857994341}
   - {fileID: 1116888289}
   m_Father: {fileID: 710027999804078651}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -40017,7 +40363,7 @@ GameObject:
   - component: {fileID: 639851427095004758}
   - component: {fileID: 4676851730492406209}
   m_Layer: 0
-  m_Name: GameJudge
+  m_Name: GameJudgeOld
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

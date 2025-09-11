@@ -701,4 +701,28 @@ public class WavUtility
         combinedClip.SetData(combinedSamples, 0);
         return combinedClip;
     }
+
+    internal static AudioClip GetAudioClipSegment(
+        AudioClip playerRecordingClip,
+        float fromTime,
+        float toTime
+    )
+    {
+        int startSample = Mathf.FloorToInt(fromTime * playerRecordingClip.frequency);
+        int endSample = Mathf.FloorToInt(toTime * playerRecordingClip.frequency);
+        int sampleCount = endSample - startSample;
+
+        AudioClip segment = AudioClip.Create(
+            "Segment",
+            sampleCount,
+            playerRecordingClip.channels,
+            playerRecordingClip.frequency,
+            false
+        );
+
+        float[] samples = new float[sampleCount * playerRecordingClip.channels];
+        playerRecordingClip.GetData(samples, startSample);
+        segment.SetData(samples, 0);
+        return segment;
+    }
 }

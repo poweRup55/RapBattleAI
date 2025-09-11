@@ -25,6 +25,8 @@ public class GeminiLiveWebRTC : MonoBehaviour
 
     public Action<string> textGUIUpdater { get; set; }
 
+    public Action textGUIReset { get; set; }
+
     [Header("Configuration")]
     [SerializeField]
     protected AILiveConfig aiConfig;
@@ -251,11 +253,6 @@ public class GeminiLiveWebRTC : MonoBehaviour
                 generationConfig = new GenerationConfig
                 {
                     responseModalities = new string[] { "text" },
-                    temperature = temperature,
-                    // topP = topP,
-                    // topK = topK,
-                    maxOutputTokens = maxOutputTokens,
-                    candidateCount = candidateCount,
                 },
                 realtimeInputConfig = new RealtimeInputConfig
                 {
@@ -486,6 +483,7 @@ public class GeminiLiveWebRTC : MonoBehaviour
             // Check for turn completion
             if (response.turnComplete || (response.serverContent?.turnComplete == true))
             {
+                StartCoroutine(WaitAndDeleteText(5f));
                 if (enableDebugLogs)
                     Debug.Log("Gemini turn complete");
             }
@@ -511,6 +509,12 @@ public class GeminiLiveWebRTC : MonoBehaviour
                 e
             );
         }
+    }
+
+    private IEnumerator WaitAndDeleteText(float duration)
+    {
+        yield return new WaitForSeconds(duration);
+        textGUIReset?.Invoke();
     }
 
     public IEnumerator SendAudioToGeminiCoroutine(AudioClip recordingClip)
@@ -595,7 +599,10 @@ public class GeminiLiveWebRTC : MonoBehaviour
             );
         }
 
-        var message = new BidiGenerateContentRealtimeInput { text = inputText };
+        var message = new BidiGenerateContentClientMessage
+        {
+            realtimeInput = new BidiGenerateContentRealtimeInput { text = inputText },
+        };
 
         yield return StartCoroutine(SendWebSocketMessageCoroutine(message));
     }

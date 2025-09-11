@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using TMPro;
 using UnityEngine;
@@ -103,6 +104,14 @@ public class UIManager : MonoBehaviour
             );
             aiJudgeTextUI.isRightToLeftText = isRtl;
             aiJudgeTextUI.text += text;
+        }
+    }
+
+    internal void ClearAIJudgeText()
+    {
+        if (aiJudgeTextUI != null)
+        {
+            aiJudgeTextUI.text = "";
         }
     }
 }
