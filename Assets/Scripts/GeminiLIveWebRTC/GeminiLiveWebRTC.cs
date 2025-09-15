@@ -27,6 +27,16 @@ public abstract class GeminiLiveWebRTC : MonoBehaviour
     [Tooltip("Number of candidates to generate")]
     protected int candidateCount = 1;
 
+    [Header("Reconnection Settings")]
+    [SerializeField]
+    protected int maxReconnectAttempts = 3;
+
+    [SerializeField]
+    protected float reconnectDelay = 2.0f;
+
+    protected int currentReconnectAttempts = 0;
+    protected bool isReconnecting = false;
+
     [Header("Debug")]
     [SerializeField]
     protected bool enableDebugLogs = true;
@@ -79,6 +89,72 @@ public abstract class GeminiLiveWebRTC : MonoBehaviour
     {
         isConnected = false;
         isSetupComplete = false;
+        currentReconnectAttempts = 0;
+        isReconnecting = false;
+    }
+
+    private IEnumerator AttemptReconnectionCoroutine()
+    {
+        if (isReconnecting)
+        {
+            if (enableDebugLogs)
+                Debug.Log("Reconnection already in progress, skipping...");
+            yield break;
+        }
+
+        isReconnecting = true;
+
+        if (currentReconnectAttempts >= maxReconnectAttempts)
+        {
+            string errorMessage = $"Failed to reconnect after {maxReconnectAttempts} attempts";
+            if (enableDebugLogs)
+                Debug.LogError(errorMessage);
+            isReconnecting = false;
+            throw new GeminiLiveException(
+                "RECONNECTION_FAILED",
+                "AttemptReconnectionCoroutine",
+                "Reconnect",
+                errorMessage
+            );
+        }
+
+        currentReconnectAttempts++;
+        if (enableDebugLogs)
+            Debug.Log(
+                $"Attempting to reconnect... (Attempt {currentReconnectAttempts}/{maxReconnectAttempts})"
+            );
+
+        // Wait before attempting reconnection
+        yield return new WaitForSeconds(reconnectDelay);
+
+        // Reset connection state but preserve reconnect attempts
+        isConnected = false;
+        isSetupComplete = false;
+
+        // Generate new ephemeral key
+        aiConfig.GenerateEphemeralKey();
+
+        // Attempt to reconnect
+        yield return StartCoroutine(ConnectWebSocketCoroutine());
+
+        if (isConnected)
+        {
+            if (enableDebugLogs)
+                Debug.Log("Successfully reconnected to Gemini Live API");
+            // Reset reconnection state
+            currentReconnectAttempts = 0;
+            isReconnecting = false;
+            // Restart message processing
+            StartCoroutine(ProcessMessagesQueue());
+        }
+        else
+        {
+            if (enableDebugLogs)
+                Debug.LogWarning("Reconnection attempt failed, will try again");
+            isReconnecting = false;
+            // Try again
+            StartCoroutine(AttemptReconnectionCoroutine());
+        }
     }
 
     private void ThrowGeminiLiveException(string errorMessage)
@@ -125,7 +201,13 @@ public abstract class GeminiLiveWebRTC : MonoBehaviour
         {
             string errorMessage =
                 $"Connection to Gemini Live API timed out. Final state: {webSocket?.State}";
-            ThrowGeminiLiveException(errorMessage);
+            if (enableDebugLogs)
+                Debug.LogError(errorMessage);
+
+            // Attempt to reconnect instead of throwing exception
+            if (enableDebugLogs)
+                Debug.Log("Attempting to reconnect due to connection timeout...");
+            StartCoroutine(AttemptReconnectionCoroutine());
         }
     }
 
@@ -169,14 +251,6 @@ public abstract class GeminiLiveWebRTC : MonoBehaviour
         {
             Debug.LogError($"Full exception details: {connectTask.Exception}");
         }
-
-        throw new GeminiLiveException(
-            "WEBSOCKET_CONNECTION_ERROR",
-            "LogWebSocketConnectionError",
-            "ConnectToGeminiWebSocket",
-            errorMessage,
-            baseException
-        );
     }
 
     private void SendSetupMessage()
@@ -286,13 +360,10 @@ public abstract class GeminiLiveWebRTC : MonoBehaviour
             if (enableDebugLogs)
                 Debug.LogError(errorMessage);
 
-            throw new GeminiLiveException(
-                "WEBSOCKET_RECEIVE_ERROR",
-                "LogWebSocketReceiveError",
-                "ReceiveMessage",
-                errorMessage,
-                baseException
-            );
+            // Attempt to reconnect instead of throwing exception
+            if (enableDebugLogs)
+                Debug.Log("Attempting to reconnect due to receive error...");
+            StartCoroutine(AttemptReconnectionCoroutine());
         }
     }
 
@@ -319,14 +390,6 @@ public abstract class GeminiLiveWebRTC : MonoBehaviour
                 $"Failed to decode binary as UTF-8: {ex.Message}, treating as audio data";
             if (enableDebugLogs)
                 Debug.Log(errorMessage);
-
-            throw new GeminiLiveException(
-                "BINARY_DECODE_ERROR",
-                "ParseWebSocketBinaryMessage",
-                "DecodeBinaryData",
-                errorMessage,
-                ex
-            );
         }
     }
 
@@ -359,7 +422,6 @@ public abstract class GeminiLiveWebRTC : MonoBehaviour
         Debug.LogWarning($"WebSocket connection closed by server. Status: {result.CloseStatus}");
         Debug.LogWarning($" Description: {closeDescription}");
 
-        // Provide more specific error information and throw exception
         string errorMessage;
         if (result.CloseStatus == WebSocketCloseStatus.InvalidPayloadData)
         {
@@ -384,12 +446,10 @@ public abstract class GeminiLiveWebRTC : MonoBehaviour
 
         Debug.LogError(errorMessage);
         isConnected = false;
-        throw new GeminiLiveException(
-            "WEBSOCKET_CLOSURE",
-            "ThrowWebSocketClosureDetails",
-            "HandleClosure",
-            errorMessage
-        );
+
+        if (enableDebugLogs)
+            Debug.Log("Attempting to reconnect due to WebSocket closure...");
+        StartCoroutine(AttemptReconnectionCoroutine());
     }
 
     protected virtual void ProcessGeminiResponse(string json)
@@ -413,13 +473,6 @@ public abstract class GeminiLiveWebRTC : MonoBehaviour
                 string errorMessage = "Failed to parse Gemini response as JSON object";
                 if (enableDebugLogs)
                     Debug.LogWarning(errorMessage);
-
-                throw new GeminiLiveException(
-                    "JSON_PARSE_ERROR",
-                    "ProcessGeminiResponse",
-                    "ParseGeminiResponse",
-                    errorMessage
-                );
             }
 
             // Check for setup completion
@@ -476,14 +529,6 @@ public abstract class GeminiLiveWebRTC : MonoBehaviour
             string errorMessage = $"Error processing Gemini response: {e.Message}";
             if (enableDebugLogs)
                 Debug.LogError(errorMessage);
-
-            throw new GeminiLiveException(
-                "RESPONSE_PROCESSING_ERROR",
-                "ProcessGeminiResponse",
-                "ProcessResponse",
-                errorMessage,
-                e
-            );
         }
     }
 
@@ -586,12 +631,10 @@ public abstract class GeminiLiveWebRTC : MonoBehaviour
             if (enableDebugLogs)
                 Debug.LogWarning(errorMessage);
 
-            throw new GeminiLiveException(
-                "WEBSOCKET_STATE_ERROR",
-                "SendWebSocketMessageCoroutine",
-                "CheckWebSocketState",
-                errorMessage
-            );
+            if (enableDebugLogs)
+                Debug.Log("Attempting to reconnect due to WebSocket state error...");
+            StartCoroutine(AttemptReconnectionCoroutine());
+            yield break;
         }
 
         string json = JsonConvert.SerializeObject(
@@ -642,13 +685,15 @@ public abstract class GeminiLiveWebRTC : MonoBehaviour
 
         if (sendTask.IsFaulted)
         {
-            throw new GeminiLiveException(
-                "WEBSOCKET_SEND_ERROR",
-                "SendWebSocketMessageCoroutine",
-                "SendMessage",
-                $"Error sending WebSocket message: {sendTask.Exception?.GetBaseException()?.Message}",
-                sendTask.Exception
-            );
+            string errorMessage =
+                $"Error sending WebSocket message: {sendTask.Exception?.GetBaseException()?.Message}";
+            if (enableDebugLogs)
+                Debug.LogError(errorMessage);
+
+            if (enableDebugLogs)
+                Debug.Log("Attempting to reconnect due to send error...");
+            StartCoroutine(AttemptReconnectionCoroutine());
+            yield break;
         }
         else if (enableDebugLogs)
         {
@@ -673,14 +718,6 @@ public abstract class GeminiLiveWebRTC : MonoBehaviour
                 string errorMessage = $"Error closing WebSocket: {e.Message}";
                 if (enableDebugLogs)
                     Debug.LogWarning(errorMessage);
-
-                throw new GeminiLiveException(
-                    "WEBSOCKET_CLOSE_ERROR",
-                    "OnDestroy",
-                    "CloseWebSocket",
-                    errorMessage,
-                    e
-                );
             }
         }
 
