@@ -10,20 +10,6 @@ using UnityEngine;
 
 public abstract class GeminiLiveWebRTC : MonoBehaviour
 {
-    static RTCIceServer[] iceServers = new RTCIceServer[]
-    {
-        new RTCIceServer { urls = new string[] { "stun:stun.l.google.com:19302" } },
-        new RTCIceServer { urls = new string[] { "stun:stun.l.google.com:5349" } },
-        new RTCIceServer { urls = new string[] { "stun:stun1.l.google.com:3478" } },
-        new RTCIceServer { urls = new string[] { "stun:stun1.l.google.com:5349" } },
-        new RTCIceServer { urls = new string[] { "stun:stun2.l.google.com:19302" } },
-        new RTCIceServer { urls = new string[] { "stun:stun2.l.google.com:5349" } },
-        new RTCIceServer { urls = new string[] { "stun:stun3.l.google.com:3478" } },
-        new RTCIceServer { urls = new string[] { "stun:stun3.l.google.com:5349" } },
-        new RTCIceServer { urls = new string[] { "stun:stun4.l.google.com:19302" } },
-        new RTCIceServer { urls = new string[] { "stun:stun4.l.google.com:5349" } },
-    };
-
     [Header("Configuration")]
     [SerializeField]
     protected AILiveConfig aiConfig;
@@ -47,10 +33,6 @@ public abstract class GeminiLiveWebRTC : MonoBehaviour
 
     [SerializeField]
     protected const int maxChunkSize = 1024;
-
-    protected RTCPeerConnection localConnection;
-    protected RTCDataChannel sendChannel;
-    protected RTCDataChannel receiveChannel;
     protected ClientWebSocket webSocket;
     protected System.Threading.CancellationTokenSource cancellationTokenSource;
     protected bool isConnected = false;
@@ -71,7 +53,6 @@ public abstract class GeminiLiveWebRTC : MonoBehaviour
         }
         ResetConnectionState();
         aiConfig.GenerateEphemeralKey();
-        InitializeWebRTC();
         yield return StartCoroutine(ConnectWebSocketCoroutine());
         StartCoroutine(ProcessMessagesQueue());
     }
@@ -110,26 +91,6 @@ public abstract class GeminiLiveWebRTC : MonoBehaviour
     protected bool IsWebSocketConnected()
     {
         return webSocket != null && webSocket.State == WebSocketState.Open && isConnected;
-    }
-
-    private void InitializeWebRTC()
-    {
-        RTCConfiguration config = default;
-        config.iceServers = iceServers;
-
-        localConnection = new RTCPeerConnection(ref config);
-
-        localConnection.OnIceCandidate = OnIceCandidate;
-        localConnection.OnIceConnectionChange = OnIceConnectionChange;
-
-        sendChannel = localConnection.CreateDataChannel("sendChannel");
-        sendChannel.OnOpen = OnSendChannelOpen;
-        sendChannel.OnClose = OnSendChannelClose;
-
-        localConnection.OnDataChannel = OnDataChannel;
-
-        if (enableDebugLogs)
-            Debug.Log("WebRTC initialized");
     }
 
     private IEnumerator ConnectWebSocketCoroutine()
@@ -670,52 +631,6 @@ public abstract class GeminiLiveWebRTC : MonoBehaviour
         }
     }
 
-    private void OnIceCandidate(RTCIceCandidate candidate)
-    {
-        if (enableDebugLogs)
-            Debug.Log($"ICE Candidate: {candidate.Candidate}");
-    }
-
-    private void OnIceConnectionChange(RTCIceConnectionState state)
-    {
-        if (enableDebugLogs)
-            Debug.Log($"ICE Connection State: {state}");
-    }
-
-    private void OnSendChannelOpen()
-    {
-        if (enableDebugLogs)
-            Debug.Log("Send channel opened");
-    }
-
-    private void OnSendChannelClose()
-    {
-        if (enableDebugLogs)
-            Debug.Log("Send channel closed");
-    }
-
-    private void OnDataChannel(RTCDataChannel channel)
-    {
-        receiveChannel = channel;
-        receiveChannel.OnMessage = OnReceiveMessage;
-
-        if (enableDebugLogs)
-            Debug.Log("Data channel received");
-    }
-
-    private void OnReceiveMessage(byte[] data)
-    {
-        string message = Encoding.UTF8.GetString(data);
-
-        if (enableDebugLogs)
-            Debug.Log($"Received message: {message}");
-    }
-
-    private void OnDestroy()
-    {
-        Destroy();
-    }
-
     public async void Destroy()
     {
         if (webSocket != null && webSocket.State == WebSocketState.Open)
@@ -745,11 +660,6 @@ public abstract class GeminiLiveWebRTC : MonoBehaviour
         }
 
         cancellationTokenSource?.Cancel();
-
-        sendChannel?.Close();
-        receiveChannel?.Close();
-        localConnection?.Close();
-
         isConnected = false;
         isSetupComplete = false;
 

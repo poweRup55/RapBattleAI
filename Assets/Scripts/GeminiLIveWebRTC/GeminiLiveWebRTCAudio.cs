@@ -264,7 +264,7 @@ public abstract class GeminiLiveWebRTCAudio : GeminiLiveWebRTC
         yield return null;
     }
 
-    private bool IsAudioActive()
+    public bool IsAudioActive()
     {
         bool isPlaying = audioSource != null && audioSource.isPlaying;
 

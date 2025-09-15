@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using TMPro;
 using UnityEngine;
@@ -7,7 +6,7 @@ using Random = UnityEngine.Random;
 public class UIManager : MonoBehaviour
 {
     [SerializeField]
-    private TextMeshProUGUI computerTextUI;
+    private TextMeshProUGUI aiRapperTextUI;
 
     [SerializeField]
     private TextMeshProUGUI statusTextUI;
@@ -24,41 +23,41 @@ public class UIManager : MonoBehaviour
     [SerializeField]
     private GameObject JudgePanelUI;
 
-    public void UpdateComputerText(string text)
+    public void SetAiText(string text)
     {
-        if (computerTextUI != null)
+        if (aiRapperTextUI != null)
         {
             // Detect RTL languages: Hebrew, Arabic, Syriac, Thaana, N'Ko, etc.
             bool isRtl = System.Text.RegularExpressions.Regex.IsMatch(
                 text,
                 @"[\u0590-\u05FF\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\u0700-\u074F\u07C0-\u07FF\uFB50-\uFDFF\uFE70-\uFEFF]"
             );
-            computerTextUI.isRightToLeftText = isRtl;
+            aiRapperTextUI.isRightToLeftText = isRtl;
             text = System.Text.RegularExpressions.Regex.Replace(text, @"\[\w+\]", "");
-            computerTextUI.text = text;
+            aiRapperTextUI.text = text;
         }
     }
 
-    public void AppendComputerText(string text)
+    public void AppendToAiText(string text)
     {
-        if (computerTextUI != null)
+        if (aiRapperTextUI != null)
         {
             // Detect RTL languages: Hebrew, Arabic, Syriac, Thaana, N'Ko, etc.
             bool isRtl = System.Text.RegularExpressions.Regex.IsMatch(
                 text,
                 @"[\u0590-\u05FF\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\u0700-\u074F\u07C0-\u07FF\uFB50-\uFDFF\uFE70-\uFEFF]"
             );
-            computerTextUI.isRightToLeftText = isRtl;
+            aiRapperTextUI.isRightToLeftText = isRtl;
             text = System.Text.RegularExpressions.Regex.Replace(text, @"\[\w+\]", "");
-            computerTextUI.text += text;
+            aiRapperTextUI.text += text;
         }
     }
 
     public void ClearComputerText()
     {
-        if (computerTextUI != null)
+        if (aiRapperTextUI != null)
         {
-            computerTextUI.text = "";
+            aiRapperTextUI.text = "";
         }
     }
 
@@ -73,9 +72,9 @@ public class UIManager : MonoBehaviour
 
     public void clearText()
     {
-        if (computerTextUI != null)
+        if (aiRapperTextUI != null)
         {
-            computerTextUI.text = "";
+            aiRapperTextUI.text = "";
         }
         if (statusTextUI != null)
         {

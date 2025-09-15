@@ -34,14 +34,14 @@ public class AIRapperGeminiLive : GeminiLiveWebRTCAudio
                 },
                 realtimeInputConfig = new RealtimeInputConfig
                 {
-                    automaticActivityDetection = new AutomaticActivityDetection { disabled = true },
+                    // automaticActivityDetection = new AutomaticActivityDetection { disabled = true },
                     activityHandling = ActivityHandling.NO_INTERRUPTION,
                 },
                 systemInstruction = new Content
                 {
                     parts = new Part[] { new Part { text = aiConfig.AIPrompt } },
                 },
-                proactivity = new ProactivityConfig { proactiveAudio = false },
+                // proactivity = new ProactivityConfig { proactiveAudio = false },
                 outputAudioTranscription = new AudioTranscriptionConfig { },
             },
         };
@@ -49,11 +49,11 @@ public class AIRapperGeminiLive : GeminiLiveWebRTCAudio
 
     protected override void OnTextResponseReceived(string text)
     {
-        uIManager.AppendComputerText(text);
+        uIManager.AppendToAiText(text);
     }
 
     protected override void OnTranscriptionReceived(string text)
     {
-        uIManager.AppendComputerText(text);
+        uIManager.AppendToAiText(text);
     }
 }

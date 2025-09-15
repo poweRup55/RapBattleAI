@@ -163,7 +163,7 @@ public class RapBattleConductor : MonoBehaviour
         yield return StartCoroutine(matchJudge.JudgeMatch());
         uiManager.UpdateStatus("Press space or tap anywhere to return to the main menu.");
         var judgeVerdict = matchJudge.GetJudgeVerdict();
-        uiManager.UpdateComputerText(judgeVerdict);
+        uiManager.SetAiText(judgeVerdict);
         if (judgeVerdict.StartsWith("AI"))
         {
             animationController.SetTrigger("StartCheering");
@@ -391,7 +391,7 @@ public class RapBattleConductor : MonoBehaviour
                 byte[] npcAudioBytes = Convert.FromBase64String(npcResponseAudio);
                 matchJudge.RecordNPCInput(npcAudioBytes);
                 AudioClip clip = WavUtility.AudioClipFromCorruptWav(npcAudioBytes, sampleRate);
-                uiManager.UpdateComputerText(npcResponseText);
+                uiManager.SetAiText(npcResponseText);
                 npcAudioSource.clip = clip;
                 npcAudioSource.Play();
                 uiManager.UpdateStatus("Opponents turn!");
