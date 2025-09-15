@@ -1,9 +1,8 @@
 using System;
 using System.Collections;
 using EpicRapBattle.Config;
-using Unity.VisualScripting;
-using UnityEditor.VersionControl;
 using UnityEngine;
+using UnityEngine.AI;
 using UnityEngine.UI;
 
 public class RapBattleConductorLive : MonoBehaviour
@@ -73,13 +72,13 @@ public class RapBattleConductorLive : MonoBehaviour
     private void Start()
     {
         microphoneDevice = Microphone.devices.Length > 0 ? Microphone.devices[0] : null;
-        if (useFileSubmission)
-        {
-            fileSubmissionClip = AudioClipResampler.ResampleAudio(
-                fileSubmissionClip,
-                AILiveConfig.inputSampleRate
-            );
-        }
+        // if (useFileSubmission)
+        // {
+        //     fileSubmissionClip = AudioClipResampler.ResampleAudio(
+        //         fileSubmissionClip,
+        //         AILiveConfig.inputSampleRate
+        //     );
+        // }
         BeginRapBattle();
     }
 
@@ -365,6 +364,7 @@ public class RapBattleConductorLive : MonoBehaviour
             Debug.LogError("Audio clip is null");
             yield break;
         }
+        clip = AudioClipResampler.ResampleAudio(clip, AILiveConfig.inputSampleRate);
         const float sendInterval = 0.1f;
         int lastSamplePosition = 0;
         if (waitCondition != null)

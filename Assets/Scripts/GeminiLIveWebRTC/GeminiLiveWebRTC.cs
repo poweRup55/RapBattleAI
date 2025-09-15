@@ -359,12 +359,37 @@ public abstract class GeminiLiveWebRTC : MonoBehaviour
         Debug.LogWarning($"WebSocket connection closed by server. Status: {result.CloseStatus}");
         Debug.LogWarning($" Description: {closeDescription}");
 
-        // Provide more specific error information
-        if (result.CloseStatus == WebSocketCloseStatus.InvalidPayloadData) { }
-        else if (result.CloseStatus == WebSocketCloseStatus.PolicyViolation) { }
-        else if (result.CloseStatus == WebSocketCloseStatus.ProtocolError) { }
-        else if (result.CloseStatus == WebSocketCloseStatus.InternalServerError) { }
-        else { }
+        // Provide more specific error information and throw exception
+        string errorMessage;
+        if (result.CloseStatus == WebSocketCloseStatus.InvalidPayloadData)
+        {
+            errorMessage = "WebSocket closed due to invalid payload data.";
+        }
+        else if (result.CloseStatus == WebSocketCloseStatus.PolicyViolation)
+        {
+            errorMessage = "WebSocket closed due to policy violation.";
+        }
+        else if (result.CloseStatus == WebSocketCloseStatus.ProtocolError)
+        {
+            errorMessage = "WebSocket closed due to protocol error.";
+        }
+        else if (result.CloseStatus == WebSocketCloseStatus.InternalServerError)
+        {
+            errorMessage = "WebSocket closed due to internal server error.";
+        }
+        else
+        {
+            errorMessage = $"WebSocket closed with status: {result.CloseStatus}.";
+        }
+
+        Debug.LogError(errorMessage);
+        isConnected = false;
+        throw new GeminiLiveException(
+            "WEBSOCKET_CLOSURE",
+            "ThrowWebSocketClosureDetails",
+            "HandleClosure",
+            errorMessage
+        );
     }
 
     protected virtual void ProcessGeminiResponse(string json)
