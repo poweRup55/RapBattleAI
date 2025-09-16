@@ -184,6 +184,9 @@ public class RapBattleConductorLive : MonoBehaviour
                     $"Round {currentRound + 1} ended. Give round score."
                 )
             );
+            uiManager.UpdateStatus($"Let's see what the judge thinks! wait for it...");
+            yield return StartCoroutine(geminiLiveAIJudge.WaitForAllMessagesToBeSent(5f));
+            yield return StartCoroutine(geminiLiveAIRapper.WaitForAllMessagesToBeSent(5f));
             yield return StartCoroutine(uiManager.ShowJudgePanelTemporarily(15.0f));
             // Rest Turn
             currentState = BattleState.Rest;
@@ -234,10 +237,9 @@ public class RapBattleConductorLive : MonoBehaviour
             animationController.SetTrigger("StartThinking");
             uiManager.UpdateStatus("Waiting for your opponent to respond...");
             float startTime = Time.time;
-            geminiLiveAIRapper.WaitForAudioReception();
             while (Time.time - startTime < 20f)
             {
-                if (geminiLiveAIRapper.IsReceivingAudioData)
+                if (geminiLiveAIRapper.responseAudioClips.Count > 0)
                 {
                     yield break;
                 }
@@ -276,11 +278,7 @@ public class RapBattleConductorLive : MonoBehaviour
             }
         }
         StartCoroutine(geminiLiveAIRapper.SendTextToGeminiCoroutine("finalized"));
-        // StartCoroutine(geminiLiveAIRapper.SendActivityEndToGeminiCoroutine());
-
         StartCoroutine(geminiLiveAIJudge.SendTextToGeminiCoroutine("finalized rapper 1"));
-        // TrimRecordingToActualLength();
-        // ResamplePlayerRecording();
     }
 
     private IEnumerator WaitForRecordingStart()
@@ -411,7 +409,6 @@ public class RapBattleConductorLive : MonoBehaviour
 
         if (originalClip.frequency != AILiveConfig.inputSampleRate)
         {
-            Debug.Log($"Resampling audio clip {originalClip.name} for agent {agentName}");
             return AudioClipResampler.ResampleAudio(originalClip, AILiveConfig.inputSampleRate);
         }
 
@@ -432,24 +429,53 @@ public class RapBattleConductorLive : MonoBehaviour
         return samples;
     }
 
+    private bool HasMeaningfulAudio(
+        float[] samples,
+        float threshold = 0.01f,
+        float minActiveRatio = 0.05f
+    )
+    {
+        if (samples == null || samples.Length == 0)
+        {
+            return false;
+        }
+
+        int meaningfulSampleCount = 0;
+        float maxAmplitude = 0f;
+
+        for (int i = 0; i < samples.Length; i++)
+        {
+            float absoluteValue = Mathf.Abs(samples[i]);
+            if (absoluteValue > threshold)
+            {
+                meaningfulSampleCount++;
+            }
+            if (absoluteValue > maxAmplitude)
+            {
+                maxAmplitude = absoluteValue;
+            }
+        }
+
+        float activeRatio = (float)meaningfulSampleCount / samples.Length;
+        bool hasMeaningfulContent = activeRatio >= minActiveRatio && maxAmplitude > threshold * 2f;
+        return hasMeaningfulContent;
+    }
+
     private IEnumerator SendInitialMessage(GeminiLiveWebRTC agent, string message)
     {
         if (!string.IsNullOrEmpty(message))
         {
-            Debug.Log($"Sending start text to Gemini agent {agent.name}: {message}");
             yield return StartCoroutine(agent.SendTextToGeminiCoroutine(message));
         }
     }
 
     private IEnumerator SendEndActivityMarker(GeminiLiveWebRTC agent)
     {
-        Debug.Log($"Sending activity end marker for agent {agent.name}");
         yield return StartCoroutine(agent.SendActivityEndToGeminiCoroutine());
     }
 
     private IEnumerator SendStartActivityMarker(GeminiLiveWebRTC agent)
     {
-        Debug.Log($"Sending activity start marker for agent {agent.name}");
         yield return StartCoroutine(agent.SendActivityStartToGeminiCoroutine());
     }
 
@@ -467,10 +493,6 @@ public class RapBattleConductorLive : MonoBehaviour
             clip.GetData(samples, lastSamplePosition % clip.samples);
 
             samples = ResampleAudioSamples(samples, clip, samplesToGet);
-
-            Debug.Log(
-                $"Sending {samples.Length} audio samples (from position {lastSamplePosition}) to Gemini agent {agent.name}"
-            );
             yield return StartCoroutine(agent.SendAudioToGeminiCoroutine(samples));
         }
     }
@@ -531,9 +553,6 @@ public class RapBattleConductorLive : MonoBehaviour
 
             if (samples != null && samples.Length > 0)
             {
-                Debug.Log(
-                    $"Sending {samples.Length} audio samples from AudioSource (position {lastSamplePosition}) to Gemini agent {agent.name}"
-                );
                 yield return StartCoroutine(agent.SendAudioToGeminiCoroutine(samples));
             }
         }
@@ -567,12 +586,18 @@ public class RapBattleConductorLive : MonoBehaviour
             float[] finalSamples = new float[maxSamplesToGet * clip.channels];
             clip.GetData(finalSamples, startPosition);
 
-            if (finalSamples != null && finalSamples.Length > 0)
+            if (finalSamples != null && finalSamples.Length > 0 && HasMeaningfulAudio(finalSamples))
             {
                 Debug.Log(
                     $"Sending final {finalSamples.Length} audio samples (from position {lastSamplePosition}) to Gemini agent {agent.name}"
                 );
                 yield return StartCoroutine(agent.SendAudioToGeminiCoroutine(finalSamples));
+            }
+            else if (finalSamples != null && finalSamples.Length > 0)
+            {
+                Debug.Log(
+                    $"Skipping final audio data for agent {agent.name} - contains only silence or noise"
+                );
             }
         }
     }
@@ -647,12 +672,22 @@ public class RapBattleConductorLive : MonoBehaviour
                     }
                 }
 
-                if (finalSamples != null && finalSamples.Length > 0)
+                if (
+                    finalSamples != null
+                    && finalSamples.Length > 0
+                    && HasMeaningfulAudio(finalSamples)
+                )
                 {
                     Debug.Log(
                         $"Sending final {finalSamples.Length} audio samples from AudioSource (position {lastSamplePosition}) to Gemini agent {agent.name}"
                     );
                     yield return StartCoroutine(agent.SendAudioToGeminiCoroutine(finalSamples));
+                }
+                else if (finalSamples != null && finalSamples.Length > 0)
+                {
+                    Debug.Log(
+                        $"Skipping final audio source data for agent {agent.name} - contains only silence or noise"
+                    );
                 }
             }
         }
@@ -680,7 +715,6 @@ public class RapBattleConductorLive : MonoBehaviour
 
         if (waitCondition != null)
         {
-            Debug.Log($"Waiting for condition to start streaming for agent {agent.name}");
             yield return new WaitUntil(waitCondition);
         }
 
@@ -761,7 +795,6 @@ public class RapBattleConductorLive : MonoBehaviour
 
         if (waitCondition != null)
         {
-            Debug.Log($"Waiting for condition to start streaming for agent {agent.name}");
             yield return new WaitUntil(waitCondition);
         }
 

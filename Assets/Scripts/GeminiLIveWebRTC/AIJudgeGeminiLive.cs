@@ -43,7 +43,6 @@ public class AIJudgeGeminiLive : GeminiLiveWebRTC
 
     protected override void OnTextResponseReceived(string text)
     {
-        Debug.Log($"OnTextResponseReceived: {text}");
         responseBuffer += text;
 
         if (responseBuffer.Contains("[/reaction]"))
@@ -55,10 +54,8 @@ public class AIJudgeGeminiLive : GeminiLiveWebRTC
                 .Replace("[reaction]", "")
                 .Replace("[/reaction]", "")
                 .Trim();
-            Debug.Log($"Reaction detected: {reactionContent}");
             uIManager.ShowPopUp(reactionContent);
             responseBuffer = responseBuffer.Remove(0, end);
-            Debug.Log("Response buffer after reaction processed: " + responseBuffer);
         }
         else if (responseBuffer.Contains("[/round score]"))
         {
@@ -69,10 +66,8 @@ public class AIJudgeGeminiLive : GeminiLiveWebRTC
                 .Replace("[round score]", "")
                 .Replace("[/round score]", "")
                 .Trim();
-            Debug.Log($"Round score detected: {scoreContent}");
             uIManager.UpdateAIJudgeText(scoreContent);
             responseBuffer = responseBuffer.Remove(0, end);
-            Debug.Log("Response buffer after round score processed: " + responseBuffer);
         }
     }
 

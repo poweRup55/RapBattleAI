@@ -55,14 +55,13 @@ public class UIMainMenuController : MonoBehaviour
     private IEnumerator MicCheck()
     {
         Microphone.Start(null, false, 10, 24000);
-        Debug.Log("Microphone check started");
+
         while (!Microphone.IsRecording(null))
         {
             yield return null;
         }
-        Debug.Log("Microphone is working");
+
         Microphone.End(null);
-        Debug.Log("Microphone check ended");
     }
 
     public void ShowInstructions()

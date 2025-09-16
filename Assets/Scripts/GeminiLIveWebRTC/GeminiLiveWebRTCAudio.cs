@@ -12,11 +12,6 @@ public abstract class GeminiLiveWebRTCAudio : GeminiLiveWebRTC
     [Header("Audio")]
     [SerializeField]
     private AudioSource audioSource;
-
-    private bool receivingAudioStreamIn { get; set; } = false;
-
-    public bool IsReceivingAudioData => receivingAudioStreamIn;
-
     private bool finishedAudioStreamIn = false;
     private Queue<byte[]> audioResponseQueue = new Queue<byte[]>();
     private Queue<IEnumerator> audioCoroutineQueue = new Queue<IEnumerator>();
@@ -27,7 +22,6 @@ public abstract class GeminiLiveWebRTCAudio : GeminiLiveWebRTC
     protected override void ResetConnectionState()
     {
         base.ResetConnectionState();
-        receivingAudioStreamIn = false;
         finishedAudioStreamIn = false;
         audioResponseQueue = new Queue<byte[]>();
         audioCoroutineQueue = new Queue<IEnumerator>();
@@ -54,7 +48,6 @@ public abstract class GeminiLiveWebRTCAudio : GeminiLiveWebRTC
                     // Handle audio response
                     if (part.inlineData != null && !string.IsNullOrEmpty(part.inlineData.data))
                     {
-                        receivingAudioStreamIn = true;
                         try
                         {
                             byte[] audioData = Convert.FromBase64String(part.inlineData.data);
@@ -90,8 +83,6 @@ public abstract class GeminiLiveWebRTCAudio : GeminiLiveWebRTC
             // Check for turn completion
             if (response.turnComplete || (response.serverContent?.turnComplete == true))
             {
-                if (enableDebugLogs)
-                    Debug.Log("Gemini turn complete");
                 finishedAudioStreamIn = true;
             }
         }
@@ -109,11 +100,6 @@ public abstract class GeminiLiveWebRTCAudio : GeminiLiveWebRTC
                 e
             );
         }
-    }
-
-    public void WaitForAudioReception()
-    {
-        receivingAudioStreamIn = false;
     }
 
     public IEnumerator PlayAudioCoroutine()
@@ -250,9 +236,6 @@ public abstract class GeminiLiveWebRTCAudio : GeminiLiveWebRTC
         audioSource.Play();
 
         yield return new WaitForSeconds(responseClip.length);
-
-        if (enableDebugLogs)
-            Debug.Log("Played audio response from Gemini");
     }
 
     public IEnumerator waitForAudioStreamFinish()
