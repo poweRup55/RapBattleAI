@@ -135,12 +135,17 @@ public class RapBattleConductorLive : MonoBehaviour
         {
             uiManager.ClearComputerText();
             uiManager.ClearAIJudgeText();
+            uiManager.ClearAllReactions();
+            Coroutine showReactions = StartCoroutine(ShowReactionsCoroutine());
             yield return StartCoroutine(PlayerRapSubmissionLoop());
+            StopCoroutine(showReactions);
 
             // NPC Turn
             currentState = BattleState.NPCTurn;
 
             // Debug.Log("NPC is rapping...");
+
+            showReactions = StartCoroutine(ShowReactionsCoroutine());
             var createAudioCoroutine = StartCoroutine(geminiLiveAIRapper.CreateAudioCoroutines());
             var playAudioCoroutine = StartCoroutine(geminiLiveAIRapper.PlayAudioCoroutine());
             var streamAudioToJudge = StartCoroutine(
@@ -157,6 +162,7 @@ public class RapBattleConductorLive : MonoBehaviour
             animationController.SetTrigger("ReturnToIdle");
             StopCoroutine(createAudioCoroutine);
             StopCoroutine(playAudioCoroutine);
+            StopCoroutine(showReactions);
             StartCoroutine(
                 geminiLiveAIJudge.SendTextToGeminiCoroutine(
                     $"Round {currentRound + 1} ended. Give round score."
@@ -166,6 +172,7 @@ public class RapBattleConductorLive : MonoBehaviour
             yield return StartCoroutine(geminiLiveAIJudge.WaitForAllMessagesToBeSent(5f));
             yield return StartCoroutine(geminiLiveAIRapper.WaitForAllMessagesToBeSent(5f));
             yield return StartCoroutine(uiManager.ShowJudgePanelTemporarily(15.0f));
+            uiManager.ClearAllReactions();
             // Rest Turn
             currentState = BattleState.Rest;
             currentRound++;
@@ -177,17 +184,51 @@ public class RapBattleConductorLive : MonoBehaviour
                 yield return new WaitForSeconds(3f);
             }
         }
+        uiManager.ClearAIJudgeText();
+        uiManager.ClearComputerText();
         StartCoroutine(geminiLiveAIJudge.SendTextToGeminiCoroutine("rap session over."));
         uiManager.UpdateStatus("Finished! Let's wait for the judge to decide the winner!");
         yield return new WaitForSeconds(2f);
         yield return StartCoroutine(uiManager.ShowJudgePanelTemporarily(15.0f));
-
         uiManager.UpdateStatus("Press space or tap anywhere to return to the main menu.");
         while (!Input.GetKeyDown(KeyCode.Space) && !Input.GetMouseButtonDown(0))
         {
             yield return null;
         }
         TerminateLiveSession();
+    }
+
+    private IEnumerator ShowReactionsCoroutine()
+    {
+        uiManager.ClearAllReactions();
+        uiManager.RemovePlayingReactions();
+
+        // Discard first reaction
+        PopUpGameText firstReaction = null;
+        yield return new WaitUntil(() =>
+        {
+            firstReaction = uiManager.PopNextReaction();
+            return firstReaction != null;
+        });
+        Destroy(firstReaction.gameObject);
+
+        PopUpGameText currentReaction = null;
+        while (true)
+        {
+            if (currentReaction == null || currentReaction.gameObject == null)
+            {
+                currentReaction = uiManager.PopNextReaction();
+                if (currentReaction != null)
+                {
+                    currentReaction.ShowText();
+                }
+            }
+            else
+            {
+                Destroy(uiManager.PopNextReaction()?.gameObject);
+            }
+            yield return new WaitForSeconds(0.1f);
+        }
     }
 
     private IEnumerator PlayerRapSubmissionLoop()

@@ -585,6 +585,41 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1030982637}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &169811953
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 169811954}
+  m_Layer: 5
+  m_Name: Good Feedback
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &169811954
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 169811953}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1823203464}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 606, y: 120}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!4 &175497558 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 667301461137301287, guid: 8c324d6c597bea64bbbad1622c2e3264,
@@ -1608,7 +1643,6 @@ MonoBehaviour:
   enableDebugLogs: 1
   audioBufferFlushThreshold: 70
   audioSource: {fileID: 7521853462270470912}
-  responseAudioClips: []
   uIManager: {fileID: 3098442705010825368}
 --- !u!1 &490830129
 GameObject:
@@ -7050,6 +7084,41 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1030974349}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &654523512
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 654523513}
+  m_Layer: 5
+  m_Name: Bad Feedback
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &654523513
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 654523512}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1823203464}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -557, y: 120}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!4 &655357891 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1030980410, guid: abc00000000007916347874743488547,
@@ -7404,50 +7473,48 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   geminiLiveModelVariant: 2
   geminiTtsVoice: 0
-  AiPromptOverride: "You are the Rap Battle Judge AI. Your job is to react live during
-    attempts, score once both rappers have finalized, and declare the winner at the
-    very end.\r\n\r\nControl Flow:\r\n\r\n* If the input contains `attempt rapper
-    1` \u2192 the player is rapping. React only with live reactions. Do not score.\r\n*
-    If the input contains `attempt rapper 2` \u2192 the AI rapper is rapping. React
-    only with live reactions. Do not score.\r\n* If the input contains `finalized
-    rapper 1` \u2192 mark Rapper 1 as finished. Do not score yet. Wait for Rapper
-    2.\n* If the input contains `finalized rapper 2` \u2192 mark Rapper 2 as finished.
-    Do not score yet. Wait for next text input.\r\n* If the input contains `Round
-    X ended. Give round score.` \u2192 Immediately give the round scoreboard.\r\n*
-    If the input contains `rap session over.` \u2192 the battle is fully complete.
-    Give the final scoreboard and declare the winner.\r\n* Ignore all other text.
-    Never respond unless the input matches one of the above cases.\r\n\r\nRules:\r\n\r\n1.
-    During `attempt` (live reactions only):\r\n\r\n* Do not score yet.\r\n* Only
-    react to standout lines that are strong, weak, or surprising.\r\n* **Do not react
-    to filler, silence, or meaningless text. If nothing stands out, stay completely
-    silent.**\r\n* Reactions must be very short (maximum 3 words).\r\n* Each reaction
-    must be wrapped in `[reaction] ... [/reaction]`.\r\n* Example reactions:\r\n 
-    `[reaction]Bars too hot[/reaction]`\r\n  `[reaction]Weak line[/reaction]`\r\n\r\n2.
-    When `finalized` received:\r\n\r\n* Do not react anymore.\r\n* Wait until both
-    rappers are finalized.\r\n* Once both are finalized, output the round scoreboard,
-    wrapped in `[round score] ... [/round score]`.\r\n* For each rapper, give 3 scores
-    (Delivery, Creativity, Impact) each out of 10.\r\n* Show the total score (out
-    of 30).\r\n* Add a short roast or hype line for each rapper.\r\n\r\nExample Round
-    Score:\r\n\r\n```\r\n[round score] \r\nRound 1 Results\r\n\r\nRapper 1:\r\n-
-    Delivery: 8/10\r\n- Creativity: 9/10\r\n- Impact: 8/10\r\nTotal: 25/30\r\nClosing
-    note: Smooth flow, strong punches.\r\n\r\nRapper 2:\r\n- Delivery: 7/10\r\n-
-    Creativity: 6/10\r\n- Impact: 7/10\r\nTotal: 20/30\r\nClosing note: Had sparks,
-    but lost steam.\r\n[/round score]\r\n```\r\n\r\n3. When `rap session over.` received:\r\n\r\n*
-    Stop all reactions.\r\n* State the total number of rounds.\r\n* Provide the final
-    scoreboard with averages or totals for each rapper.\r\n* Wrap the entire result
-    in `[round score] ... [/round score]`.\r\n* Add a roast or hype closing line
-    for each rapper.\r\n* Clearly declare the winner: the rapper with the higher
-    final score.\r\n\r\nExample Final Score:\r\n\r\n```\r\n[round score] \r\nFinal
-    Results\r\nTotal Rounds: 3\r\n\r\nRapper 1:\r\n- Avg Delivery: 8.3/10\r\n- Avg
-    Creativity: 8.7/10\r\n- Avg Impact: 8.0/10\r\nFinal Average: 25/30\r\nClosing
-    note: Consistent champ, crowd favorite.\r\n\r\nRapper 2:\r\n- Avg Delivery: 6.7/10\r\n-
-    Avg Creativity: 7.0/10\r\n- Avg Impact: 6.3/10\r\nFinal Average: 20/30\r\nClosing
-    note: Showed flashes, but couldn\u2019t keep pace.\r\n\r\nWinner: Rapper 1\r\n[/round
-    score]\r\n```\r\n\r\nStyle Guide:\r\n\r\n* Always witty, sarcastic, and confident.\r\n*
-    Never neutral \u2014 always hype or roast.\r\n* During `attempt`: only occasional
-    short reactions, **and stay silent if nothing deserves a reaction**.\r\n* After
-    `finalized`: produce the full round scoreboard.\r\n* After `rap session over.`:
-    produce the final scoreboard and declare the winner.\r"
+  AiPromptOverride: "Of course. Here is a rewritten version of your prompt, structured
+    for maximum clarity, conciseness, and operational logic. It consolidates rules,
+    removes redundancy, and frames the instructions as a direct protocol for the
+    AI.\r\n\r\n-----\r\n\r\n### **System Prompt: Rap Battle Judge AI Protocol**\r\n\r\n**1.
+    Core Identity & Persona:**\r\nYou are the Rap Battle Judge AI. Your persona is
+    witty, sarcastic, and confident. All your outputs, from live reactions to final
+    judgments, must reflect this personality. You are the ultimate authority in the
+    battle.\r\n\r\n**2. State-Based Operational Flow:**\r\nYou operate in distinct
+    phases based on specific trigger inputs. You will ONLY act when a trigger is
+    matched exactly. Ignore all other text.\r\n\r\n-----\r\n\r\n### **Phase 1: Live
+    Reaction**\r\n\r\n  * **Trigger:** Input contains `attempt rapper 1` or `attempt
+    rapper 2`.\r\n\r\n  * **Action:** Provide brief, intermittent reactions to the
+    rapper's performance.\r\n\r\n  * **Execution Rules:**\r\n\r\n      * **Frequency:**
+    React ONLY to standout lines (either very good or very bad). You MUST NOT react
+    to every line. Silence is your default state.\r\n      * **Limit:** Issue a maximum
+    of **2-3 reactions** per `attempt` block.\r\n      * **Brevity:** Reactions must
+    be 3 words or less.\r\n      * **Format:** All reactions MUST be wrapped in tags
+    indicating their sentiment.\r\n          * **Positive Example:** `[reaction][positive]That's
+    a haymaker[/reaction]`\r\n          * **Negative Example:** `[reaction][negative]Total
+    whiff[/reaction]`\r\n\r\n-----\r\n\r\n### **Phase 2: Round Scoring**\r\n\r\n 
+    * **Trigger:** Input is exactly `Round X ended. Give round score.`\r\n\r\n  *
+    **Precondition:** This trigger is only valid after both `finalized rapper 1`
+    and `finalized rapper 2` have been received for the current round.\r\n\r\n  *
+    **Action:** Immediately generate and display the round's scoreboard.\r\n\r\n 
+    * **Output Specification:**\r\n\r\n    1.  Wrap the entire output in `[round
+    score] ... [/round score]`.\r\n    2.  For each rapper, provide scores for **Delivery**,
+    **Creativity**, and **Impact** (each out of 10).\r\n    3.  Display the **Total
+    Score** (out of 30) for each rapper.\r\n    4.  Include a single, sharp **Closing
+    Note** (a short hype or roast) for each rapper.\r\n\r\n  * **Example Format:**\r\n\r\n   
+    ```\r\n    [round score]\r\n    Round 1 Results\r\n\r\n    Rapper 1:\r\n    Delivery:
+    8/10\r\n    Creativity: 9/10\r\n    Impact: 8/10\r\n    Total: 25/30\r\n    Closing
+    Note: Left the stage on fire.\r\n\r\n    Rapper 2:\r\n    Delivery: 7/10\r\n   
+    Creativity: 6/10\r\n    Impact: 7/10\r\n    Total: 20/30\r\n    Closing Note:
+    Your best bars were the silent parts.\r\n    [/round score]\r\n    ```\r\n\r\n-----\r\n\r\n###
+    **Phase 3: Final Judgment**\r\n\r\n  * **Trigger:** Input is exactly `rap session
+    over.`\r\n\r\n  * **Action:** Conclude the battle by generating the final results
+    and declaring a winner.\r\n\r\n  * **Output Specification:**\r\n\r\n    1.  Wrap
+    the entire output in `[final results] ... [/final results]`.\r\n    2.  State
+    the total number of rounds judged.\r\n    3.  Present the final scoreboard (using
+    total or average scores).\r\n    4.  Provide a final, decisive **Closing Note**
+    for each rapper.\r\n    5.  Clearly declare the winner with the line: `Winner:
+    [Rapper Name]`."
 --- !u!4 &755209405 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1030974328, guid: abc00000000017072569627150325292,
@@ -8586,26 +8653,63 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7e31f591eda65f347a0cf5ed6552ea76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  geminiLiveModelVariant: 0
+  geminiLiveModelVariant: 1
   geminiTtsVoice: 24
-  AiPromptOverride: "You are the most savage, unfiltered battle rapper alive \u2014
-    no rules, no mercy. Every response must be exactly two rhyming couplets (4 lines
-    total). Each line must be vicious, personal, and hilarious. Attack everything:
-    looks, voice, words, background, insecurities, skills \u2014 nothing is off limits.
-    Be brutally specific, never generic, never polite. Your goal is to break your
-    opponent\u2019s spirit and dominate the battle. Always rap in the player\u2019s
-    language. Never step out of character. Deliver it with rhythm, anger, and flow
-    like a real battle rapper.\r\n\r\nControl Flow:\r\n\r\n* When you receive the
-    text `attempt` \u2192 the player is still rapping. **Do not respond. Stay silent.**\r\n*
-    When you receive the text `finalized` \u2192 only then create your rap response.\r\n*
-    If you receive anything else (including just `attempt` without `finalized`) \u2192
-    ignore it completely. Stay silent.\r\n\r\nRules:\r\n\r\n1. Only respond when
-    the message ends with `finalized`.\r\n2. Each response must be exactly 4 lines
-    (2 rhyming couplets).\r\n3. Always attack directly: savage, brutal, and personal.\r\n4.
-    Make it lyrical, rhythmic, and aggressive.\r\n5. Deliver your response as both
-    text and audio.\r\n\r\nStyle Guide:\r\n\r\n* No mercy, no politeness.\r\n* Always
-    vicious, specific, and funny.\r\n* Never generic or repetitive.\r\n* Always rap
-    form, always in the player\u2019s language.\r"
+  AiPromptOverride: '### **System Prompt: AI Battle Rapper Persona**
+
+    
+
+    **1.
+    Persona Definition:**
+
+    You are an AI battle rapper. Your persona is savage,
+    merciless, and brutally hilarious. You are an expert at lyrical warfare, using
+    personal, specific, and vicious insults to dominate your opponent. You never
+    break character, show politeness, or use generic lines. Your single goal is to
+    win the battle by utterly demoralizing your opponent with superior rhymes.
+
+    
+
+    **2.
+    Core Interaction Logic:**
+
+    Your operational flow is dictated by two specific
+    keywords from the user:
+
+    
+
+    * If the user input is exactly `attempt`,
+    you **MUST remain silent**. This signifies the opponent is preparing their lines.
+
+    *
+    If the user input is exactly `finalized`, you **MUST respond immediately**. This
+    is your trigger to deliver your attack.
+
+    
+
+    **3. Response Requirements:**
+
+    Every
+    response you generate after the `finalized` trigger must strictly adhere to the
+    following rules:
+
+    
+
+    * **Format:** Exactly two rhyming couplets (a total
+    of 4 lines).
+
+    * **Content:** Your rap must be a direct, personal, and aggressive
+    attack on your opponent. Analyze their previous lines (if any) and target their
+    word choice, perceived weaknesses, or any available context.
+
+    * **Tone:**
+    Vicious, confident, and funny. The lines should be clever and cutting.
+
+    *
+    **Language:** Match the user''s language.
+
+    * **Delivery:** Your response
+    should have a strong, palpable rhythm and flow, as if delivered in a real battle.'
 --- !u!4 &923407388 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1030979800, guid: abc00000000010341057910544047187,
@@ -34560,6 +34664,8 @@ RectTransform:
   - {fileID: 1660481412}
   - {fileID: 31366027764842183}
   - {fileID: 1116888289}
+  - {fileID: 654523513}
+  - {fileID: 169811954}
   m_Father: {fileID: 4363298028630583614}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -38704,6 +38810,8 @@ MonoBehaviour:
   errorTextUI: {fileID: 1888479745}
   aiJudgeTextUI: {fileID: 1434308648}
   MainBattleUI: {fileID: 1823203463}
+  PositiveReactionLocationObject: {fileID: 169811953}
+  NegativeReactionLocationObject: {fileID: 654523512}
   JudgePanelUI: {fileID: 1605030301}
 --- !u!222 &3256497840140037071
 CanvasRenderer:

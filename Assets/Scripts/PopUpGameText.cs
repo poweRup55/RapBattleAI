@@ -15,11 +15,27 @@ public class PopUpGameText : MonoBehaviour
         animator.enabled = false;
     }
 
-    public void ShowText(string content)
+    public void ShowText()
     {
-        textComponent.text = content;
+        gameObject.SetActive(true);
         animator.enabled = true;
         StartCoroutine(WaitForAnimationAndDestroy());
+    }
+
+    public void SetColor(Color newColor)
+    {
+        if (textComponent != null)
+        {
+            textComponent.color = newColor;
+        }
+    }
+
+    public void SetText(string message)
+    {
+        if (textComponent != null)
+        {
+            textComponent.text = message;
+        }
     }
 
     private IEnumerator WaitForAnimationAndDestroy()

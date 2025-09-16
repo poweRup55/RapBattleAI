@@ -62,7 +62,18 @@ public class AIJudgeGeminiLive : GeminiLiveWebRTC
 
                 if (!string.IsNullOrEmpty(reactionContent))
                 {
-                    uIManager.ShowPopUp(reactionContent);
+                    string cleanReactionText = reactionContent
+                        .Replace("[positive]", "")
+                        .Replace("[negative]", "")
+                        .Trim();
+                    if (reactionContent.StartsWith("[positive]"))
+                    {
+                        uIManager.AddReaction(cleanReactionText, true);
+                    }
+                    else
+                    {
+                        uIManager.AddReaction(cleanReactionText, false);
+                    }
                 }
 
                 responseBuffer = responseBuffer.Remove(startIndex, endIndex - startIndex);

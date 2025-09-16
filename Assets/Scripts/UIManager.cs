@@ -1,4 +1,6 @@
+using System;
 using System.Collections;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -21,7 +23,15 @@ public class UIManager : MonoBehaviour
     private GameObject MainBattleUI;
 
     [SerializeField]
+    private GameObject PositiveReactionLocationObject;
+
+    [SerializeField]
+    private GameObject NegativeReactionLocationObject;
+
+    [SerializeField]
     private GameObject JudgePanelUI;
+
+    private Queue<PopUpGameText> popupStack = new Queue<PopUpGameText>();
 
     public void SetAiText(string text)
     {
@@ -121,18 +131,55 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    public void ShowPopUp(string message)
+    public void AddReaction(string message, bool isPositive)
     {
         GameObject popUpObj = Instantiate(
             Resources.Load<GameObject>("PopUpGameText"),
-            MainBattleUI.transform
+            isPositive
+                ? PositiveReactionLocationObject.transform
+                : NegativeReactionLocationObject.transform
         );
-        popUpObj.GetComponent<RectTransform>().anchoredPosition = new Vector2(
-            Random.Range(-50f, 50f),
-            Random.Range(-50f, 50f)
-        );
-        PopUpGameText popUpGameText = popUpObj.GetComponent<PopUpGameText>();
-        popUpGameText.ShowText(message);
+        popUpObj.SetActive(false);
+        PopUpGameText popUpReaction = popUpObj.GetComponent<PopUpGameText>();
+        Color reactionColor = isPositive
+            ? new Color(0.2f, 1f, 0.2f) // Green for positive reactions
+            : new Color(1f, 0.2f, 0.2f); // Red for negative reactions
+
+        popUpReaction.SetColor(reactionColor);
+        popUpReaction.SetText(message);
+
+        popupStack.Enqueue(popUpReaction);
+    }
+
+    public PopUpGameText PopNextReaction()
+    {
+        if (popupStack.Count > 0)
+        {
+            PopUpGameText nextPopup = popupStack.Dequeue();
+            return nextPopup;
+        }
+        return null;
+    }
+
+    public void ClearAllReactions()
+    {
+        while (popupStack.Count > 0)
+        {
+            PopUpGameText popup = popupStack.Dequeue();
+            Destroy(popup.gameObject);
+        }
+    }
+
+    public void RemovePlayingReactions()
+    {
+        foreach (Transform child in PositiveReactionLocationObject.transform)
+        {
+            Destroy(child.gameObject);
+        }
+        foreach (Transform child in NegativeReactionLocationObject.transform)
+        {
+            Destroy(child.gameObject);
+        }
     }
 
     public IEnumerator ShowJudgePanelTemporarily(float duration)
