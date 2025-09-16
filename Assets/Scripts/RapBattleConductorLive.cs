@@ -7,6 +7,23 @@ using UnityEngine.UI;
 
 public class RapBattleConductorLive : MonoBehaviour
 {
+    [System.Serializable]
+    private struct AudioStreamConfig
+    {
+        public string startText;
+        public string endText;
+        public bool addActivityMarkers;
+        public Func<bool> waitCondition;
+        public const float sendInterval = 0.1f;
+    }
+
+    private struct AudioStreamState
+    {
+        public int lastSamplePosition;
+        public float lastSendTime;
+        public AudioClip processedClip;
+    }
+
     [Header("Animation Controller")]
     [Tooltip("Animation controller for the rapper.")]
     [SerializeField]
@@ -147,8 +164,7 @@ public class RapBattleConductorLive : MonoBehaviour
             StartCoroutine(
                 StreamAudioToGemini(
                     geminiLiveAIJudge,
-                    AIRapperAAudioSource.clip,
-                    () => AIRapperAAudioSource.timeSamples,
+                    AIRapperAAudioSource,
                     () => geminiLiveAIRapper.IsAudioActive(),
                     false,
                     "attempt rapper 2",
@@ -344,6 +360,289 @@ public class RapBattleConductorLive : MonoBehaviour
         }
     }
 
+    private bool ValidateAudioStreamInputs(
+        GeminiLiveWebRTC agent,
+        AudioSource audioSource = null,
+        AudioClip clip = null
+    )
+    {
+        if (agent == null)
+        {
+            Debug.LogError("Gemini agent is null");
+            return false;
+        }
+
+        if (audioSource == null && clip == null)
+        {
+            Debug.LogError($"Both audio source and clip are null for agent {agent.name}");
+            return false;
+        }
+
+        if (audioSource != null && audioSource == null)
+        {
+            Debug.LogError($"Audio source is null for agent {agent.name}");
+            return false;
+        }
+
+        if (clip == null && audioSource != null)
+        {
+            return true;
+        }
+
+        if (clip != null)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    private AudioClip PrepareAudioClip(AudioClip originalClip, string agentName)
+    {
+        if (originalClip == null)
+        {
+            Debug.LogError($"Audio clip is null for agent {agentName}");
+            return null;
+        }
+
+        if (originalClip.frequency != AILiveConfig.inputSampleRate)
+        {
+            Debug.Log($"Resampling audio clip {originalClip.name} for agent {agentName}");
+            return AudioClipResampler.ResampleAudio(originalClip, AILiveConfig.inputSampleRate);
+        }
+
+        return originalClip;
+    }
+
+    private float[] ResampleAudioSamples(float[] samples, AudioClip originalClip, int samplesToGet)
+    {
+        if (originalClip.frequency != AILiveConfig.inputSampleRate)
+        {
+            AudioClip resampledClip = AudioClipResampler.ResampleAudio(
+                originalClip,
+                AILiveConfig.inputSampleRate
+            );
+            float[] resampledSamples = new float[samplesToGet * resampledClip.channels];
+            return resampledSamples;
+        }
+        return samples;
+    }
+
+    private IEnumerator SendInitialMessage(GeminiLiveWebRTC agent, string message)
+    {
+        if (!string.IsNullOrEmpty(message))
+        {
+            Debug.Log($"Sending start text to Gemini agent {agent.name}: {message}");
+            yield return StartCoroutine(agent.SendTextToGeminiCoroutine(message));
+        }
+    }
+
+    private IEnumerator SendEndActivityMarker(GeminiLiveWebRTC agent)
+    {
+        Debug.Log($"Sending activity end marker for agent {agent.name}");
+        yield return StartCoroutine(agent.SendActivityEndToGeminiCoroutine());
+    }
+
+    private IEnumerator SendStartActivityMarker(GeminiLiveWebRTC agent)
+    {
+        Debug.Log($"Sending activity start marker for agent {agent.name}");
+        yield return StartCoroutine(agent.SendActivityStartToGeminiCoroutine());
+    }
+
+    private IEnumerator ProcessAndSendAudioSamples(
+        GeminiLiveWebRTC agent,
+        AudioClip clip,
+        int lastSamplePosition,
+        int currentSamplePosition
+    )
+    {
+        int samplesToGet = currentSamplePosition - lastSamplePosition;
+        if (samplesToGet > 0)
+        {
+            float[] samples = new float[samplesToGet * clip.channels];
+            clip.GetData(samples, lastSamplePosition % clip.samples);
+
+            samples = ResampleAudioSamples(samples, clip, samplesToGet);
+
+            Debug.Log(
+                $"Sending {samples.Length} audio samples (from position {lastSamplePosition}) to Gemini agent {agent.name}"
+            );
+            yield return StartCoroutine(agent.SendAudioToGeminiCoroutine(samples));
+        }
+    }
+
+    private IEnumerator ProcessAndSendAudioSourceSamples(
+        GeminiLiveWebRTC agent,
+        AudioSource audioSource,
+        int lastSamplePosition,
+        int currentSamplePosition
+    )
+    {
+        AudioClip currentClip = audioSource.clip;
+        int samplesToGet = currentSamplePosition - lastSamplePosition;
+
+        if (samplesToGet > 0)
+        {
+            float[] samples = new float[samplesToGet * currentClip.channels];
+            currentClip.GetData(samples, lastSamplePosition % currentClip.samples);
+
+            if (currentClip.frequency != AILiveConfig.inputSampleRate)
+            {
+                AudioClip resampledClip = AudioClipResampler.ResampleAudio(
+                    currentClip,
+                    AILiveConfig.inputSampleRate
+                );
+                samples = new float[samplesToGet * resampledClip.channels];
+                resampledClip.GetData(samples, lastSamplePosition % resampledClip.samples);
+            }
+
+            Debug.Log(
+                $"Sending {samples.Length} audio samples from AudioSource (position {lastSamplePosition}) to Gemini agent {agent.name}"
+            );
+            yield return StartCoroutine(agent.SendAudioToGeminiCoroutine(samples));
+        }
+    }
+
+    private IEnumerator SendFinalAudioData(
+        GeminiLiveWebRTC agent,
+        AudioClip clip,
+        Func<int> getPosition,
+        int lastSamplePosition
+    )
+    {
+        int finalSamplePosition = getPosition();
+        if (finalSamplePosition < lastSamplePosition)
+        {
+            finalSamplePosition += clip.samples;
+        }
+
+        int finalSamplesToGet = finalSamplePosition - lastSamplePosition;
+        if (finalSamplesToGet > 0)
+        {
+            float[] finalSamples = new float[finalSamplesToGet * clip.channels];
+            clip.GetData(finalSamples, lastSamplePosition % clip.samples);
+
+            Debug.Log(
+                $"Sending final {finalSamples.Length} audio samples (from position {lastSamplePosition}) to Gemini agent {agent.name}"
+            );
+            yield return StartCoroutine(agent.SendAudioToGeminiCoroutine(finalSamples));
+        }
+    }
+
+    private IEnumerator SendFinalAudioSourceData(
+        GeminiLiveWebRTC agent,
+        AudioSource audioSource,
+        int lastSamplePosition
+    )
+    {
+        if (audioSource.clip != null)
+        {
+            int finalSamplePosition = audioSource.timeSamples;
+            AudioClip finalClip = audioSource.clip;
+
+            if (finalSamplePosition < lastSamplePosition)
+            {
+                finalSamplePosition += finalClip.samples;
+            }
+
+            int finalSamplesToGet = finalSamplePosition - lastSamplePosition;
+            if (finalSamplesToGet > 0)
+            {
+                float[] finalSamples = new float[finalSamplesToGet * finalClip.channels];
+                finalClip.GetData(finalSamples, lastSamplePosition % finalClip.samples);
+
+                if (finalClip.frequency != AILiveConfig.inputSampleRate)
+                {
+                    AudioClip resampledClip = AudioClipResampler.ResampleAudio(
+                        finalClip,
+                        AILiveConfig.inputSampleRate
+                    );
+                    finalSamples = new float[finalSamplesToGet * resampledClip.channels];
+                    resampledClip.GetData(finalSamples, lastSamplePosition % resampledClip.samples);
+                }
+
+                Debug.Log(
+                    $"Sending final {finalSamples.Length} audio samples from AudioSource (position {lastSamplePosition}) to Gemini agent {agent.name}"
+                );
+                yield return StartCoroutine(agent.SendAudioToGeminiCoroutine(finalSamples));
+            }
+        }
+    }
+
+    private IEnumerator StreamAudioToGemini(
+        GeminiLiveWebRTC agent,
+        AudioSource audioSource,
+        Func<bool> isActive,
+        bool addActivityMarkers = false,
+        string startText = null,
+        string endText = null,
+        Func<bool> waitCondition = null
+    )
+    {
+        yield return StartCoroutine(SendInitialMessage(agent, startText));
+
+        if (!ValidateAudioStreamInputs(agent, audioSource))
+        {
+            yield break;
+        }
+
+        const float sendInterval = 0.1f;
+        int lastSamplePosition = 0;
+
+        if (waitCondition != null)
+        {
+            Debug.Log($"Waiting for condition to start streaming for agent {agent.name}");
+            yield return new WaitUntil(waitCondition);
+        }
+
+        if (addActivityMarkers)
+        {
+            yield return StartCoroutine(SendStartActivityMarker(agent));
+        }
+
+        float lastSendTime = Time.time;
+
+        while (isActive())
+        {
+            if (audioSource.clip != null && audioSource.isPlaying)
+            {
+                int currentSamplePosition = audioSource.timeSamples;
+                AudioClip currentClip = audioSource.clip;
+
+                if (currentSamplePosition < lastSamplePosition)
+                {
+                    currentSamplePosition += currentClip.samples;
+                }
+
+                if (Time.time - lastSendTime >= sendInterval)
+                {
+                    yield return StartCoroutine(
+                        ProcessAndSendAudioSourceSamples(
+                            agent,
+                            audioSource,
+                            lastSamplePosition,
+                            currentSamplePosition
+                        )
+                    );
+                    lastSamplePosition = currentSamplePosition % currentClip.samples;
+                    lastSendTime = Time.time;
+                }
+            }
+            yield return null;
+        }
+
+        yield return StartCoroutine(
+            SendFinalAudioSourceData(agent, audioSource, lastSamplePosition)
+        );
+
+        if (addActivityMarkers)
+        {
+            yield return StartCoroutine(SendEndActivityMarker(agent));
+        }
+
+        yield return StartCoroutine(SendInitialMessage(agent, endText));
+    }
+
     private IEnumerator StreamAudioToGemini(
         GeminiLiveWebRTC agent,
         AudioClip clip,
@@ -355,27 +654,35 @@ public class RapBattleConductorLive : MonoBehaviour
         Func<bool> waitCondition = null
     )
     {
-        if (!string.IsNullOrEmpty(startText))
+        yield return StartCoroutine(SendInitialMessage(agent, startText));
+
+        if (!ValidateAudioStreamInputs(agent, null, clip))
         {
-            StartCoroutine(agent.SendTextToGeminiCoroutine(startText));
-        }
-        if (clip == null)
-        {
-            Debug.LogError("Audio clip is null");
             yield break;
         }
-        clip = AudioClipResampler.ResampleAudio(clip, AILiveConfig.inputSampleRate);
+
+        clip = PrepareAudioClip(clip, agent.name);
+        if (clip == null)
+        {
+            yield break;
+        }
+
         const float sendInterval = 0.1f;
         int lastSamplePosition = 0;
+
         if (waitCondition != null)
         {
+            Debug.Log($"Waiting for condition to start streaming for agent {agent.name}");
             yield return new WaitUntil(waitCondition);
         }
+
         if (addActivityMarkers)
         {
-            StartCoroutine(agent.SendActivityStartToGeminiCoroutine());
+            yield return StartCoroutine(SendStartActivityMarker(agent));
         }
+
         float lastSendTime = Time.time;
+
         while (isActive())
         {
             int currentSamplePosition = getPosition();
@@ -383,38 +690,33 @@ public class RapBattleConductorLive : MonoBehaviour
             {
                 currentSamplePosition += clip.samples;
             }
-            int samplesToGet = currentSamplePosition - lastSamplePosition;
-            if (samplesToGet > 0 && Time.time - lastSendTime >= sendInterval)
+
+            if (Time.time - lastSendTime >= sendInterval)
             {
-                float[] samples = new float[samplesToGet * clip.channels];
-                clip.GetData(samples, lastSamplePosition % clip.samples);
-                StartCoroutine(agent.SendAudioToGeminiCoroutine(samples));
+                yield return StartCoroutine(
+                    ProcessAndSendAudioSamples(
+                        agent,
+                        clip,
+                        lastSamplePosition,
+                        currentSamplePosition
+                    )
+                );
                 lastSamplePosition = currentSamplePosition % clip.samples;
                 lastSendTime = Time.time;
             }
             yield return null;
         }
-        // Send any remaining audio data after recording stops
-        int finalSamplePosition = getPosition();
-        if (finalSamplePosition < lastSamplePosition)
-        {
-            finalSamplePosition += clip.samples;
-        }
-        int finalSamplesToGet = finalSamplePosition - lastSamplePosition;
-        if (finalSamplesToGet > 0)
-        {
-            float[] finalSamples = new float[finalSamplesToGet * clip.channels];
-            clip.GetData(finalSamples, lastSamplePosition % clip.samples);
-            StartCoroutine(agent.SendAudioToGeminiCoroutine(finalSamples));
-        }
+
+        yield return StartCoroutine(
+            SendFinalAudioData(agent, clip, getPosition, lastSamplePosition)
+        );
+
         if (addActivityMarkers)
         {
-            StartCoroutine(agent.SendActivityEndToGeminiCoroutine());
+            yield return StartCoroutine(SendEndActivityMarker(agent));
         }
-        if (!string.IsNullOrEmpty(endText))
-        {
-            StartCoroutine(agent.SendTextToGeminiCoroutine(endText));
-        }
+
+        yield return StartCoroutine(SendInitialMessage(agent, endText));
     }
 
     private void StartMicrophoneRecording()

@@ -34,14 +34,14 @@ public class AIRapperGeminiLive : GeminiLiveWebRTCAudio
                 },
                 realtimeInputConfig = new RealtimeInputConfig
                 {
-                    // automaticActivityDetection = new AutomaticActivityDetection { disabled = true },
+                    automaticActivityDetection = new AutomaticActivityDetection { disabled = true },
                     activityHandling = ActivityHandling.NO_INTERRUPTION,
                 },
                 systemInstruction = new Content
                 {
                     parts = new Part[] { new Part { text = aiConfig.AIPrompt } },
                 },
-                // proactivity = new ProactivityConfig { proactiveAudio = false },
+                // proactivity = new ProactivityConfig { proactiveAudio = true },
                 outputAudioTranscription = new AudioTranscriptionConfig { },
             },
         };

@@ -35,6 +35,7 @@ public class AIJudgeGeminiLive : GeminiLiveWebRTC
                     {
                         parts = new Part[] { new Part { text = aiConfig.AIPrompt } },
                     },
+                    // proactivity = new ProactivityConfig { proactiveAudio = true },
                 },
             };
         }
