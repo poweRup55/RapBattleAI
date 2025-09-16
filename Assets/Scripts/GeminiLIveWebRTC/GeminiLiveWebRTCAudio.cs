@@ -12,6 +12,8 @@ public abstract class GeminiLiveWebRTCAudio : GeminiLiveWebRTC
     [Header("Audio")]
     [SerializeField]
     private AudioSource audioSource;
+
+    private int originalSampleRate = 24000;
     private bool finishedAudioStreamIn = false;
     private Queue<byte[]> audioResponseQueue = new Queue<byte[]>();
     private Queue<IEnumerator> audioCoroutineQueue = new Queue<IEnumerator>();
@@ -196,7 +198,7 @@ public abstract class GeminiLiveWebRTCAudio : GeminiLiveWebRTC
                     "GeminiResponse",
                     samples.Length,
                     1,
-                    24000,
+                    originalSampleRate,
                     false
                 );
                 responseClip.SetData(samples, 0);
@@ -272,7 +274,7 @@ public abstract class GeminiLiveWebRTCAudio : GeminiLiveWebRTC
         base.Destroy();
     }
 
-    public IEnumerator StreamToOtherAgent(GeminiLiveWebRTC agent)
+    public IEnumerator StreamToOtherAgent(GeminiLiveWebRTC agent, int targetSampleRate)
     {
         StartCoroutine(agent.SendTextToGeminiCoroutine("attempt rapper 2"));
         while (IsAudioActive())
@@ -285,6 +287,10 @@ public abstract class GeminiLiveWebRTCAudio : GeminiLiveWebRTC
             }
             if (clip != null)
             {
+                if (clip.frequency != targetSampleRate)
+                {
+                    clip = AudioClipResampler.ResampleAudio(clip, targetSampleRate);
+                }
                 float[] samples = new float[clip.samples * clip.channels];
                 clip.GetData(samples, 0);
                 StartCoroutine(agent.SendAudioToGeminiCoroutine(samples));

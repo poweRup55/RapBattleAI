@@ -144,7 +144,10 @@ public class RapBattleConductorLive : MonoBehaviour
             var createAudioCoroutine = StartCoroutine(geminiLiveAIRapper.CreateAudioCoroutines());
             var playAudioCoroutine = StartCoroutine(geminiLiveAIRapper.PlayAudioCoroutine());
             var streamAudioToJudge = StartCoroutine(
-                geminiLiveAIRapper.StreamToOtherAgent(geminiLiveAIJudge)
+                geminiLiveAIRapper.StreamToOtherAgent(
+                    geminiLiveAIJudge,
+                    AILiveConfig.inputSampleRate
+                )
             );
             yield return new WaitUntil(() => geminiLiveAIRapper.IsPlaying);
             uiManager.UpdateStatus($"NPC is rapping!");
@@ -400,7 +403,6 @@ public class RapBattleConductorLive : MonoBehaviour
             float[] samples = new float[samplesToGet * clip.channels];
             clip.GetData(samples, lastSamplePosition % clip.samples);
 
-            // samples = ResampleAudioSamples(samples, clip, samplesToGet);
             yield return StartCoroutine(agent.SendAudioToGeminiCoroutine(samples));
         }
     }
@@ -415,7 +417,7 @@ public class RapBattleConductorLive : MonoBehaviour
     {
         if (resizeClip > 0 && clip != null && clip.samples != resizeClip)
         {
-            clip = WavUtility.TrimClipToLength(clip, resizeClip + 5f);
+            clip = WavUtility.TrimClipToLength(clip, resizeClip);
         }
         int finalSamplePosition = getPosition();
         if (finalSamplePosition < lastSamplePosition)
