@@ -45,29 +45,62 @@ public class AIJudgeGeminiLive : GeminiLiveWebRTC
     {
         responseBuffer += text;
 
-        if (responseBuffer.Contains("[/reaction]"))
+        // Process all complete reactions first
+        while (responseBuffer.Contains("[reaction]") && responseBuffer.Contains("[/reaction]"))
         {
-            int start = responseBuffer.IndexOf("[reaction]");
-            int end = responseBuffer.IndexOf("[/reaction]") + "[/reaction]".Length;
-            string reaction = responseBuffer.Substring(start, end - start);
-            string reactionContent = reaction
-                .Replace("[reaction]", "")
-                .Replace("[/reaction]", "")
-                .Trim();
-            uIManager.ShowPopUp(reactionContent);
-            responseBuffer = responseBuffer.Remove(0, end);
+            int startIndex = responseBuffer.IndexOf("[reaction]");
+            int endIndex = responseBuffer.IndexOf("[/reaction]", startIndex);
+
+            if (endIndex > startIndex)
+            {
+                endIndex += "[/reaction]".Length;
+                string reaction = responseBuffer.Substring(startIndex, endIndex - startIndex);
+                string reactionContent = reaction
+                    .Replace("[reaction]", "")
+                    .Replace("[/reaction]", "")
+                    .Trim();
+
+                if (!string.IsNullOrEmpty(reactionContent))
+                {
+                    uIManager.ShowPopUp(reactionContent);
+                }
+
+                responseBuffer = responseBuffer.Remove(startIndex, endIndex - startIndex);
+            }
+            else
+            {
+                break; // Incomplete tag, wait for more data
+            }
         }
-        else if (responseBuffer.Contains("[/round score]"))
+
+        // Process all complete round scores
+        while (
+            responseBuffer.Contains("[round score]") && responseBuffer.Contains("[/round score]")
+        )
         {
-            int start = responseBuffer.IndexOf("[round score]");
-            int end = responseBuffer.IndexOf("[/round score]") + "[/round score]".Length;
-            string score = responseBuffer.Substring(start, end - start);
-            string scoreContent = score
-                .Replace("[round score]", "")
-                .Replace("[/round score]", "")
-                .Trim();
-            uIManager.UpdateAIJudgeText(scoreContent);
-            responseBuffer = responseBuffer.Remove(0, end);
+            int startIndex = responseBuffer.IndexOf("[round score]");
+            int endIndex = responseBuffer.IndexOf("[/round score]", startIndex);
+
+            if (endIndex > startIndex)
+            {
+                endIndex += "[/round score]".Length;
+                string score = responseBuffer.Substring(startIndex, endIndex - startIndex);
+                string scoreContent = score
+                    .Replace("[round score]", "")
+                    .Replace("[/round score]", "")
+                    .Trim();
+
+                if (!string.IsNullOrEmpty(scoreContent))
+                {
+                    uIManager.UpdateAIJudgeText(scoreContent);
+                }
+
+                responseBuffer = responseBuffer.Remove(startIndex, endIndex - startIndex);
+            }
+            else
+            {
+                break; // Incomplete tag, wait for more data
+            }
         }
     }
 

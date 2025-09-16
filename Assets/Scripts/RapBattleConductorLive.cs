@@ -399,35 +399,35 @@ public class RapBattleConductorLive : MonoBehaviour
         return false;
     }
 
-    private AudioClip PrepareAudioClip(AudioClip originalClip, string agentName)
-    {
-        if (originalClip == null)
-        {
-            Debug.LogError($"Audio clip is null for agent {agentName}");
-            return null;
-        }
+    // private AudioClip PrepareAudioClip(AudioClip originalClip, string agentName)
+    // {
+    //     if (originalClip == null)
+    //     {
+    //         Debug.LogError($"Audio clip is null for agent {agentName}");
+    //         return null;
+    //     }
 
-        if (originalClip.frequency != AILiveConfig.inputSampleRate)
-        {
-            return AudioClipResampler.ResampleAudio(originalClip, AILiveConfig.inputSampleRate);
-        }
+    //     if (originalClip.frequency != AILiveConfig.inputSampleRate)
+    //     {
+    //         return AudioClipResampler.ResampleAudio(originalClip, AILiveConfig.inputSampleRate);
+    //     }
 
-        return originalClip;
-    }
+    //     return originalClip;
+    // }
 
-    private float[] ResampleAudioSamples(float[] samples, AudioClip originalClip, int samplesToGet)
-    {
-        if (originalClip.frequency != AILiveConfig.inputSampleRate)
-        {
-            AudioClip resampledClip = AudioClipResampler.ResampleAudio(
-                originalClip,
-                AILiveConfig.inputSampleRate
-            );
-            float[] resampledSamples = new float[samplesToGet * resampledClip.channels];
-            return resampledSamples;
-        }
-        return samples;
-    }
+    // private float[] ResampleAudioSamples(float[] samples, AudioClip originalClip, int samplesToGet)
+    // {
+    //     if (originalClip.frequency != AILiveConfig.inputSampleRate)
+    //     {
+    //         AudioClip resampledClip = AudioClipResampler.ResampleAudio(
+    //             originalClip,
+    //             AILiveConfig.inputSampleRate
+    //         );
+    //         float[] resampledSamples = new float[samplesToGet * resampledClip.channels];
+    //         return resampledSamples;
+    //     }
+    //     return samples;
+    // }
 
     private IEnumerator SendInitialMessage(GeminiLiveWebRTC agent, string message)
     {
@@ -460,7 +460,7 @@ public class RapBattleConductorLive : MonoBehaviour
             float[] samples = new float[samplesToGet * clip.channels];
             clip.GetData(samples, lastSamplePosition % clip.samples);
 
-            samples = ResampleAudioSamples(samples, clip, samplesToGet);
+            // samples = ResampleAudioSamples(samples, clip, samplesToGet);
             yield return StartCoroutine(agent.SendAudioToGeminiCoroutine(samples));
         }
     }
@@ -489,35 +489,35 @@ public class RapBattleConductorLive : MonoBehaviour
             float[] samples = new float[maxSamplesToGet * currentClip.channels];
             currentClip.GetData(samples, startPosition);
 
-            if (currentClip.frequency != AILiveConfig.inputSampleRate)
-            {
-                AudioClip resampledClip = AudioClipResampler.ResampleAudio(
-                    currentClip,
-                    AILiveConfig.inputSampleRate
-                );
+            // if (currentClip.frequency != AILiveConfig.inputSampleRate)
+            // {
+            //     AudioClip resampledClip = AudioClipResampler.ResampleAudio(
+            //         currentClip,
+            //         AILiveConfig.inputSampleRate
+            //     );
 
-                if (resampledClip != null)
-                {
-                    // Calculate resampled position and size
-                    float resampleRatio =
-                        (float)AILiveConfig.inputSampleRate / currentClip.frequency;
-                    int resampledStartPosition = Mathf.FloorToInt(startPosition * resampleRatio);
-                    int resampledSamplesToGet = Mathf.FloorToInt(maxSamplesToGet * resampleRatio);
+            //     if (resampledClip != null)
+            //     {
+            //         // Calculate resampled position and size
+            //         float resampleRatio =
+            //             (float)AILiveConfig.inputSampleRate / currentClip.frequency;
+            //         int resampledStartPosition = Mathf.FloorToInt(startPosition * resampleRatio);
+            //         int resampledSamplesToGet = Mathf.FloorToInt(maxSamplesToGet * resampleRatio);
 
-                    // Ensure bounds for resampled clip
-                    resampledStartPosition = resampledStartPosition % resampledClip.samples;
-                    resampledSamplesToGet = Mathf.Min(
-                        resampledSamplesToGet,
-                        resampledClip.samples - resampledStartPosition
-                    );
+            //         // Ensure bounds for resampled clip
+            //         resampledStartPosition = resampledStartPosition % resampledClip.samples;
+            //         resampledSamplesToGet = Mathf.Min(
+            //             resampledSamplesToGet,
+            //             resampledClip.samples - resampledStartPosition
+            //         );
 
-                    if (resampledSamplesToGet > 0)
-                    {
-                        samples = new float[resampledSamplesToGet * resampledClip.channels];
-                        resampledClip.GetData(samples, resampledStartPosition);
-                    }
-                }
-            }
+            //         if (resampledSamplesToGet > 0)
+            //         {
+            //             samples = new float[resampledSamplesToGet * resampledClip.channels];
+            //             resampledClip.GetData(samples, resampledStartPosition);
+            //         }
+            //     }
+            // }
 
             if (samples != null && samples.Length > 0)
             {
@@ -609,41 +609,41 @@ public class RapBattleConductorLive : MonoBehaviour
                 float[] finalSamples = new float[maxSamplesToGet * finalClip.channels];
                 finalClip.GetData(finalSamples, startPosition);
 
-                if (finalClip.frequency != AILiveConfig.inputSampleRate)
-                {
-                    AudioClip resampledClip = AudioClipResampler.ResampleAudio(
-                        finalClip,
-                        AILiveConfig.inputSampleRate
-                    );
+                // if (finalClip.frequency != AILiveConfig.inputSampleRate)
+                // {
+                //     AudioClip resampledClip = AudioClipResampler.ResampleAudio(
+                //         finalClip,
+                //         AILiveConfig.inputSampleRate
+                //     );
 
-                    if (resampledClip != null)
-                    {
-                        // Calculate resampled position and size
-                        float resampleRatio =
-                            (float)AILiveConfig.inputSampleRate / finalClip.frequency;
-                        int resampledStartPosition = Mathf.FloorToInt(
-                            startPosition * resampleRatio
-                        );
-                        int resampledSamplesToGet = Mathf.FloorToInt(
-                            maxSamplesToGet * resampleRatio
-                        );
+                //     if (resampledClip != null)
+                //     {
+                //         // Calculate resampled position and size
+                //         float resampleRatio =
+                //             (float)AILiveConfig.inputSampleRate / finalClip.frequency;
+                //         int resampledStartPosition = Mathf.FloorToInt(
+                //             startPosition * resampleRatio
+                //         );
+                //         int resampledSamplesToGet = Mathf.FloorToInt(
+                //             maxSamplesToGet * resampleRatio
+                //         );
 
-                        // Ensure bounds for resampled clip
-                        resampledStartPosition = resampledStartPosition % resampledClip.samples;
-                        resampledSamplesToGet = Mathf.Min(
-                            resampledSamplesToGet,
-                            resampledClip.samples - resampledStartPosition
-                        );
+                //         // Ensure bounds for resampled clip
+                //         resampledStartPosition = resampledStartPosition % resampledClip.samples;
+                //         resampledSamplesToGet = Mathf.Min(
+                //             resampledSamplesToGet,
+                //             resampledClip.samples - resampledStartPosition
+                //         );
 
-                        if (resampledSamplesToGet > 0)
-                        {
-                            finalSamples = new float[
-                                resampledSamplesToGet * resampledClip.channels
-                            ];
-                            resampledClip.GetData(finalSamples, resampledStartPosition);
-                        }
-                    }
-                }
+                //         if (resampledSamplesToGet > 0)
+                //         {
+                //             finalSamples = new float[
+                //                 resampledSamplesToGet * resampledClip.channels
+                //             ];
+                //             resampledClip.GetData(finalSamples, resampledStartPosition);
+                //         }
+                //     }
+                // }
 
                 if (finalSamples != null && finalSamples.Length > 0)
                 {
@@ -753,7 +753,7 @@ public class RapBattleConductorLive : MonoBehaviour
             yield break;
         }
 
-        clip = PrepareAudioClip(clip, agent.name);
+        // clip = PrepareAudioClip(clip, agent.name);
         if (clip == null)
         {
             yield break;
