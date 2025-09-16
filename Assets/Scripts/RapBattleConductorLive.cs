@@ -239,7 +239,7 @@ public class RapBattleConductorLive : MonoBehaviour
             float startTime = Time.time;
             while (Time.time - startTime < 20f)
             {
-                if (geminiLiveAIRapper.responseAudioClips.Count > 0)
+                if (geminiLiveAIRapper.IsAudioActive())
                 {
                     yield break;
                 }
@@ -429,38 +429,6 @@ public class RapBattleConductorLive : MonoBehaviour
         return samples;
     }
 
-    private bool HasMeaningfulAudio(
-        float[] samples,
-        float threshold = 0.01f,
-        float minActiveRatio = 0.05f
-    )
-    {
-        if (samples == null || samples.Length == 0)
-        {
-            return false;
-        }
-
-        int meaningfulSampleCount = 0;
-        float maxAmplitude = 0f;
-
-        for (int i = 0; i < samples.Length; i++)
-        {
-            float absoluteValue = Mathf.Abs(samples[i]);
-            if (absoluteValue > threshold)
-            {
-                meaningfulSampleCount++;
-            }
-            if (absoluteValue > maxAmplitude)
-            {
-                maxAmplitude = absoluteValue;
-            }
-        }
-
-        float activeRatio = (float)meaningfulSampleCount / samples.Length;
-        bool hasMeaningfulContent = activeRatio >= minActiveRatio && maxAmplitude > threshold * 2f;
-        return hasMeaningfulContent;
-    }
-
     private IEnumerator SendInitialMessage(GeminiLiveWebRTC agent, string message)
     {
         if (!string.IsNullOrEmpty(message))
@@ -562,9 +530,14 @@ public class RapBattleConductorLive : MonoBehaviour
         GeminiLiveWebRTC agent,
         AudioClip clip,
         Func<int> getPosition,
-        int lastSamplePosition
+        int lastSamplePosition,
+        float resizeClip = -1f
     )
     {
+        if (resizeClip > 0 && clip != null && clip.samples != resizeClip)
+        {
+            clip = WavUtility.TrimClipToLength(clip, resizeClip);
+        }
         int finalSamplePosition = getPosition();
         if (finalSamplePosition < lastSamplePosition)
         {
@@ -586,7 +559,7 @@ public class RapBattleConductorLive : MonoBehaviour
             float[] finalSamples = new float[maxSamplesToGet * clip.channels];
             clip.GetData(finalSamples, startPosition);
 
-            if (finalSamples != null && finalSamples.Length > 0 && HasMeaningfulAudio(finalSamples))
+            if (finalSamples != null && finalSamples.Length > 0)
             {
                 Debug.Log(
                     $"Sending final {finalSamples.Length} audio samples (from position {lastSamplePosition}) to Gemini agent {agent.name}"
@@ -672,11 +645,7 @@ public class RapBattleConductorLive : MonoBehaviour
                     }
                 }
 
-                if (
-                    finalSamples != null
-                    && finalSamples.Length > 0
-                    && HasMeaningfulAudio(finalSamples)
-                )
+                if (finalSamples != null && finalSamples.Length > 0)
                 {
                     Debug.Log(
                         $"Sending final {finalSamples.Length} audio samples from AudioSource (position {lastSamplePosition}) to Gemini agent {agent.name}"
@@ -830,7 +799,13 @@ public class RapBattleConductorLive : MonoBehaviour
         }
 
         yield return StartCoroutine(
-            SendFinalAudioData(agent, clip, getPosition, lastSamplePosition)
+            SendFinalAudioData(
+                agent,
+                clip,
+                getPosition,
+                lastSamplePosition,
+                recordingLengthInSeconds
+            )
         );
 
         if (addActivityMarkers)

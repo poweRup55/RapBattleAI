@@ -739,4 +739,28 @@ public class WavUtility
         segment.SetData(samples, 0);
         return segment;
     }
+
+    public static AudioClip TrimClipToLength(AudioClip clip, float clipLengthInSeconds)
+    {
+        if (clip == null || clipLengthInSeconds <= 0f)
+            return null;
+
+        int trimmedSamples = Mathf.FloorToInt(clipLengthInSeconds * clip.frequency);
+        trimmedSamples = Mathf.Min(trimmedSamples, clip.samples); // Don't exceed original
+        if (trimmedSamples <= 0)
+            trimmedSamples = clip.samples;
+
+        float[] samples = new float[trimmedSamples * clip.channels];
+        clip.GetData(samples, 0);
+
+        var newPlayerRecordingClip = AudioClip.Create(
+            "PlayerRecordingTrimmed",
+            trimmedSamples,
+            clip.channels,
+            clip.frequency,
+            false
+        );
+        newPlayerRecordingClip.SetData(samples, 0);
+        return newPlayerRecordingClip;
+    }
 }

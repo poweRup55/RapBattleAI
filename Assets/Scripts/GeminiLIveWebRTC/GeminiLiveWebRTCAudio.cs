@@ -15,7 +15,6 @@ public abstract class GeminiLiveWebRTCAudio : GeminiLiveWebRTC
     private bool finishedAudioStreamIn = false;
     private Queue<byte[]> audioResponseQueue = new Queue<byte[]>();
     private Queue<IEnumerator> audioCoroutineQueue = new Queue<IEnumerator>();
-    public List<AudioClip> responseAudioClips = new List<AudioClip>();
 
     public bool IsPlaying => audioSource.isPlaying;
 
@@ -25,7 +24,6 @@ public abstract class GeminiLiveWebRTCAudio : GeminiLiveWebRTC
         finishedAudioStreamIn = false;
         audioResponseQueue = new Queue<byte[]>();
         audioCoroutineQueue = new Queue<IEnumerator>();
-        responseAudioClips.Clear();
     }
 
     protected override void ProcessGeminiResponse(string json)
@@ -203,11 +201,6 @@ public abstract class GeminiLiveWebRTCAudio : GeminiLiveWebRTC
                 );
                 responseClip.SetData(samples, 0);
 
-                lock (responseAudioClips)
-                {
-                    responseAudioClips.Add(responseClip);
-                }
-
                 lock (audioCoroutineQueue)
                 {
                     audioCoroutineQueue.Enqueue(PlayAudioResponse(responseClip));
@@ -273,6 +266,5 @@ public abstract class GeminiLiveWebRTCAudio : GeminiLiveWebRTC
     public new void Destroy()
     {
         base.Destroy();
-        responseAudioClips.Clear();
     }
 }
