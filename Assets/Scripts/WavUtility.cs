@@ -642,11 +642,25 @@ public class WavUtility
 
     public static byte[] ConvertToPCM16(float[] samples)
     {
+        if (samples == null || samples.Length == 0)
+        {
+            return new byte[0];
+        }
+
         byte[] pcmData = new byte[samples.Length * 2];
 
         for (int i = 0; i < samples.Length; i++)
         {
-            short sample = (short)(samples[i] * 32767f);
+            // Clamp the sample to the valid range [-1.0, 1.0]
+            float clampedSample = Mathf.Clamp(samples[i], -1.0f, 1.0f);
+
+            // Handle NaN or infinity values
+            if (float.IsNaN(clampedSample) || float.IsInfinity(clampedSample))
+            {
+                clampedSample = 0f;
+            }
+
+            short sample = (short)(clampedSample * 32767f);
             byte[] bytes = BitConverter.GetBytes(sample);
             pcmData[i * 2] = bytes[0];
             pcmData[i * 2 + 1] = bytes[1];

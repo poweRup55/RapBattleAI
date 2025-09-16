@@ -1,0 +1,100 @@
+Data longer than the AudioClip: GeminiResponse_Resampled. 45440 sample(s) copied
+UnityEngine.AudioClip:GetData (single[],int)
+RapBattleConductorLive/<ProcessAndSendAudioSourceSamples>d__41:MoveNext () (at Assets/Scripts/RapBattleConductorLive.cs:501)
+UnityEngine.MonoBehaviour:StartCoroutine (System.Collections.IEnumerator)
+RapBattleConductorLive/<StreamAudioToGemini>d__44:MoveNext () (at Assets/Scripts/RapBattleConductorLive.cs:624)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+GeminiLive: Error receiving message: The remote party closed the WebSocket connection without completing the close handshake.
+UnityEngine.Debug:LogError (object)
+GeminiLiveWebRTC:LogWebSocketReceiveError (System.Threading.Tasks.Task`1<System.Net.WebSockets.WebSocketReceiveResult>) (at Assets/Scripts/GeminiLIveWebRTC/GeminiLiveWebRTC.cs:439)
+GeminiLiveWebRTC/<ReceiveMessagesCoroutine>d__33:MoveNext () (at Assets/Scripts/GeminiLIveWebRTC/GeminiLiveWebRTC.cs:394)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+GeminiLive: WebSocket state when error occurred: Aborted
+UnityEngine.Debug:LogError (object)
+GeminiLiveWebRTC:LogWebSocketReceiveError (System.Threading.Tasks.Task`1<System.Net.WebSockets.WebSocketReceiveResult>) (at Assets/Scripts/GeminiLIveWebRTC/GeminiLiveWebRTC.cs:440)
+GeminiLiveWebRTC/<ReceiveMessagesCoroutine>d__33:MoveNext () (at Assets/Scripts/GeminiLIveWebRTC/GeminiLiveWebRTC.cs:394)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+GeminiLive: Connection state when error occurred - isConnected: True, isSetupComplete: True, isSetupSent: True
+UnityEngine.Debug:LogError (object)
+GeminiLiveWebRTC:LogWebSocketReceiveError (System.Threading.Tasks.Task`1<System.Net.WebSockets.WebSocketReceiveResult>) (at Assets/Scripts/GeminiLIveWebRTC/GeminiLiveWebRTC.cs:443)
+GeminiLiveWebRTC/<ReceiveMessagesCoroutine>d__33:MoveNext () (at Assets/Scripts/GeminiLIveWebRTC/GeminiLiveWebRTC.cs:394)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+GeminiLive: Exception type: WebSocketException
+UnityEngine.Debug:LogError (object)
+GeminiLiveWebRTC:LogWebSocketReceiveError (System.Threading.Tasks.Task`1<System.Net.WebSockets.WebSocketReceiveResult>) (at Assets/Scripts/GeminiLIveWebRTC/GeminiLiveWebRTC.cs:446)
+GeminiLiveWebRTC/<ReceiveMessagesCoroutine>d__33:MoveNext () (at Assets/Scripts/GeminiLIveWebRTC/GeminiLiveWebRTC.cs:394)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+Error sending WebSocket message: The WebSocket is in an invalid state ('Aborted') for this operation. Valid states are: 'Open, CloseReceived'
+UnityEngine.Debug:LogError (object)
+GeminiLiveWebRTC/<SendWebSocketMessageChunk>d__46:MoveNext () (at Assets/Scripts/GeminiLIveWebRTC/GeminiLiveWebRTC.cs:793)
+UnityEngine.MonoBehaviour:StartCoroutine (System.Collections.IEnumerator)
+GeminiLiveWebRTC/<SendWebSocketMessageCoroutine>d__45:MoveNext () (at Assets/Scripts/GeminiLIveWebRTC/GeminiLiveWebRTC.cs:769)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+
+GeminiLive: WebSocket connection closed by server. Status: InvalidPayloadData
+UnityEngine.Debug:LogWarning (object)
+GeminiLiveWebRTC:ThrowWebSocketClosureDetails (System.Net.WebSockets.WebSocketReceiveResult) (at Assets/Scripts/GeminiLIveWebRTC/GeminiLiveWebRTC.cs:508)
+GeminiLiveWebRTC/<ReceiveMessagesCoroutine>d__33:MoveNext () (at Assets/Scripts/GeminiLIveWebRTC/GeminiLiveWebRTC.cs:415)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+GeminiLive: Description: Invalid JSON payload received. Unexpected token.
+AAAAAAAAAAAAAAAAAAAA
+^
+UnityEngine.Debug:LogWarning (object)
+GeminiLiveWebRTC:ThrowWebSocketClosureDetails (System.Net.WebSockets.WebSocketReceiveResult) (at Assets/Scripts/GeminiLIveWebRTC/GeminiLiveWebRTC.cs:511)
+GeminiLiveWebRTC/<ReceiveMessagesCoroutine>d__33:MoveNext () (at Assets/Scripts/GeminiLIveWebRTC/GeminiLiveWebRTC.cs:415)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+GeminiLive: Connection state when closed - isConnected: True, isSetupComplete: False, isSetupSent: True
+UnityEngine.Debug:LogWarning (object)
+GeminiLiveWebRTC:ThrowWebSocketClosureDetails (System.Net.WebSockets.WebSocketReceiveResult) (at Assets/Scripts/GeminiLIveWebRTC/GeminiLiveWebRTC.cs:512)
+GeminiLiveWebRTC/<ReceiveMessagesCoroutine>d__33:MoveNext () (at Assets/Scripts/GeminiLIveWebRTC/GeminiLiveWebRTC.cs:415)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+WebSocket closed due to invalid payload data.
+UnityEngine.Debug:LogError (object)
+GeminiLiveWebRTC:ThrowWebSocketClosureDetails (System.Net.WebSockets.WebSocketReceiveResult) (at Assets/Scripts/GeminiLIveWebRTC/GeminiLiveWebRTC.cs:538)
+GeminiLiveWebRTC/<ReceiveMessagesCoroutine>d__33:MoveNext () (at Assets/Scripts/GeminiLIveWebRTC/GeminiLiveWebRTC.cs:415)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+GeminiLive: Cannot send message - WebSocket state: CloseReceived
+UnityEngine.Debug:LogWarning (object)
+GeminiLiveWebRTC/<SendWebSocketMessageCoroutine>d__45:MoveNext () (at Assets/Scripts/GeminiLIveWebRTC/GeminiLiveWebRTC.cs:727)
+UnityEngine.MonoBehaviour:StartCoroutine (System.Collections.IEnumerator)
+GeminiLiveWebRTC/<ProcessMessagesQueue>d__23:MoveNext () (at Assets/Scripts/GeminiLIveWebRTC/GeminiLiveWebRTC.cs:114)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+GeminiLive: Message type that failed to send: BidiGenerateContentClientMessage
+UnityEngine.Debug:LogWarning (object)
+GeminiLiveWebRTC/<SendWebSocketMessageCoroutine>d__45:MoveNext () (at Assets/Scripts/GeminiLIveWebRTC/GeminiLiveWebRTC.cs:728)
+UnityEngine.MonoBehaviour:StartCoroutine (System.Collections.IEnumerator)
+GeminiLiveWebRTC/<ProcessMessagesQueue>d__23:MoveNext () (at Assets/Scripts/GeminiLIveWebRTC/GeminiLiveWebRTC.cs:114)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+GeminiLive: Current connection state - isConnected: False, isSetupComplete: False, isSetupSent: True
+UnityEngine.Debug:LogWarning (object)
+GeminiLiveWebRTC/<SendWebSocketMessageCoroutine>d__45:MoveNext () (at Assets/Scripts/GeminiLIveWebRTC/GeminiLiveWebRTC.cs:731)
+UnityEngine.MonoBehaviour:StartCoroutine (System.Collections.IEnumerator)
+GeminiLiveWebRTC/<ProcessMessagesQueue>d__23:MoveNext () (at Assets/Scripts/GeminiLIveWebRTC/GeminiLiveWebRTC.cs:114)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+Data longer than the AudioClip: GeminiResponse_Resampled. 35200 sample(s) copied
+UnityEngine.AudioClip:GetData (single[],int)
+RapBattleConductorLive/<ProcessAndSendAudioSourceSamples>d__41:MoveNext () (at Assets/Scripts/RapBattleConductorLive.cs:501)
+UnityEngine.MonoBehaviour:StartCoroutine (System.Collections.IEnumerator)
+RapBattleConductorLive/<StreamAudioToGemini>d__44:MoveNext () (at Assets/Scripts/RapBattleConductorLive.cs:624)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+Data longer than the AudioClip: GeminiResponse_Resampled. 45440 sample(s) copied
+UnityEngine.AudioClip:GetData (single[],int)
+RapBattleConductorLive/<ProcessAndSendAudioSourceSamples>d__41:MoveNext () (at Assets/Scripts/RapBattleConductorLive.cs:501)
+UnityEngine.MonoBehaviour:StartCoroutine (System.Collections.IEnumerator)
+RapBattleConductorLive/<StreamAudioToGemini>d__44:MoveNext () (at Assets/Scripts/RapBattleConductorLive.cs:624)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+

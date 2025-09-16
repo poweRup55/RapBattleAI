@@ -7411,11 +7411,12 @@ MonoBehaviour:
     If the input contains `attempt rapper 2` \u2192 the AI rapper is rapping. React
     only with live reactions. Do not score.\r\n* If the input contains `finalized
     rapper 1` \u2192 mark Rapper 1 as finished. Do not score yet. Wait for Rapper
-    2.\r\n* If the input contains `finalized, round X ended. Give round score.` \u2192
-    mark Rapper 2 as finished. Now both rappers are done. Immediately give the round
-    scoreboard.\r\n* If the input contains `rap session over.` \u2192 the battle
-    is fully complete. Give the final scoreboard and declare the winner.\r\n* Ignore
-    all other text. Never respond unless the input matches one of the above cases.\r\n\r\nRules:\r\n\r\n1.
+    2.\n* If the input contains `finalized rapper 2` \u2192 mark Rapper 2 as finished.
+    Do not score yet. Wait for next text input.\r\n* If the input contains `Round
+    X ended. Give round score.` \u2192 Immediately give the round scoreboard.\r\n*
+    If the input contains `rap session over.` \u2192 the battle is fully complete.
+    Give the final scoreboard and declare the winner.\r\n* Ignore all other text.
+    Never respond unless the input matches one of the above cases.\r\n\r\nRules:\r\n\r\n1.
     During `attempt` (live reactions only):\r\n\r\n* Do not score yet.\r\n* Only
     react to standout lines that are strong, weak, or surprising.\r\n* **Do not react
     to filler, silence, or meaningless text. If nothing stands out, stay completely
