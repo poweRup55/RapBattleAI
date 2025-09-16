@@ -591,6 +591,17 @@ public abstract class GeminiLiveWebRTC : MonoBehaviour
 
     protected abstract void OnTranscriptionReceived(string text);
 
+    public IEnumerator SendSilenceToGeminiCoroutine(
+        float durationSeconds,
+        int sampleRate,
+        int channels
+    )
+    {
+        int totalSamples = (int)(durationSeconds * sampleRate * channels);
+        float[] samples = new float[totalSamples];
+        yield return StartCoroutine(SendAudioToGeminiCoroutine(samples));
+    }
+
     public IEnumerator SendAudioToGeminiCoroutine(float[] samples)
     {
         if (isInErrorState)

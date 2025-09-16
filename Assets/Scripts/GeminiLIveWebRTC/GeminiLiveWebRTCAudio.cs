@@ -15,6 +15,7 @@ public abstract class GeminiLiveWebRTCAudio : GeminiLiveWebRTC
     private bool finishedAudioStreamIn = false;
     private Queue<byte[]> audioResponseQueue = new Queue<byte[]>();
     private Queue<IEnumerator> audioCoroutineQueue = new Queue<IEnumerator>();
+    private Queue<AudioClip> audioClipQueue = new Queue<AudioClip>();
 
     public bool IsPlaying => audioSource.isPlaying;
 
@@ -119,7 +120,6 @@ public abstract class GeminiLiveWebRTCAudio : GeminiLiveWebRTC
 
     public IEnumerator CreateAudioCoroutines()
     {
-        finishedAudioStreamIn = false;
         float timeSinceLastFlush = 0f;
         const float maxWaitTime = 1f;
 
@@ -205,6 +205,10 @@ public abstract class GeminiLiveWebRTCAudio : GeminiLiveWebRTC
                 {
                     audioCoroutineQueue.Enqueue(PlayAudioResponse(responseClip));
                 }
+                lock (audioClipQueue)
+                {
+                    audioClipQueue.Enqueue(responseClip);
+                }
             }
             catch (Exception e)
             {
@@ -266,5 +270,32 @@ public abstract class GeminiLiveWebRTCAudio : GeminiLiveWebRTC
     public new void Destroy()
     {
         base.Destroy();
+    }
+
+    public IEnumerator StreamToOtherAgent(GeminiLiveWebRTC agent)
+    {
+        StartCoroutine(agent.SendTextToGeminiCoroutine("attempt rapper 2"));
+        while (IsAudioActive())
+        {
+            AudioClip clip = null;
+            lock (audioClipQueue)
+            {
+                if (audioClipQueue.Count > 0)
+                    clip = audioClipQueue.Dequeue();
+            }
+            if (clip != null)
+            {
+                float[] samples = new float[clip.samples * clip.channels];
+                clip.GetData(samples, 0);
+                StartCoroutine(agent.SendAudioToGeminiCoroutine(samples));
+                if (enableDebugLogs)
+                    Debug.Log($"Streamed audio clip to other agent: {clip.name}");
+            }
+            yield return null;
+        }
+        yield return StartCoroutine(agent.SendSilenceToGeminiCoroutine(2f, 24000, 1));
+
+        StartCoroutine(agent.SendTextToGeminiCoroutine("finalized rapper 2"));
+        yield break;
     }
 }

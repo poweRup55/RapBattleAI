@@ -6,23 +6,6 @@ using UnityEngine.UI;
 
 public class RapBattleConductorLive : MonoBehaviour
 {
-    [System.Serializable]
-    private struct AudioStreamConfig
-    {
-        public string startText;
-        public string endText;
-        public bool addActivityMarkers;
-        public Func<bool> waitCondition;
-        public const float sendInterval = 0.1f;
-    }
-
-    private struct AudioStreamState
-    {
-        public int lastSamplePosition;
-        public float lastSendTime;
-        public AudioClip processedClip;
-    }
-
     [Header("Animation Controller")]
     [Tooltip("Animation controller for the rapper.")]
     [SerializeField]
@@ -160,16 +143,8 @@ public class RapBattleConductorLive : MonoBehaviour
             // Debug.Log("NPC is rapping...");
             var createAudioCoroutine = StartCoroutine(geminiLiveAIRapper.CreateAudioCoroutines());
             var playAudioCoroutine = StartCoroutine(geminiLiveAIRapper.PlayAudioCoroutine());
-            StartCoroutine(
-                StreamAudioToGemini(
-                    geminiLiveAIJudge,
-                    AIRapperAAudioSource,
-                    () => geminiLiveAIRapper.IsAudioActive(),
-                    false,
-                    "attempt rapper 2",
-                    $"finalized rapper 2",
-                    () => geminiLiveAIRapper.IsAudioActive()
-                )
+            var streamAudioToJudge = StartCoroutine(
+                geminiLiveAIRapper.StreamToOtherAgent(geminiLiveAIJudge)
             );
             yield return new WaitUntil(() => geminiLiveAIRapper.IsPlaying);
             uiManager.UpdateStatus($"NPC is rapping!");
@@ -362,33 +337,12 @@ public class RapBattleConductorLive : MonoBehaviour
         }
     }
 
-    private bool ValidateAudioStreamInputs(
-        GeminiLiveWebRTC agent,
-        AudioSource audioSource = null,
-        AudioClip clip = null
-    )
+    private bool ValidateAudioStreamInputs(GeminiLiveWebRTC agent, AudioClip clip = null)
     {
         if (agent == null)
         {
             Debug.LogError("Gemini agent is null");
             return false;
-        }
-
-        if (audioSource == null && clip == null)
-        {
-            Debug.LogError($"Both audio source and clip are null for agent {agent.name}");
-            return false;
-        }
-
-        if (audioSource != null && audioSource == null)
-        {
-            Debug.LogError($"Audio source is null for agent {agent.name}");
-            return false;
-        }
-
-        if (clip == null && audioSource != null)
-        {
-            return true;
         }
 
         if (clip != null)
@@ -399,35 +353,21 @@ public class RapBattleConductorLive : MonoBehaviour
         return false;
     }
 
-    // private AudioClip PrepareAudioClip(AudioClip originalClip, string agentName)
-    // {
-    //     if (originalClip == null)
-    //     {
-    //         Debug.LogError($"Audio clip is null for agent {agentName}");
-    //         return null;
-    //     }
+    private AudioClip PrepareAudioClip(AudioClip originalClip, string agentName)
+    {
+        if (originalClip == null)
+        {
+            Debug.LogError($"Audio clip is null for agent {agentName}");
+            return null;
+        }
 
-    //     if (originalClip.frequency != AILiveConfig.inputSampleRate)
-    //     {
-    //         return AudioClipResampler.ResampleAudio(originalClip, AILiveConfig.inputSampleRate);
-    //     }
+        if (originalClip.frequency != AILiveConfig.inputSampleRate)
+        {
+            return AudioClipResampler.ResampleAudio(originalClip, AILiveConfig.inputSampleRate);
+        }
 
-    //     return originalClip;
-    // }
-
-    // private float[] ResampleAudioSamples(float[] samples, AudioClip originalClip, int samplesToGet)
-    // {
-    //     if (originalClip.frequency != AILiveConfig.inputSampleRate)
-    //     {
-    //         AudioClip resampledClip = AudioClipResampler.ResampleAudio(
-    //             originalClip,
-    //             AILiveConfig.inputSampleRate
-    //         );
-    //         float[] resampledSamples = new float[samplesToGet * resampledClip.channels];
-    //         return resampledSamples;
-    //     }
-    //     return samples;
-    // }
+        return originalClip;
+    }
 
     private IEnumerator SendInitialMessage(GeminiLiveWebRTC agent, string message)
     {
@@ -465,67 +405,6 @@ public class RapBattleConductorLive : MonoBehaviour
         }
     }
 
-    private IEnumerator ProcessAndSendAudioSourceSamples(
-        GeminiLiveWebRTC agent,
-        AudioSource audioSource,
-        int lastSamplePosition,
-        int currentSamplePosition
-    )
-    {
-        AudioClip currentClip = audioSource.clip;
-        int samplesToGet = currentSamplePosition - lastSamplePosition;
-
-        if (samplesToGet > 0 && currentClip != null)
-        {
-            // Ensure we don't exceed clip bounds
-            int startPosition = lastSamplePosition % currentClip.samples;
-            int maxSamplesToGet = Mathf.Min(samplesToGet, currentClip.samples - startPosition);
-
-            if (maxSamplesToGet <= 0)
-            {
-                yield break;
-            }
-
-            float[] samples = new float[maxSamplesToGet * currentClip.channels];
-            currentClip.GetData(samples, startPosition);
-
-            // if (currentClip.frequency != AILiveConfig.inputSampleRate)
-            // {
-            //     AudioClip resampledClip = AudioClipResampler.ResampleAudio(
-            //         currentClip,
-            //         AILiveConfig.inputSampleRate
-            //     );
-
-            //     if (resampledClip != null)
-            //     {
-            //         // Calculate resampled position and size
-            //         float resampleRatio =
-            //             (float)AILiveConfig.inputSampleRate / currentClip.frequency;
-            //         int resampledStartPosition = Mathf.FloorToInt(startPosition * resampleRatio);
-            //         int resampledSamplesToGet = Mathf.FloorToInt(maxSamplesToGet * resampleRatio);
-
-            //         // Ensure bounds for resampled clip
-            //         resampledStartPosition = resampledStartPosition % resampledClip.samples;
-            //         resampledSamplesToGet = Mathf.Min(
-            //             resampledSamplesToGet,
-            //             resampledClip.samples - resampledStartPosition
-            //         );
-
-            //         if (resampledSamplesToGet > 0)
-            //         {
-            //             samples = new float[resampledSamplesToGet * resampledClip.channels];
-            //             resampledClip.GetData(samples, resampledStartPosition);
-            //         }
-            //     }
-            // }
-
-            if (samples != null && samples.Length > 0)
-            {
-                yield return StartCoroutine(agent.SendAudioToGeminiCoroutine(samples));
-            }
-        }
-    }
-
     private IEnumerator SendFinalAudioData(
         GeminiLiveWebRTC agent,
         AudioClip clip,
@@ -536,7 +415,7 @@ public class RapBattleConductorLive : MonoBehaviour
     {
         if (resizeClip > 0 && clip != null && clip.samples != resizeClip)
         {
-            clip = WavUtility.TrimClipToLength(clip, resizeClip);
+            clip = WavUtility.TrimClipToLength(clip, resizeClip + 5f);
         }
         int finalSamplePosition = getPosition();
         if (finalSamplePosition < lastSamplePosition)
@@ -547,192 +426,16 @@ public class RapBattleConductorLive : MonoBehaviour
         int finalSamplesToGet = finalSamplePosition - lastSamplePosition;
         if (finalSamplesToGet > 0)
         {
-            // Ensure we don't exceed clip bounds
-            int startPosition = lastSamplePosition % clip.samples;
-            int maxSamplesToGet = Mathf.Min(finalSamplesToGet, clip.samples - startPosition);
-
-            if (maxSamplesToGet <= 0)
-            {
-                yield break;
-            }
-
-            float[] finalSamples = new float[maxSamplesToGet * clip.channels];
-            clip.GetData(finalSamples, startPosition);
-
-            if (finalSamples != null && finalSamples.Length > 0)
-            {
-                Debug.Log(
-                    $"Sending final {finalSamples.Length} audio samples (from position {lastSamplePosition}) to Gemini agent {agent.name}"
-                );
-                yield return StartCoroutine(agent.SendAudioToGeminiCoroutine(finalSamples));
-            }
-            else if (finalSamples != null && finalSamples.Length > 0)
-            {
-                Debug.Log(
-                    $"Skipping final audio data for agent {agent.name} - contains only silence or noise"
-                );
-            }
+            float[] finalSamples = new float[finalSamplesToGet * clip.channels];
+            clip.GetData(finalSamples, lastSamplePosition % clip.samples);
+            Debug.Log(
+                $"Sending final {finalSamples.Length} audio samples (from position {lastSamplePosition}) to Gemini agent {agent.name}"
+            );
+            yield return StartCoroutine(agent.SendAudioToGeminiCoroutine(finalSamples));
         }
-    }
-
-    private IEnumerator SendFinalAudioSourceData(
-        GeminiLiveWebRTC agent,
-        AudioSource audioSource,
-        int lastSamplePosition
-    )
-    {
-        if (audioSource.clip != null)
-        {
-            int finalSamplePosition = audioSource.timeSamples;
-            AudioClip finalClip = audioSource.clip;
-
-            if (finalSamplePosition < lastSamplePosition)
-            {
-                finalSamplePosition += finalClip.samples;
-            }
-
-            int finalSamplesToGet = finalSamplePosition - lastSamplePosition;
-            if (finalSamplesToGet > 0)
-            {
-                // Ensure we don't exceed clip bounds
-                int startPosition = lastSamplePosition % finalClip.samples;
-                int maxSamplesToGet = Mathf.Min(
-                    finalSamplesToGet,
-                    finalClip.samples - startPosition
-                );
-
-                if (maxSamplesToGet <= 0)
-                {
-                    yield break;
-                }
-
-                float[] finalSamples = new float[maxSamplesToGet * finalClip.channels];
-                finalClip.GetData(finalSamples, startPosition);
-
-                // if (finalClip.frequency != AILiveConfig.inputSampleRate)
-                // {
-                //     AudioClip resampledClip = AudioClipResampler.ResampleAudio(
-                //         finalClip,
-                //         AILiveConfig.inputSampleRate
-                //     );
-
-                //     if (resampledClip != null)
-                //     {
-                //         // Calculate resampled position and size
-                //         float resampleRatio =
-                //             (float)AILiveConfig.inputSampleRate / finalClip.frequency;
-                //         int resampledStartPosition = Mathf.FloorToInt(
-                //             startPosition * resampleRatio
-                //         );
-                //         int resampledSamplesToGet = Mathf.FloorToInt(
-                //             maxSamplesToGet * resampleRatio
-                //         );
-
-                //         // Ensure bounds for resampled clip
-                //         resampledStartPosition = resampledStartPosition % resampledClip.samples;
-                //         resampledSamplesToGet = Mathf.Min(
-                //             resampledSamplesToGet,
-                //             resampledClip.samples - resampledStartPosition
-                //         );
-
-                //         if (resampledSamplesToGet > 0)
-                //         {
-                //             finalSamples = new float[
-                //                 resampledSamplesToGet * resampledClip.channels
-                //             ];
-                //             resampledClip.GetData(finalSamples, resampledStartPosition);
-                //         }
-                //     }
-                // }
-
-                if (finalSamples != null && finalSamples.Length > 0)
-                {
-                    Debug.Log(
-                        $"Sending final {finalSamples.Length} audio samples from AudioSource (position {lastSamplePosition}) to Gemini agent {agent.name}"
-                    );
-                    yield return StartCoroutine(agent.SendAudioToGeminiCoroutine(finalSamples));
-                }
-                else if (finalSamples != null && finalSamples.Length > 0)
-                {
-                    Debug.Log(
-                        $"Skipping final audio source data for agent {agent.name} - contains only silence or noise"
-                    );
-                }
-            }
-        }
-    }
-
-    private IEnumerator StreamAudioToGemini(
-        GeminiLiveWebRTC agent,
-        AudioSource audioSource,
-        Func<bool> isActive,
-        bool addActivityMarkers = false,
-        string startText = null,
-        string endText = null,
-        Func<bool> waitCondition = null
-    )
-    {
-        yield return StartCoroutine(SendInitialMessage(agent, startText));
-
-        if (!ValidateAudioStreamInputs(agent, audioSource))
-        {
-            yield break;
-        }
-
-        const float sendInterval = 0.1f;
-        int lastSamplePosition = 0;
-
-        if (waitCondition != null)
-        {
-            yield return new WaitUntil(waitCondition);
-        }
-
-        if (addActivityMarkers)
-        {
-            yield return StartCoroutine(SendStartActivityMarker(agent));
-        }
-
-        float lastSendTime = Time.time;
-
-        while (isActive())
-        {
-            if (audioSource.clip != null && audioSource.isPlaying)
-            {
-                int currentSamplePosition = audioSource.timeSamples;
-                AudioClip currentClip = audioSource.clip;
-
-                if (currentSamplePosition < lastSamplePosition)
-                {
-                    currentSamplePosition += currentClip.samples;
-                }
-
-                if (Time.time - lastSendTime >= sendInterval)
-                {
-                    yield return StartCoroutine(
-                        ProcessAndSendAudioSourceSamples(
-                            agent,
-                            audioSource,
-                            lastSamplePosition,
-                            currentSamplePosition
-                        )
-                    );
-                    lastSamplePosition = currentSamplePosition % currentClip.samples;
-                    lastSendTime = Time.time;
-                }
-            }
-            yield return null;
-        }
-
         yield return StartCoroutine(
-            SendFinalAudioSourceData(agent, audioSource, lastSamplePosition)
+            agent.SendSilenceToGeminiCoroutine(2f, clip.frequency, clip.channels)
         );
-
-        if (addActivityMarkers)
-        {
-            yield return StartCoroutine(SendEndActivityMarker(agent));
-        }
-
-        yield return StartCoroutine(SendInitialMessage(agent, endText));
     }
 
     private IEnumerator StreamAudioToGemini(
@@ -748,12 +451,12 @@ public class RapBattleConductorLive : MonoBehaviour
     {
         yield return StartCoroutine(SendInitialMessage(agent, startText));
 
-        if (!ValidateAudioStreamInputs(agent, null, clip))
+        if (!ValidateAudioStreamInputs(agent, clip))
         {
             yield break;
         }
 
-        // clip = PrepareAudioClip(clip, agent.name);
+        clip = PrepareAudioClip(clip, agent.name);
         if (clip == null)
         {
             yield break;
