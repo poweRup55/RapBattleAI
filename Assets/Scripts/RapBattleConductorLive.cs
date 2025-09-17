@@ -83,10 +83,66 @@ public class RapBattleConductorLive : MonoBehaviour
 
     public void BeginRapBattle()
     {
+        // Stop any existing coroutines
+        StopAllCoroutines();
+
+        // Reset battle state
         currentRound = 0;
         currentState = BattleState.WaitingStart;
-        uiManager.clearText();
+
+        // Reset recording state
+        if (isRecording)
+        {
+            StopMicrophoneRecording();
+        }
+        isRecording = false;
+        recordingLengthInSeconds = 0f;
+        playerRecordingClip = null;
+
+        // Reset animation controller
+        if (animationController != null)
+        {
+            animationController.SetTrigger("ReturnToIdle");
+        }
+
+        // Reset audio sources
+        if (musicSource != null && musicSource.isPlaying)
+        {
+            musicSource.Stop();
+        }
+        if (AIRapperAAudioSource != null && AIRapperAAudioSource.isPlaying)
+        {
+            AIRapperAAudioSource.Stop();
+        }
+
+        // Reset UI components
+        if (uiManager != null)
+        {
+            uiManager.clearText();
+            uiManager.ClearComputerText();
+            uiManager.ClearAIJudgeText();
+            uiManager.ClearAllReactions();
+            uiManager.RemovePlayingReactions();
+        }
+
+        // Reset record button
+        if (recordButton != null)
+        {
+            recordButton.interactable = true;
+        }
+
+        // Destroy and reinitialize Gemini agents if they exist
+        if (geminiLiveAIRapper != null)
+        {
+            geminiLiveAIRapper.Destroy();
+        }
+        if (geminiLiveAIJudge != null)
+        {
+            geminiLiveAIJudge.Destroy();
+        }
         PlayMusic();
+
+        // Start the battle loop
         StartCoroutine(BattleLoop());
     }
 
@@ -107,17 +163,22 @@ public class RapBattleConductorLive : MonoBehaviour
         }
     }
 
-    private void TerminateLiveSession()
+    public void TerminateLiveSession(string errorMessage = null)
     {
         animationController.SetTrigger("ReturnToIdle");
         geminiLiveAIRapper.Destroy();
         geminiLiveAIJudge.Destroy();
-        uIMenuController.ShowMainMenu();
+        uIMenuController.ShowMainMenu(errorMessage);
     }
 
     private IEnumerator InitializeWithStatus()
     {
         uiManager.UpdateStatus("Connecting...");
+
+        // Set reference to this conductor for error handling
+        geminiLiveAIRapper.SetRapBattleConductor(this);
+        geminiLiveAIJudge.SetRapBattleConductor(this);
+
         Coroutine init = StartCoroutine(geminiLiveAIRapper.Initialize());
         Coroutine initJudge = StartCoroutine(geminiLiveAIJudge.Initialize());
         yield return new WaitForSeconds(2f);
@@ -130,7 +191,6 @@ public class RapBattleConductorLive : MonoBehaviour
     private IEnumerator BattleLoop()
     {
         yield return StartCoroutine(InitializeWithStatus());
-
         while (totalRounds > currentRound)
         {
             uiManager.ClearComputerText();
@@ -163,7 +223,7 @@ public class RapBattleConductorLive : MonoBehaviour
             StopCoroutine(createAudioCoroutine);
             StopCoroutine(playAudioCoroutine);
             StopCoroutine(showReactions);
-            StartCoroutine(
+            yield return StartCoroutine(
                 geminiLiveAIJudge.SendTextToGeminiCoroutine(
                     $"Round {currentRound + 1} ended. Give round score."
                 )
@@ -186,7 +246,9 @@ public class RapBattleConductorLive : MonoBehaviour
         }
         uiManager.ClearAIJudgeText();
         uiManager.ClearComputerText();
-        StartCoroutine(geminiLiveAIJudge.SendTextToGeminiCoroutine("rap session over."));
+        yield return StartCoroutine(
+            geminiLiveAIJudge.SendTextToGeminiCoroutine("rap session over.")
+        );
         uiManager.UpdateStatus("Finished! Let's wait for the judge to decide the winner!");
         yield return new WaitForSeconds(2f);
         yield return StartCoroutine(uiManager.ShowJudgePanelTemporarily(15.0f));
@@ -296,8 +358,10 @@ public class RapBattleConductorLive : MonoBehaviour
                 rapSubmitted = true;
             }
         }
-        StartCoroutine(geminiLiveAIRapper.SendTextToGeminiCoroutine("finalized"));
-        StartCoroutine(geminiLiveAIJudge.SendTextToGeminiCoroutine("finalized rapper 1"));
+        yield return StartCoroutine(geminiLiveAIRapper.SendTextToGeminiCoroutine("finalized"));
+        yield return StartCoroutine(
+            geminiLiveAIJudge.SendTextToGeminiCoroutine("finalized rapper 1")
+        );
     }
 
     private IEnumerator WaitForRecordingStart()

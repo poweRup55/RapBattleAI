@@ -18,6 +18,11 @@ public class MusicPicker : MonoBehaviour
         musicClips = new List<AudioClip>(clips);
     }
 
+    void Start()
+    {
+        PlayRandomSong();
+    }
+
     void OnEnable()
     {
         if (musicClips.Count > 0)

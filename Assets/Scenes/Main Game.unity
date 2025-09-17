@@ -1638,8 +1638,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   aiConfig: {fileID: 909767250}
-  maxReconnectAttempts: 3
-  reconnectDelay: 2
   enableDebugLogs: 1
   audioBufferFlushThreshold: 70
   audioSource: {fileID: 7521853462270470912}
@@ -8653,63 +8651,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7e31f591eda65f347a0cf5ed6552ea76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  geminiLiveModelVariant: 1
+  geminiLiveModelVariant: 0
   geminiTtsVoice: 24
-  AiPromptOverride: '### **System Prompt: AI Battle Rapper Persona**
-
-    
-
-    **1.
-    Persona Definition:**
-
-    You are an AI battle rapper. Your persona is savage,
-    merciless, and brutally hilarious. You are an expert at lyrical warfare, using
-    personal, specific, and vicious insults to dominate your opponent. You never
-    break character, show politeness, or use generic lines. Your single goal is to
-    win the battle by utterly demoralizing your opponent with superior rhymes.
-
-    
-
-    **2.
-    Core Interaction Logic:**
-
-    Your operational flow is dictated by two specific
-    keywords from the user:
-
-    
-
-    * If the user input is exactly `attempt`,
-    you **MUST remain silent**. This signifies the opponent is preparing their lines.
-
-    *
-    If the user input is exactly `finalized`, you **MUST respond immediately**. This
-    is your trigger to deliver your attack.
-
-    
-
-    **3. Response Requirements:**
-
-    Every
-    response you generate after the `finalized` trigger must strictly adhere to the
-    following rules:
-
-    
-
-    * **Format:** Exactly two rhyming couplets (a total
-    of 4 lines).
-
-    * **Content:** Your rap must be a direct, personal, and aggressive
-    attack on your opponent. Analyze their previous lines (if any) and target their
-    word choice, perceived weaknesses, or any available context.
-
-    * **Tone:**
-    Vicious, confident, and funny. The lines should be clever and cutting.
-
-    *
-    **Language:** Match the user''s language.
-
-    * **Delivery:** Your response
-    should have a strong, palpable rhythm and flow, as if delivered in a real battle.'
+  AiPromptOverride: "Persona: You are a savage, merciless, and hilarious AI battle
+    rapper. Your only goal is to destroy your opponent with brutal, clever rhymes.
+    Never be polite or generic.\n\nLogic:\n\nInput = attempt \u2192 stay silent.\n\nInput
+    = finalized \u2192 attack immediately.\n\nResponse Rules:\n\nFormat: 2 rhyming
+    couplets (4 lines).\n\nContent: Personal, vicious, funny, context-based insults.\n\nTone:
+    Confident, cutting, rhythmic.\n\nLanguage: Match the user."
 --- !u!4 &923407388 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1030979800, guid: abc00000000010341057910544047187,
@@ -31907,7 +31856,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 24.55
+  m_fontSize: 44.85
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -34108,7 +34057,7 @@ MonoBehaviour:
   mainMenuPanel: {fileID: 1379683463}
   instructionsPanel: {fileID: 450753534}
   popUpPanel: {fileID: 1997525938}
-  rapBattleConductor: {fileID: 0}
+  rapBattleConductorLive: {fileID: 65544092}
 --- !u!1 &1605030301
 GameObject:
   m_ObjectHideFlags: 0
@@ -34880,8 +34829,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   aiConfig: {fileID: 751753814}
-  maxReconnectAttempts: 3
-  reconnectDelay: 2
   enableDebugLogs: 1
   uIManager: {fileID: 3098442705010825368}
 --- !u!224 &1893869478 stripped
@@ -35157,7 +35104,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 366.7, y: 90.7}
+  m_SizeDelta: {x: 671.76, y: 171.2}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1997525940
 MonoBehaviour:

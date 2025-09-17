@@ -19,7 +19,7 @@ public class UIMainMenuController : MonoBehaviour
     private GameObject popUpPanel;
 
     [SerializeField]
-    private RapBattleConductor rapBattleConductor;
+    private RapBattleConductorLive rapBattleConductorLive;
 
     // Start is called before the first frame update
     void Start()
@@ -33,7 +33,6 @@ public class UIMainMenuController : MonoBehaviour
         gameComponents.SetActive(false);
         mainMenuPanel.SetActive(true);
         instructionsPanel.SetActive(false);
-        popUpPanel.SetActive(false);
     }
 
     // Update is called once per frame
@@ -49,7 +48,7 @@ public class UIMainMenuController : MonoBehaviour
         }
         this.gameObject.SetActive(false);
         gameComponents.SetActive(true);
-        rapBattleConductor.BeginRapBattle();
+        rapBattleConductorLive.BeginRapBattle();
     }
 
     private IEnumerator MicCheck()
@@ -79,22 +78,27 @@ public class UIMainMenuController : MonoBehaviour
 
     public IEnumerator ShowPopUp(string message)
     {
-        popUpPanel.GetComponentInChildren<TextMeshProUGUI>().text = message;
+        popUpPanel.GetComponentInChildren<TextMeshProUGUI>().text =
+            "An error has occurred: " + message + "\nPlease start a new battle and try again.";
 
         popUpPanel.SetActive(true);
 
-        yield return new WaitForSeconds(3f);
+        yield return new WaitForSeconds(6f);
 
         popUpPanel.SetActive(false);
     }
 
-    public void ShowMainMenu()
+    public void ShowMainMenu(string errorMessage = null)
     {
         gameComponents.SetActive(false);
         this.gameObject.SetActive(true);
         mainMenuPanel.SetActive(true);
         instructionsPanel.SetActive(false);
-        popUpPanel.SetActive(false);
+        if (!string.IsNullOrEmpty(errorMessage))
+        {
+            StartCoroutine(ShowPopUp(errorMessage));
+        }
+        seenInstructions = false;
     }
 
     public void ExitGame()

@@ -276,7 +276,7 @@ public abstract class GeminiLiveWebRTCAudio : GeminiLiveWebRTC
 
     public IEnumerator StreamToOtherAgent(GeminiLiveWebRTC agent, int targetSampleRate)
     {
-        StartCoroutine(agent.SendTextToGeminiCoroutine("attempt rapper 2"));
+        yield return StartCoroutine(agent.SendTextToGeminiCoroutine("attempt rapper 2"));
         while (IsAudioActive())
         {
             AudioClip clip = null;
@@ -293,7 +293,7 @@ public abstract class GeminiLiveWebRTCAudio : GeminiLiveWebRTC
                 }
                 float[] samples = new float[clip.samples * clip.channels];
                 clip.GetData(samples, 0);
-                StartCoroutine(agent.SendAudioToGeminiCoroutine(samples));
+                yield return StartCoroutine(agent.SendAudioToGeminiCoroutine(samples));
                 if (enableDebugLogs)
                     Debug.Log($"Streamed audio clip to other agent: {clip.name}");
             }
@@ -301,7 +301,7 @@ public abstract class GeminiLiveWebRTCAudio : GeminiLiveWebRTC
         }
         yield return StartCoroutine(agent.SendSilenceToGeminiCoroutine(2f, 24000, 1));
 
-        StartCoroutine(agent.SendTextToGeminiCoroutine("finalized rapper 2"));
+        yield return StartCoroutine(agent.SendTextToGeminiCoroutine("finalized rapper 2"));
         yield break;
     }
 }
