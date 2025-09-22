@@ -19,6 +19,7 @@ public class AIRapperGeminiLive : GeminiLiveWebRTCAudio
                 generationConfig = new GenerationConfig
                 {
                     responseModalities = new string[] { Modality.AUDIO.ToString() },
+                    enableAffectiveDialog = true,
                     speechConfig = new SpeechConfig
                     {
                         voiceConfig = new VoiceConfig

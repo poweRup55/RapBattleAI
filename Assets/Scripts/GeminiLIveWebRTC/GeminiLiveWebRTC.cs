@@ -39,6 +39,8 @@ public abstract class GeminiLiveWebRTC : MonoBehaviour
     protected bool isConnected = false;
     protected bool isSetupComplete = false;
     protected bool isSetupSent = false;
+    protected bool isReceiving = false;
+    protected Coroutine receiveCoroutine = null;
     public bool IsConnected => isConnected;
     public bool IsSetupComplete => isSetupComplete;
 
@@ -178,6 +180,12 @@ public abstract class GeminiLiveWebRTC : MonoBehaviour
         isConnected = false;
         isSetupComplete = false;
         isSetupSent = false;
+        isReceiving = false;
+        if (receiveCoroutine != null)
+        {
+            StopCoroutine(receiveCoroutine);
+            receiveCoroutine = null;
+        }
     }
 
     protected virtual void ClearMessageQueue()
@@ -219,7 +227,11 @@ public abstract class GeminiLiveWebRTC : MonoBehaviour
             yield return new WaitForSeconds(0.1f);
             SendSetupMessage();
             yield return new WaitForSeconds(1f);
-            StartCoroutine(ReceiveMessagesCoroutine());
+
+            if (!isReceiving && receiveCoroutine == null)
+            {
+                receiveCoroutine = StartCoroutine(ReceiveMessagesCoroutine());
+            }
             isConnected = true;
 
             if (enableDebugLogs)
@@ -323,145 +335,163 @@ public abstract class GeminiLiveWebRTC : MonoBehaviour
 
     private IEnumerator ReceiveMessagesCoroutine()
     {
+        if (isReceiving)
+        {
+            if (enableDebugLogs)
+                Debug.LogWarning("GeminiLive: ReceiveMessagesCoroutine already running, skipping");
+            yield break;
+        }
+
+        isReceiving = true;
         byte[] buffer = new byte[1024 * 16];
         StringBuilder messageBuilder = new StringBuilder();
 
-        while (
-            webSocket != null
-            && webSocket.State == WebSocketState.Open
-            && cancellationTokenSource != null
-            && !cancellationTokenSource.IsCancellationRequested
-        )
+        try
         {
-            // Store local reference to prevent race conditions
-            var localCancellationTokenSource = cancellationTokenSource;
-            var localWebSocket = webSocket;
+            while (
+                webSocket != null
+                && webSocket.State == WebSocketState.Open
+                && cancellationTokenSource != null
+                && !cancellationTokenSource.IsCancellationRequested
+            )
+            {
+                // Store local reference to prevent race conditions
+                var localCancellationTokenSource = cancellationTokenSource;
+                var localWebSocket = webSocket;
 
-            if (localCancellationTokenSource == null || localWebSocket == null)
-            {
-                if (enableDebugLogs)
-                    Debug.LogWarning(
-                        "GeminiLive: CancellationTokenSource or WebSocket is null, stopping receive loop"
-                    );
-                break;
-            }
-
-            if (localCancellationTokenSource.IsCancellationRequested)
-            {
-                if (enableDebugLogs)
-                    Debug.LogWarning("GeminiLive: Cancellation requested, stopping receive loop");
-                break;
-            }
-
-            System.Threading.Tasks.Task<WebSocketReceiveResult> receiveTask = null;
-
-            try
-            {
-                receiveTask = localWebSocket.ReceiveAsync(
-                    new ArraySegment<byte>(buffer),
-                    localCancellationTokenSource.Token
-                );
-            }
-            catch (ObjectDisposedException)
-            {
-                if (enableDebugLogs)
-                    Debug.LogWarning(
-                        "GeminiLive: WebSocket disposed during ReceiveAsync, stopping receive loop"
-                    );
-                break;
-            }
-            catch (Exception e)
-            {
-                if (enableDebugLogs)
-                    Debug.LogError($"GeminiLive: Error starting ReceiveAsync: {e.Message}");
-                break;
-            }
-
-            if (receiveTask == null)
-            {
-                if (enableDebugLogs)
-                    Debug.LogWarning(
-                        "GeminiLive: ReceiveAsync task is null, stopping receive loop"
-                    );
-                break;
-            }
-
-            while (!receiveTask.IsCompleted)
-            {
-                // Check if we should stop waiting due to cleanup
-                if (
-                    webSocket == null
-                    || cancellationTokenSource == null
-                    || cancellationTokenSource.IsCancellationRequested
-                )
+                if (localCancellationTokenSource == null || localWebSocket == null)
                 {
                     if (enableDebugLogs)
                         Debug.LogWarning(
-                            "GeminiLive: Cleanup initiated while waiting for receive task, stopping"
+                            "GeminiLive: CancellationTokenSource or WebSocket is null, stopping receive loop"
                         );
-                    throw new GeminiLiveException(
-                        "RECEIVE_CANCELED",
-                        "ReceiveMessagesCoroutine",
-                        "ReceiveAsync",
-                        "Receive operation was canceled due to cleanup."
-                    );
+                    break;
                 }
-                yield return null;
-            }
 
-            if (receiveTask.IsFaulted)
-            {
-                LogWebSocketReceiveError(receiveTask);
-                break;
-            }
-            else if (receiveTask.IsCompletedSuccessfully)
-            {
-                WebSocketReceiveResult result = null;
+                if (localCancellationTokenSource.IsCancellationRequested)
+                {
+                    if (enableDebugLogs)
+                        Debug.LogWarning(
+                            "GeminiLive: Cancellation requested, stopping receive loop"
+                        );
+                    break;
+                }
+
+                System.Threading.Tasks.Task<WebSocketReceiveResult> receiveTask = null;
+
                 try
                 {
-                    result = receiveTask.Result;
+                    receiveTask = localWebSocket.ReceiveAsync(
+                        new ArraySegment<byte>(buffer),
+                        localCancellationTokenSource.Token
+                    );
+                }
+                catch (ObjectDisposedException)
+                {
+                    if (enableDebugLogs)
+                        Debug.LogWarning(
+                            "GeminiLive: WebSocket disposed during ReceiveAsync, stopping receive loop"
+                        );
+                    break;
                 }
                 catch (Exception e)
                 {
                     if (enableDebugLogs)
-                        Debug.LogError(
-                            $"GeminiLive: Error getting receive task result: {e.Message}"
-                        );
+                        Debug.LogError($"GeminiLive: Error starting ReceiveAsync: {e.Message}");
                     break;
                 }
 
-                if (result == null)
+                if (receiveTask == null)
                 {
                     if (enableDebugLogs)
                         Debug.LogWarning(
-                            "GeminiLive: Receive task result is null, stopping receive loop"
+                            "GeminiLive: ReceiveAsync task is null, stopping receive loop"
                         );
                     break;
                 }
 
-                if (enableDebugLogs)
-                    Debug.Log(
-                        $"Received message type: {result.MessageType}, Count: {result.Count}, EndOfMessage: {result.EndOfMessage}"
-                    );
-
-                switch (result.MessageType)
+                while (!receiveTask.IsCompleted)
                 {
-                    case WebSocketMessageType.Text:
-                        ParseWebSocketTextMessage(buffer, messageBuilder, result);
+                    // Check if we should stop waiting due to cleanup
+                    if (
+                        webSocket == null
+                        || cancellationTokenSource == null
+                        || cancellationTokenSource.IsCancellationRequested
+                    )
+                    {
+                        if (enableDebugLogs)
+                            Debug.LogWarning(
+                                "GeminiLive: Cleanup initiated while waiting for receive task, stopping"
+                            );
+                        throw new GeminiLiveException(
+                            "RECEIVE_CANCELED",
+                            "ReceiveMessagesCoroutine",
+                            "ReceiveAsync",
+                            "Receive operation was canceled due to cleanup."
+                        );
+                    }
+                    yield return null;
+                }
+
+                if (receiveTask.IsFaulted)
+                {
+                    LogWebSocketReceiveError(receiveTask);
+                    break;
+                }
+                else if (receiveTask.IsCompletedSuccessfully)
+                {
+                    WebSocketReceiveResult result = null;
+                    try
+                    {
+                        result = receiveTask.Result;
+                    }
+                    catch (Exception e)
+                    {
+                        if (enableDebugLogs)
+                            Debug.LogError(
+                                $"GeminiLive: Error getting receive task result: {e.Message}"
+                            );
                         break;
-                    case WebSocketMessageType.Binary:
-                        ParseWebSocketBinaryMessage(buffer, result);
+                    }
+
+                    if (result == null)
+                    {
+                        if (enableDebugLogs)
+                            Debug.LogWarning(
+                                "GeminiLive: Receive task result is null, stopping receive loop"
+                            );
                         break;
-                    case WebSocketMessageType.Close:
-                        ThrowWebSocketClosureDetails(result);
-                        break;
+                    }
+
+                    if (enableDebugLogs)
+                        Debug.Log(
+                            $"Received message type: {result.MessageType}, Count: {result.Count}, EndOfMessage: {result.EndOfMessage}"
+                        );
+
+                    switch (result.MessageType)
+                    {
+                        case WebSocketMessageType.Text:
+                            ParseWebSocketTextMessage(buffer, messageBuilder, result);
+                            break;
+                        case WebSocketMessageType.Binary:
+                            ParseWebSocketBinaryMessage(buffer, result);
+                            break;
+                        case WebSocketMessageType.Close:
+                            ThrowWebSocketClosureDetails(result);
+                            break;
+                    }
                 }
             }
         }
+        finally
+        {
+            isReceiving = false;
+            receiveCoroutine = null;
 
-        // Cleanup notification when loop exits
-        if (enableDebugLogs)
-            Debug.Log("GeminiLive: ReceiveMessagesCoroutine exited");
+            // Cleanup notification when loop exits
+            if (enableDebugLogs)
+                Debug.Log("GeminiLive: ReceiveMessagesCoroutine exited");
+        }
     }
 
     private void LogWebSocketReceiveError(
@@ -919,6 +949,14 @@ public abstract class GeminiLiveWebRTC : MonoBehaviour
     {
         try
         {
+            // Stop receive coroutine first
+            if (receiveCoroutine != null)
+            {
+                StopCoroutine(receiveCoroutine);
+                receiveCoroutine = null;
+            }
+            isReceiving = false;
+
             // Cancel all ongoing operations first
             if (cancellationTokenSource != null && !cancellationTokenSource.IsCancellationRequested)
             {
@@ -997,6 +1035,7 @@ public abstract class GeminiLiveWebRTC : MonoBehaviour
             isConnected = false;
             isSetupComplete = false;
             isSetupSent = false;
+            isReceiving = false;
 
             if (enableDebugLogs)
                 Debug.Log("GeminiLive: Connection cleanup completed");

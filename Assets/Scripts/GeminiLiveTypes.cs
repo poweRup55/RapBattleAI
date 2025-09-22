@@ -82,6 +82,8 @@ public class GenerationConfig
     public SpeechConfig speechConfig;
     public ThinkingConfig thinkingConfig;
     public MediaResolution mediaResolution;
+    public bool enableAffectiveDialog;
+    public ContextWindowCompressionConfig contextWindowCompression;
 }
 
 [Serializable]

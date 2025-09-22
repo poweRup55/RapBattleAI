@@ -187,6 +187,8 @@ MonoBehaviour:
   geminiLiveAIJudge: {fileID: 1891305148}
   maxPlayerRecordingLengthInSeconds: 30
   minRecordingLengthInSeconds: 5
+  totalRounds: 2
+  submitRapPeriodInSeconds: 5
   uIMenuController: {fileID: 1587049345}
   recordButton: {fileID: 1190998655}
   playBackRecording: 0
@@ -7492,8 +7494,10 @@ MonoBehaviour:
     lines that are strong, weak, or surprising.\r\n* Do not react to filler, silence,
     or meaningless text. If nothing stands out, stay completely silent.\r\n* Reactions
     must be very short (maximum 3 words).\r\n* Each reaction must be wrapped in `[reaction]
-    ... [/reaction]`.\r\n* Example reactions:\r\n  `[reaction]Bars too hot[/reaction]`\r\n 
-    `[reaction]Weak line[/reaction]`\r\n\r\n2. When `finalized` received:\r\n\r\n*
+    ... [/reaction]`.\n* A reaction can be either positive of negative. If it is
+    positive - write [positive] after [reaction]. If it is negative - write [negative]
+    after [reaction]\r\n* Example reactions:\r\n  `[reaction][positive]Bars too hot[/reaction]`\r\n 
+    `[reaction][negative]Weak line[/reaction]`\r\n\r\n2. When `finalized` received:\r\n\r\n*
     Do not react anymore.\r\n* Wait until both rappers are finalized.\r\n* Once both
     are finalized, output the round scoreboard, wrapped in `[round score] ... [/round
     score]`.\r\n* For each rapper, give 3 scores (Delivery, Creativity, Impact) each
@@ -7507,7 +7511,8 @@ MonoBehaviour:
     of rounds.\r\n* Provide the final scoreboard with averages or totals for each
     rapper.\r\n* Wrap the entire result in `[round score] ... [/round score]`.\r\n*
     Add a roast or hype closing line for each rapper.\r\n* Clearly declare the winner:
-    the rapper with the higher final score.\r\n\r\nExample Final Score:\r\n\r\n```\r\n[round
+    the rapper with the higher final score.\n* A round score can be sent only once.
+    Don't send the score of a single round twice.\r\n\r\nExample Final Score:\r\n\r\n```\r\n[round
     score] \r\nFinal Results\r\nTotal Rounds: 3\r\n\r\nRapper 1:\r\n- Avg Delivery:
     8.3/10\r\n- Avg Creativity: 8.7/10\r\n- Avg Impact: 8.0/10\r\nFinal Average:
     25/30\r\nClosing note: Consistent champ, crowd favorite.\r\n\r\nRapper 2:\r\n-
@@ -11366,9 +11371,9 @@ MonoBehaviour:
 
 
     You and
-    the AI take turns rapping over 3 rounds.
+    the AI take turns rapping over 2 rounds.
 
-    After round 3, the Judge AI scores
+    After round 2, the Judge AI scores
     both sides and declares the winner.'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -33970,7 +33975,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1587049341
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -34679,10 +34684,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 2047609463}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 960, y: -625.5}
+  m_SizeDelta: {x: 1920, y: 741}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1888479744
 MonoBehaviour:
@@ -38586,7 +38591,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!222 &1645820201273452780
 CanvasRenderer:
   m_ObjectHideFlags: 0
