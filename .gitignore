@@ -92,7 +92,6 @@ Thumbs.db.meta
 .plastic
 *.plastic
 *.wktree
-*.mat
 WebGL Builds
 connectwebgl.zip
 webgl_sharing
