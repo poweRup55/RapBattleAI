@@ -86,7 +86,7 @@ namespace EpicRapBattle.Config
                 catch (System.Exception ex)
                 {
                     Debug.LogError($"Failed to get ephemeral key: {ex.Message}");
-                    return null;
+                    throw new System.Exception("Failed to get ephemeral key", ex);
                 }
             }
         }

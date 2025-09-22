@@ -98,7 +98,6 @@ public class UIMainMenuController : MonoBehaviour
         {
             StartCoroutine(ShowPopUp(errorMessage));
         }
-        seenInstructions = false;
     }
 
     public void ExitGame()

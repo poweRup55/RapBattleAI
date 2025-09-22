@@ -17,6 +17,12 @@ public class PopUpGameText : MonoBehaviour
 
     public void ShowText()
     {
+        if (textComponent.text == "" || textComponent.text == null)
+        {
+            Destroy(gameObject);
+            Debug.LogWarning("PopUpGameText: No text to display, destroying object.");
+            return;
+        }
         gameObject.SetActive(true);
         animator.enabled = true;
         StartCoroutine(WaitForAnimationAndDestroy());

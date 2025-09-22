@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using EpicRapBattle.Config;
 using Newtonsoft.Json;
 using UnityEngine;
 
@@ -287,9 +288,9 @@ public abstract class GeminiLiveWebRTCAudio : GeminiLiveWebRTC
             }
             if (clip != null)
             {
-                if (clip.frequency != targetSampleRate)
+                if (clip.frequency != AILiveConfig.inputSampleRate)
                 {
-                    clip = AudioClipResampler.ResampleAudio(clip, targetSampleRate);
+                    clip = AudioClipResampler.ResampleAudio(clip, AILiveConfig.inputSampleRate);
                 }
                 float[] samples = new float[clip.samples * clip.channels];
                 clip.GetData(samples, 0);

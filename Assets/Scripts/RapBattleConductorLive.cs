@@ -38,11 +38,11 @@ public class RapBattleConductorLive : MonoBehaviour
     [Header("Game Configuration")]
     [Tooltip("Total Rap Rounds")]
     [SerializeField]
-    private const int totalRounds = 3;
+    private int totalRounds = 3;
 
     [Tooltip("Rap submission Time")]
     [SerializeField]
-    private const int submitRapPeriodInSeconds = 5;
+    private int submitRapPeriodInSeconds = 5;
 
     [Header("UI")]
     [SerializeField]
@@ -83,14 +83,9 @@ public class RapBattleConductorLive : MonoBehaviour
 
     public void BeginRapBattle()
     {
-        // Stop any existing coroutines
         StopAllCoroutines();
-
-        // Reset battle state
         currentRound = 0;
         currentState = BattleState.WaitingStart;
-
-        // Reset recording state
         if (isRecording)
         {
             StopMicrophoneRecording();
@@ -98,14 +93,11 @@ public class RapBattleConductorLive : MonoBehaviour
         isRecording = false;
         recordingLengthInSeconds = 0f;
         playerRecordingClip = null;
-
-        // Reset animation controller
         if (animationController != null)
         {
-            animationController.SetTrigger("ReturnToIdle");
+            if (animationController.GetCurrentAnimatorStateInfo(0).IsName("Rapping"))
+                animationController.SetTrigger("ReturnToIdle");
         }
-
-        // Reset audio sources
         if (musicSource != null && musicSource.isPlaying)
         {
             musicSource.Stop();
@@ -114,8 +106,6 @@ public class RapBattleConductorLive : MonoBehaviour
         {
             AIRapperAAudioSource.Stop();
         }
-
-        // Reset UI components
         if (uiManager != null)
         {
             uiManager.clearText();
@@ -124,14 +114,10 @@ public class RapBattleConductorLive : MonoBehaviour
             uiManager.ClearAllReactions();
             uiManager.RemovePlayingReactions();
         }
-
-        // Reset record button
         if (recordButton != null)
         {
-            recordButton.interactable = true;
+            recordButton.interactable = false;
         }
-
-        // Destroy and reinitialize Gemini agents if they exist
         if (geminiLiveAIRapper != null)
         {
             geminiLiveAIRapper.Destroy();
@@ -233,6 +219,7 @@ public class RapBattleConductorLive : MonoBehaviour
             yield return StartCoroutine(geminiLiveAIRapper.WaitForAllMessagesToBeSent(5f));
             yield return StartCoroutine(uiManager.ShowJudgePanelTemporarily(15.0f));
             uiManager.ClearAllReactions();
+            uiManager.RemovePlayingReactions();
             // Rest Turn
             currentState = BattleState.Rest;
             currentRound++;
@@ -334,6 +321,8 @@ public class RapBattleConductorLive : MonoBehaviour
     private IEnumerator GetRapRecording()
     {
         bool rapSubmitted = false;
+        yield return StartCoroutine(geminiLiveAIRapper.SendActivityStartToGeminiCoroutine());
+
         while (!rapSubmitted)
         {
             yield return StartCoroutine(RecordPlayerRap());
@@ -359,6 +348,7 @@ public class RapBattleConductorLive : MonoBehaviour
             }
         }
         yield return StartCoroutine(geminiLiveAIRapper.SendTextToGeminiCoroutine("finalized"));
+        yield return StartCoroutine(geminiLiveAIRapper.SendActivityEndToGeminiCoroutine());
         yield return StartCoroutine(
             geminiLiveAIJudge.SendTextToGeminiCoroutine("finalized rapper 1")
         );
@@ -379,8 +369,18 @@ public class RapBattleConductorLive : MonoBehaviour
     private IEnumerator RecordPlayerRap()
     {
         bool submitRecording = false;
+        bool firstAttempt = true;
         while (!submitRecording)
         {
+            if (!firstAttempt)
+            {
+                yield return StartCoroutine(
+                    geminiLiveAIRapper.SendTextToGeminiCoroutine("discard")
+                );
+                yield return StartCoroutine(
+                    geminiLiveAIJudge.SendTextToGeminiCoroutine("discard rapper 1")
+                );
+            }
             uiManager.UpdateStatus("Press and hold the button to record your rap.");
             yield return StartCoroutine(WaitForRecordingStart());
             StartMicrophoneRecording();
@@ -392,7 +392,6 @@ public class RapBattleConductorLive : MonoBehaviour
                     playerRecordingClip,
                     () => Microphone.GetPosition(microphoneDevice),
                     () => isRecording,
-                    true,
                     "attempt"
                 )
             );
@@ -403,7 +402,6 @@ public class RapBattleConductorLive : MonoBehaviour
                     playerRecordingClip,
                     () => Microphone.GetPosition(microphoneDevice),
                     () => isRecording,
-                    false,
                     "attempt rapper 1"
                 )
             );
@@ -438,10 +436,12 @@ public class RapBattleConductorLive : MonoBehaviour
                     $"Recording too short. Please record at least {minRecordingLengthInSeconds} second."
                 );
                 yield return new WaitForSeconds(2f);
+                firstAttempt = false;
                 continue;
             }
 
             submitRecording = true;
+            firstAttempt = false;
         }
     }
 
@@ -550,7 +550,6 @@ public class RapBattleConductorLive : MonoBehaviour
         AudioClip clip,
         Func<int> getPosition,
         Func<bool> isActive,
-        bool addActivityMarkers = false,
         string startText = null,
         string endText = null,
         Func<bool> waitCondition = null
@@ -576,12 +575,6 @@ public class RapBattleConductorLive : MonoBehaviour
         {
             yield return new WaitUntil(waitCondition);
         }
-
-        if (addActivityMarkers)
-        {
-            yield return StartCoroutine(SendStartActivityMarker(agent));
-        }
-
         float lastSendTime = Time.time;
 
         while (isActive())
@@ -617,11 +610,6 @@ public class RapBattleConductorLive : MonoBehaviour
                 recordingLengthInSeconds
             )
         );
-
-        if (addActivityMarkers)
-        {
-            yield return StartCoroutine(SendEndActivityMarker(agent));
-        }
 
         yield return StartCoroutine(SendInitialMessage(agent, endText));
     }
