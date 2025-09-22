@@ -70,7 +70,7 @@ public class RapBattleConductorLive : MonoBehaviour
 
     private void Start()
     {
-        microphoneDevice = Microphone.devices.Length > 0 ? Microphone.devices[0] : null;
+        // microphoneDevice = Microphone.devices.Length > 0 ? Microphone.devices[0] : null;
         // if (useFileSubmission)
         // {
         //     fileSubmissionClip = AudioClipResampler.ResampleAudio(
@@ -642,7 +642,7 @@ public class RapBattleConductorLive : MonoBehaviour
             AudioSource playbackSource = gameObject.AddComponent<AudioSource>();
             playbackSource.clip = playerRecordingClip;
             playbackSource.Play();
-            yield return new WaitForSeconds(playerRecordingClip.length);
+            yield return new WaitForSeconds(recordingLengthInSeconds);
             Destroy(playbackSource);
             musicSource.UnPause();
         }

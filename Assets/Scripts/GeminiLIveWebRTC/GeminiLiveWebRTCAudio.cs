@@ -235,7 +235,10 @@ public abstract class GeminiLiveWebRTCAudio : GeminiLiveWebRTC
         audioSource.clip = responseClip;
         audioSource.Play();
 
-        yield return new WaitForSeconds(responseClip.length);
+        while (audioSource.isPlaying)
+        {
+            yield return null;
+        }
     }
 
     public IEnumerator waitForAudioStreamFinish()
