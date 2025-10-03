@@ -68,19 +68,6 @@ public class RapBattleConductorLive : MonoBehaviour
     private bool isRecording = false;
     private int currentRound = 0;
 
-    private void Start()
-    {
-        // microphoneDevice = Microphone.devices.Length > 0 ? Microphone.devices[0] : null;
-        // if (useFileSubmission)
-        // {
-        //     fileSubmissionClip = AudioClipResampler.ResampleAudio(
-        //         fileSubmissionClip,
-        //         AILiveConfig.inputSampleRate
-        //     );
-        // }
-        BeginRapBattle();
-    }
-
     public void BeginRapBattle()
     {
         StopAllCoroutines();
@@ -118,11 +105,11 @@ public class RapBattleConductorLive : MonoBehaviour
         {
             recordButton.interactable = false;
         }
-        if (geminiLiveAIRapper != null)
+        if (geminiLiveAIRapper != null && geminiLiveAIRapper.IsWebSocketConnected())
         {
             geminiLiveAIRapper.Destroy();
         }
-        if (geminiLiveAIJudge != null)
+        if (geminiLiveAIJudge != null && geminiLiveAIJudge.IsWebSocketConnected())
         {
             geminiLiveAIJudge.Destroy();
         }

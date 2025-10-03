@@ -50,7 +50,7 @@ public class AIRapperGeminiLive : GeminiLiveWebRTCAudio
 
     protected override void OnTextResponseReceived(string text)
     {
-        uIManager.AppendToAiText(text);
+        Debug.Log($"Rapper Text Response: {text}");
     }
 
     protected override void OnTranscriptionReceived(string text)
