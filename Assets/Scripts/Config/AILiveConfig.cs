@@ -80,7 +80,6 @@ namespace EpicRapBattle.Config
                         string.Empty
                     );
                     var json = JsonUtility.FromJson<TokenResponse>(response);
-                    Debug.Log($"Received token: {json.token}");
                     ephemeralKey = json.token;
                     return ephemeralKey;
                 }
