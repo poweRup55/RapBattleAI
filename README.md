@@ -5,8 +5,7 @@ A Unity-based rap battle game where players compete against AI opponents powered
 ## Features
 
 - **Real-time AI Rap Battles**: Face off against AI rappers using Gemini Live's native audio capabilities
-- **Voice-to-Voice Interaction**: Speak your verses and hear AI responses in real-time via WebRTC
-- **Multiple AI Personalities**: Random AI rapper personalities with different styles and voices
+- **Voice-to-Voice Interaction**: Speak your verses and hear AI responses in real-time via WebSocket
 - **Round-based Competition**: Multi-round battles with AI-powered judging
 - **3D City Environment**: Battle in a stylized urban setting with character animations
 
