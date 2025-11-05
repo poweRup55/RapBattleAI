@@ -10,8 +10,6 @@ namespace EpicRapBattle.Config
         public enum GeminiLiveModels
         {
             gemini_2_5_flash_native_audio_preview_09_2025,
-            gemini_2_5_flash_preview_native_audio_dialog,
-            gemini_2_5_flash_exp_native_audio_thinking_dialog,
             gemini_live_2_5_flash_preview,
             gemini_2_0_flash_live_001,
         };
@@ -108,16 +106,12 @@ namespace EpicRapBattle.Config
                 {
                     case GeminiLiveModels.gemini_2_5_flash_native_audio_preview_09_2025:
                         return "gemini-2.5-flash-native-audio-preview-09-2025";
-                    case GeminiLiveModels.gemini_2_5_flash_preview_native_audio_dialog:
-                        return "gemini-2.5-flash-preview-native-audio-dialog";
-                    case GeminiLiveModels.gemini_2_5_flash_exp_native_audio_thinking_dialog:
-                        return "gemini-2.5-flash-exp-native-audio-thinking-dialog";
                     case GeminiLiveModels.gemini_live_2_5_flash_preview:
                         return "gemini-live-2.5-flash-preview";
                     case GeminiLiveModels.gemini_2_0_flash_live_001:
                         return "gemini-2.0-flash-live-001";
                     default:
-                        return "gemini-live-2.5-flash-preview";
+                        return "gemini-2.5-flash-native-audio-preview-09-2025";
                 }
             }
         }
