@@ -7,11 +7,19 @@ public class PopUpGameText : MonoBehaviour
 {
     private TextMeshProUGUI textComponent;
     private Animator animator;
+    private AudioSource audioSource;
+
+    [SerializeField]
+    private AudioClip positiveSoundEffect;
+
+    [SerializeField]
+    private AudioClip negativeSoundEffect;
 
     private void Awake()
     {
         textComponent = GetComponent<TextMeshProUGUI>();
         animator = GetComponent<Animator>();
+        audioSource = GetComponent<AudioSource>();
         animator.enabled = false;
     }
 
@@ -25,10 +33,12 @@ public class PopUpGameText : MonoBehaviour
         }
         gameObject.SetActive(true);
         animator.enabled = true;
+        audioSource.Play();
+
         StartCoroutine(WaitForAnimationAndDestroy());
     }
 
-    public void SetColor(Color newColor)
+    private void SetColor(Color newColor)
     {
         if (textComponent != null)
         {
@@ -36,12 +46,28 @@ public class PopUpGameText : MonoBehaviour
         }
     }
 
-    public void SetText(string message)
+    private void SetText(string message)
     {
         if (textComponent != null)
         {
             textComponent.text = message;
         }
+    }
+
+    private void SetSoundEffect(bool isPositive)
+    {
+        audioSource.clip = isPositive ? positiveSoundEffect : negativeSoundEffect;
+    }
+
+    public void SetReaction(string message, bool isPositive)
+    {
+        Color reactionColor = isPositive
+            ? new Color(0.2f, 1f, 0.2f) // Green for positive reactions
+            : new Color(1f, 0.2f, 0.2f); // Red for negative reactions
+
+        SetColor(reactionColor);
+        SetText(message);
+        SetSoundEffect(isPositive);
     }
 
     private IEnumerator WaitForAnimationAndDestroy()

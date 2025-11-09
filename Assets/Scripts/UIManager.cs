@@ -13,9 +13,6 @@ public class UIManager : MonoBehaviour
     private TextMeshProUGUI statusTextUI;
 
     [SerializeField]
-    private TextMeshProUGUI errorTextUI;
-
-    [SerializeField]
     private TextMeshProUGUI aiJudgeTextUI;
 
     [SerializeField]
@@ -29,6 +26,9 @@ public class UIManager : MonoBehaviour
 
     [SerializeField]
     private GameObject JudgePanelUI;
+
+    [SerializeField]
+    private GameObject PopUpGameTextPrefab;
 
     private Queue<PopUpGameText> popupStack = new Queue<PopUpGameText>();
 
@@ -89,23 +89,10 @@ public class UIManager : MonoBehaviour
         {
             statusTextUI.text = "";
         }
-        if (errorTextUI != null)
-        {
-            errorTextUI.text = "";
-        }
         if (aiJudgeTextUI != null)
         {
             aiJudgeTextUI.text = "";
         }
-    }
-
-    public void ShowError(string errorMessage)
-    {
-        if (errorTextUI != null)
-        {
-            errorTextUI.text = "Error: " + errorMessage;
-        }
-        Debug.LogError(errorMessage);
     }
 
     public void UpdateAIJudgeText(string text)
@@ -132,20 +119,21 @@ public class UIManager : MonoBehaviour
 
     public void AddReaction(string message, bool isPositive)
     {
+        if (PopUpGameTextPrefab == null)
+        {
+            Debug.LogError("PopUpGameTextPrefab is not assigned in UIManager!");
+            return;
+        }
+
         GameObject popUpObj = Instantiate(
-            Resources.Load<GameObject>("PopUpGameText"),
+            PopUpGameTextPrefab,
             isPositive
                 ? PositiveReactionLocationObject.transform
                 : NegativeReactionLocationObject.transform
         );
         popUpObj.SetActive(false);
         PopUpGameText popUpReaction = popUpObj.GetComponent<PopUpGameText>();
-        Color reactionColor = isPositive
-            ? new Color(0.2f, 1f, 0.2f) // Green for positive reactions
-            : new Color(1f, 0.2f, 0.2f); // Red for negative reactions
-
-        popUpReaction.SetColor(reactionColor);
-        popUpReaction.SetText(message);
+        popUpReaction.SetReaction(message, isPositive);
 
         popupStack.Enqueue(popUpReaction);
     }

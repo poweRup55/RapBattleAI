@@ -60,8 +60,6 @@ public class RapBattleConductorLive : MonoBehaviour
 
     [SerializeField]
     private AudioClip fileSubmissionClip;
-
-    private BattleState currentState = BattleState.WaitingStart;
     private AudioClip playerRecordingClip;
     private float recordingLengthInSeconds;
     private string microphoneDevice;
@@ -72,7 +70,6 @@ public class RapBattleConductorLive : MonoBehaviour
     {
         StopAllCoroutines();
         currentRound = 0;
-        currentState = BattleState.WaitingStart;
         if (isRecording)
         {
             StopMicrophoneRecording();
@@ -174,7 +171,6 @@ public class RapBattleConductorLive : MonoBehaviour
             StopCoroutine(showReactions);
 
             // NPC Turn
-            currentState = BattleState.NPCTurn;
 
             // Debug.Log("NPC is rapping...");
 
@@ -208,7 +204,6 @@ public class RapBattleConductorLive : MonoBehaviour
             uiManager.ClearAllReactions();
             uiManager.RemovePlayingReactions();
             // Rest Turn
-            currentState = BattleState.Rest;
             currentRound++;
             if (totalRounds > currentRound)
             {
@@ -271,16 +266,15 @@ public class RapBattleConductorLive : MonoBehaviour
     {
         while (true)
         {
-            currentState = BattleState.PlayerTurn;
             uiManager.UpdateStatus(
                 "Hold the space bar or tap and hold anywhere to begin recording your rap!"
             );
 
-            // if (useFileSubmission && fileSubmissionClip != null)
-            // {
-            //     uiManager.UpdateStatus("Using file submission for this round.");
-            //     playerRecordingClip = fileSubmissionClip;
-            // }
+            if (useFileSubmission && fileSubmissionClip != null)
+            {
+                uiManager.UpdateStatus("Using file submission for this round.");
+                playerRecordingClip = fileSubmissionClip;
+            }
 
             yield return StartCoroutine(GetRapRecording());
 
@@ -288,7 +282,6 @@ public class RapBattleConductorLive : MonoBehaviour
             {
                 yield return PlayBackRecording();
             }
-            currentState = BattleState.WaitingTurn;
             animationController.SetTrigger("StartThinking");
             uiManager.UpdateStatus("Waiting for your opponent to respond...");
             float startTime = Time.time;

@@ -308,13 +308,9 @@ public class RapBattleConductor : MonoBehaviour
         {
             if (error != null)
             {
-                uiManager.ShowError($"OpenAI API error: {error.Message}");
+                throw new Exception($"OpenAI API error: {error.Message}", error);
             }
-            else
-            {
-                uiManager.ShowError("Failed to get a response from OpenAI after retries.");
-            }
-            yield break;
+            throw new Exception("Failed to get a response from OpenAI after retries.");
         }
 
         npcResponseText = response.choices[0].message.content;
@@ -358,7 +354,7 @@ public class RapBattleConductor : MonoBehaviour
             : null;
         if (string.IsNullOrEmpty(playerRecordingBase64))
         {
-            uiManager.ShowError("No microphone audio recording found!");
+            throw new Exception("No microphone audio recording found!");
         }
         // Add current user message
         gameAIService.AddUserAudioMessage(playerRecordingBase64);
@@ -459,11 +455,10 @@ public class RapBattleConductor : MonoBehaviour
 
             if (request.result != UnityWebRequest.Result.Success)
             {
-                uiManager.ShowError($"Gemini TTS failed: {request.error}");
                 Debug.LogError(
                     $"Gemini TTS with request: {jsonBody} \nfailed: {request.error} \nResponse: {request.downloadHandler.text}"
                 );
-                yield break;
+                throw new Exception($"Gemini TTS failed: {request.error}");
             }
 
             try
