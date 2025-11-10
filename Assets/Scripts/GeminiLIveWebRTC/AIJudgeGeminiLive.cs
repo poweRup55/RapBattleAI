@@ -1,4 +1,5 @@
 using System;
+using System.Text;
 using UnityEngine;
 
 public class AIJudgeGeminiLive : GeminiLiveWebRTC
@@ -6,7 +7,14 @@ public class AIJudgeGeminiLive : GeminiLiveWebRTC
     [SerializeField]
     private UIManager uIManager;
 
-    private string responseBuffer = "";
+    private StringBuilder responseBuffer = new StringBuilder();
+
+    private const string REACTION_START_TAG = "[reaction]";
+    private const string REACTION_END_TAG = "[/reaction]";
+    private const string ROUND_SCORE_START_TAG = "[round score]";
+    private const string ROUND_SCORE_END_TAG = "[/round score]";
+    private const string POSITIVE_TAG = "[positive]";
+    private const string NEGATIVE_TAG = "[negative]";
 
     protected override BidiGenerateContentClientMessage GetSetupMessage(
         string modelString,
@@ -43,76 +51,109 @@ public class AIJudgeGeminiLive : GeminiLiveWebRTC
 
     protected override void OnTextResponseReceived(string text)
     {
-        responseBuffer += text;
+        if (string.IsNullOrEmpty(text))
+            return;
 
-        // Process all complete reactions first
-        while (responseBuffer.Contains("[reaction]") && responseBuffer.Contains("[/reaction]"))
+        responseBuffer.Append(text);
+        string bufferString = responseBuffer.ToString();
+
+        ProcessReactionTags(ref bufferString);
+        ProcessScoreTags(ref bufferString);
+    }
+
+    private void ProcessReactionTags(ref string bufferString)
+    {
+        int reactionStartIndex = bufferString.IndexOf(REACTION_START_TAG);
+        while (reactionStartIndex >= 0)
         {
-            int startIndex = responseBuffer.IndexOf("[reaction]");
-            int endIndex = responseBuffer.IndexOf("[/reaction]", startIndex);
+            int reactionEndIndex = bufferString.IndexOf(REACTION_END_TAG, reactionStartIndex);
 
-            if (endIndex > startIndex)
+            if (reactionEndIndex > reactionStartIndex)
             {
-                endIndex += "[/reaction]".Length;
-                string reaction = responseBuffer.Substring(startIndex, endIndex - startIndex);
-                string reactionContent = reaction
-                    .Replace("[reaction]", "")
-                    .Replace("[/reaction]", "")
-                    .Trim();
+                string reactionContent = ExtractTagContent(
+                    bufferString,
+                    reactionStartIndex,
+                    REACTION_START_TAG,
+                    reactionEndIndex,
+                    REACTION_END_TAG
+                );
 
                 if (!string.IsNullOrEmpty(reactionContent))
                 {
+                    bool isPositive = reactionContent.StartsWith(POSITIVE_TAG);
                     string cleanReactionText = reactionContent
-                        .Replace("[positive]", "")
-                        .Replace("[negative]", "")
+                        .Replace(POSITIVE_TAG, "")
+                        .Replace(NEGATIVE_TAG, "")
                         .Trim();
-                    if (reactionContent.StartsWith("[positive]"))
+
+                    if (!string.IsNullOrEmpty(cleanReactionText))
                     {
-                        uIManager.AddReaction(cleanReactionText, true);
-                    }
-                    else
-                    {
-                        uIManager.AddReaction(cleanReactionText, false);
+                        uIManager.AddReaction(cleanReactionText, isPositive);
                     }
                 }
 
-                responseBuffer = responseBuffer.Remove(startIndex, endIndex - startIndex);
+                // Remove processed reaction from buffer
+                int removeEndIndex = reactionEndIndex + REACTION_END_TAG.Length;
+                responseBuffer.Remove(reactionStartIndex, removeEndIndex - reactionStartIndex);
+                bufferString = responseBuffer.ToString();
+                reactionStartIndex = bufferString.IndexOf(REACTION_START_TAG);
             }
             else
             {
-                break; // Incomplete tag, wait for more data
+                break;
             }
         }
+    }
 
-        // Process all complete round scores
-        while (
-            responseBuffer.Contains("[round score]") && responseBuffer.Contains("[/round score]")
-        )
+    private void ProcessScoreTags(ref string bufferString)
+    {
+        int scoreStartIndex = bufferString.IndexOf(ROUND_SCORE_START_TAG);
+        while (scoreStartIndex >= 0)
         {
-            int startIndex = responseBuffer.IndexOf("[round score]");
-            int endIndex = responseBuffer.IndexOf("[/round score]", startIndex);
+            int scoreEndIndex = bufferString.IndexOf(ROUND_SCORE_END_TAG, scoreStartIndex);
 
-            if (endIndex > startIndex)
+            if (scoreEndIndex > scoreStartIndex)
             {
-                endIndex += "[/round score]".Length;
-                string score = responseBuffer.Substring(startIndex, endIndex - startIndex);
-                string scoreContent = score
-                    .Replace("[round score]", "")
-                    .Replace("[/round score]", "")
-                    .Trim();
+                string scoreContent = ExtractTagContent(
+                    bufferString,
+                    scoreStartIndex,
+                    ROUND_SCORE_START_TAG,
+                    scoreEndIndex,
+                    ROUND_SCORE_END_TAG
+                );
 
                 if (!string.IsNullOrEmpty(scoreContent))
                 {
                     uIManager.UpdateAIJudgeText(scoreContent);
                 }
 
-                responseBuffer = responseBuffer.Remove(startIndex, endIndex - startIndex);
+                int removeEndIndex = scoreEndIndex + ROUND_SCORE_END_TAG.Length;
+                responseBuffer.Remove(scoreStartIndex, removeEndIndex - scoreStartIndex);
+                bufferString = responseBuffer.ToString();
+                scoreStartIndex = bufferString.IndexOf(ROUND_SCORE_START_TAG);
             }
             else
             {
-                break; // Incomplete tag, wait for more data
+                break;
             }
         }
+    }
+
+    private string ExtractTagContent(
+        string buffer,
+        int startIdx,
+        string startTag,
+        int endIdx,
+        string endTag
+    )
+    {
+        int contentStart = startIdx + startTag.Length;
+        int contentLength = endIdx - contentStart;
+        if (contentLength > 0)
+        {
+            return buffer.Substring(contentStart, contentLength).Trim();
+        }
+        return string.Empty;
     }
 
     protected override void OnTranscriptionReceived(string text) { }

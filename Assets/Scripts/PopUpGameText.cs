@@ -73,6 +73,7 @@ public class PopUpGameText : MonoBehaviour
     private IEnumerator WaitForAnimationAndDestroy()
     {
         yield return new WaitForSeconds(animator.GetCurrentAnimatorStateInfo(0).length);
-        Destroy(gameObject);
+        // Don't destroy, let UIManager handle pooling
+        gameObject.SetActive(false);
     }
 }

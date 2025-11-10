@@ -33,6 +33,13 @@ public abstract class GeminiLiveWebRTC : MonoBehaviour
     [SerializeField]
     protected const int maxChunkSize = 1024;
 
+    private static readonly JsonSerializerSettings cachedJsonSettings = new JsonSerializerSettings
+    {
+        DefaultValueHandling = DefaultValueHandling.Ignore,
+        Formatting = Formatting.None,
+        NullValueHandling = NullValueHandling.Ignore,
+    };
+
     protected RapBattleConductorLive rapBattleConductorLive;
     protected ClientWebSocket webSocket;
     protected System.Threading.CancellationTokenSource cancellationTokenSource;
@@ -590,7 +597,7 @@ public abstract class GeminiLiveWebRTC : MonoBehaviour
             BidiGenerateContentServerMessage response =
                 JsonConvert.DeserializeObject<BidiGenerateContentServerMessage>(
                     json,
-                    new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore }
+                    cachedJsonSettings
                 );
 
             if (response == null)
@@ -817,14 +824,7 @@ public abstract class GeminiLiveWebRTC : MonoBehaviour
             );
         }
 
-        string json = JsonConvert.SerializeObject(
-            message,
-            new JsonSerializerSettings
-            {
-                DefaultValueHandling = DefaultValueHandling.Ignore,
-                Formatting = Formatting.None,
-            }
-        );
+        string json = JsonConvert.SerializeObject(message, cachedJsonSettings);
 
         byte[] bytes = Encoding.UTF8.GetBytes(json);
         int totalBytes = bytes.Length;

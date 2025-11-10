@@ -76,7 +76,14 @@ public class RapBattleConductorLive : MonoBehaviour
         }
         isRecording = false;
         recordingLengthInSeconds = 0f;
-        playerRecordingClip = null;
+
+        // Clean up player recording clip if it exists
+        if (playerRecordingClip != null)
+        {
+            playerRecordingClip.UnloadAudioData();
+            Destroy(playerRecordingClip);
+            playerRecordingClip = null;
+        }
         if (animationController != null)
         {
             if (animationController.GetCurrentAnimatorStateInfo(0).IsName("Rapping"))
@@ -178,10 +185,7 @@ public class RapBattleConductorLive : MonoBehaviour
             var createAudioCoroutine = StartCoroutine(geminiLiveAIRapper.CreateAudioCoroutines());
             var playAudioCoroutine = StartCoroutine(geminiLiveAIRapper.PlayAudioCoroutine());
             var streamAudioToJudge = StartCoroutine(
-                geminiLiveAIRapper.StreamToOtherAgent(
-                    geminiLiveAIJudge,
-                    AILiveConfig.inputSampleRate
-                )
+                geminiLiveAIRapper.StreamToOtherAgent(geminiLiveAIJudge)
             );
             yield return new WaitUntil(() => geminiLiveAIRapper.IsPlaying);
             uiManager.UpdateStatus($"NPC is rapping!");
@@ -234,17 +238,19 @@ public class RapBattleConductorLive : MonoBehaviour
         uiManager.ClearAllReactions();
         uiManager.RemovePlayingReactions();
 
-        // Discard first reaction
         PopUpGameText firstReaction = null;
         yield return new WaitUntil(() =>
         {
             firstReaction = uiManager.PopNextReaction();
             return firstReaction != null;
         });
-        Destroy(firstReaction.gameObject);
+        if (firstReaction != null && firstReaction.gameObject != null)
+        {
+            firstReaction.gameObject.SetActive(false);
+        }
 
         PopUpGameText currentReaction = null;
-        while (true)
+        const float reactionPollInterval = 0.3f;
         {
             if (currentReaction == null || currentReaction.gameObject == null)
             {
@@ -256,9 +262,13 @@ public class RapBattleConductorLive : MonoBehaviour
             }
             else
             {
-                Destroy(uiManager.PopNextReaction()?.gameObject);
+                PopUpGameText nextReaction = uiManager.PopNextReaction();
+                if (nextReaction != null && nextReaction.gameObject != null)
+                {
+                    nextReaction.gameObject.SetActive(false);
+                }
             }
-            yield return new WaitForSeconds(0.1f);
+            yield return new WaitForSeconds(reactionPollInterval);
         }
     }
 
@@ -309,6 +319,7 @@ public class RapBattleConductorLive : MonoBehaviour
             float submitEndTime = Time.time + submitRapPeriodInSeconds;
             bool retakeRequested = false;
 
+            const float inputCheckInterval = 0.05f; // Check input every 50ms instead of every frame
             while (Time.time < submitEndTime)
             {
                 uiManager.UpdateStatus(
@@ -319,7 +330,7 @@ public class RapBattleConductorLive : MonoBehaviour
                     retakeRequested = true;
                     break;
                 }
-                yield return null;
+                yield return new WaitForSeconds(inputCheckInterval);
             }
 
             if (!retakeRequested)
@@ -549,6 +560,7 @@ public class RapBattleConductorLive : MonoBehaviour
         }
 
         const float sendInterval = 0.1f;
+        const float positionCheckInterval = 0.05f; // Check position every 50ms instead of every frame
         int lastSamplePosition = 0;
 
         if (waitCondition != null)
@@ -556,29 +568,35 @@ public class RapBattleConductorLive : MonoBehaviour
             yield return new WaitUntil(waitCondition);
         }
         float lastSendTime = Time.time;
+        float lastPositionCheckTime = Time.time;
 
         while (isActive())
         {
-            int currentSamplePosition = getPosition();
-            if (currentSamplePosition < lastSamplePosition)
+            // Only check position at intervals to reduce overhead
+            if (Time.time - lastPositionCheckTime >= positionCheckInterval)
             {
-                currentSamplePosition += clip.samples;
-            }
+                int currentSamplePosition = getPosition();
+                if (currentSamplePosition < lastSamplePosition)
+                {
+                    currentSamplePosition += clip.samples;
+                }
 
-            if (Time.time - lastSendTime >= sendInterval)
-            {
-                yield return StartCoroutine(
-                    ProcessAndSendAudioSamples(
-                        agent,
-                        clip,
-                        lastSamplePosition,
-                        currentSamplePosition
-                    )
-                );
-                lastSamplePosition = currentSamplePosition % clip.samples;
-                lastSendTime = Time.time;
+                if (Time.time - lastSendTime >= sendInterval)
+                {
+                    yield return StartCoroutine(
+                        ProcessAndSendAudioSamples(
+                            agent,
+                            clip,
+                            lastSamplePosition,
+                            currentSamplePosition
+                        )
+                    );
+                    lastSamplePosition = currentSamplePosition % clip.samples;
+                    lastSendTime = Time.time;
+                }
+                lastPositionCheckTime = Time.time;
             }
-            yield return null;
+            yield return new WaitForSeconds(positionCheckInterval);
         }
 
         yield return StartCoroutine(
@@ -625,6 +643,7 @@ public class RapBattleConductorLive : MonoBehaviour
             yield return new WaitForSeconds(recordingLengthInSeconds);
             Destroy(playbackSource);
             musicSource.UnPause();
+            // Note: playerRecordingClip cleanup is handled elsewhere when no longer needed
         }
         yield break;
     }

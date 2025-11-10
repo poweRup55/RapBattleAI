@@ -125,11 +125,12 @@ public abstract class GeminiLiveWebRTCAudio : GeminiLiveWebRTC
     {
         float timeSinceLastFlush = 0f;
         const float maxWaitTime = 1f;
+        const float checkInterval = 0.05f;
 
         while (IsWebSocketConnected())
         {
             bool shouldProcess = false;
-            int queueCount = 0;
+            int queueCount;
 
             lock (audioResponseQueue)
             {
@@ -146,10 +147,10 @@ public abstract class GeminiLiveWebRTCAudio : GeminiLiveWebRTC
             }
             else
             {
-                timeSinceLastFlush += Time.deltaTime;
+                timeSinceLastFlush += checkInterval;
             }
 
-            yield return null;
+            yield return new WaitForSeconds(checkInterval);
         }
     }
 
@@ -235,9 +236,15 @@ public abstract class GeminiLiveWebRTCAudio : GeminiLiveWebRTC
         audioSource.clip = responseClip;
         audioSource.Play();
 
-        while (audioSource.isPlaying)
+        // Clean up clip after playing
+        float clipLength = responseClip.length;
+        yield return new WaitForSeconds(clipLength + 0.1f); // Small buffer
+
+        // Unload audio data to free memory after playback
+        if (responseClip != null)
         {
-            yield return null;
+            responseClip.UnloadAudioData();
+            Destroy(responseClip);
         }
     }
 
@@ -275,12 +282,26 @@ public abstract class GeminiLiveWebRTCAudio : GeminiLiveWebRTC
 
     public new void Destroy()
     {
+        lock (audioClipQueue)
+        {
+            while (audioClipQueue.Count > 0)
+            {
+                AudioClip clip = audioClipQueue.Dequeue();
+                if (clip != null)
+                {
+                    clip.UnloadAudioData();
+                    Destroy(clip);
+                }
+            }
+        }
+
         base.Destroy();
     }
 
-    public IEnumerator StreamToOtherAgent(GeminiLiveWebRTC agent, int targetSampleRate)
+    public IEnumerator StreamToOtherAgent(GeminiLiveWebRTC agent)
     {
         yield return StartCoroutine(agent.SendTextToGeminiCoroutine("attempt rapper 2"));
+        const float streamCheckInterval = 0.1f; // Check for new clips every 100ms
         while (IsAudioActive())
         {
             AudioClip clip = null;
@@ -301,7 +322,10 @@ public abstract class GeminiLiveWebRTCAudio : GeminiLiveWebRTC
                 if (enableDebugLogs)
                     Debug.Log($"Streamed audio clip to other agent: {clip.name}");
             }
-            yield return null;
+            else
+            {
+                yield return new WaitForSeconds(streamCheckInterval);
+            }
         }
         yield return StartCoroutine(agent.SendSilenceToGeminiCoroutine(2f, 24000, 1));
 

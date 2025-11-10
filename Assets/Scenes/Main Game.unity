@@ -7473,56 +7473,47 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   geminiLiveModelVariant: 2
   geminiTtsVoice: 0
-  AiPromptOverride: "You are the Rap Battle Judge AI. Your job is to react live during
-    attempts, score once both rappers have finalized, and declare the winner at the
-    very end.\r\n\r\nControl Flow:\r\n\r\n* If the input contains `attempt rapper
-    1` \u2192 Rapper 1 is rapping. React only with live reactions. Do not score.\r\n*
-    If the input contains `attempt rapper 2` \u2192 Rapper 2 is rapping. React only
-    with live reactions. Do not score.\r\n* If the input contains `discard rapper
-    1` \u2192 erase everything from Rapper 1\u2019s current attempt as if it never
-    happened. Stay silent.\r\n* If the input contains `discard rapper 2` \u2192 erase
-    everything from Rapper 2\u2019s current attempt as if it never happened. Stay
-    silent.\r\n* If the input contains `finalized rapper 1` \u2192 mark Rapper 1
-    as finished. Do not score yet. Wait for Rapper 2.\r\n* If the input contains
-    `finalized rapper 2` \u2192 mark Rapper 2 as finished. Do not score yet. Wait
-    for next text input.\r\n* If the input contains `Round X ended. Give round score.`
-    \u2192 Immediately give the round scoreboard.\r\n* If the input contains `rap
-    session over.` \u2192 the battle is fully complete. Give the final scoreboard
-    and declare the winner.\r\n* Ignore all other text. Never respond unless the
-    input matches one of the above cases.\r\n\r\nRules:\r\n\r\n1. During `attempt`
-    (live reactions only):\r\n\r\n* Do not score yet.\r\n* Only react to standout
-    lines that are strong, weak, or surprising.\r\n* Do not react to filler, silence,
-    or meaningless text. If nothing stands out, stay completely silent.\r\n* Reactions
-    must be very short (maximum 3 words).\r\n* Each reaction must be wrapped in `[reaction]
-    ... [/reaction]`.\n* A reaction can be either positive of negative. If it is
-    positive - write [positive] after [reaction]. If it is negative - write [negative]
-    after [reaction]\r\n* Example reactions:\r\n  `[reaction][positive]Bars too hot[/reaction]`\r\n 
-    `[reaction][negative]Weak line[/reaction]`\r\n\r\n2. When `finalized` received:\r\n\r\n*
-    Do not react anymore.\r\n* Wait until both rappers are finalized.\r\n* Once both
-    are finalized, output the round scoreboard, wrapped in `[round score] ... [/round
-    score]`.\r\n* For each rapper, give 3 scores (Delivery, Creativity, Impact) each
-    out of 10.\r\n* Show the total score (out of 30).\r\n* Add a short roast or hype
-    line for each rapper.\r\n\r\nExample Round Score:\r\n\r\n```\r\n[round score]
-    \r\nRound 1 Results\r\n\r\nRapper 1:\r\n- Delivery: 8/10\r\n- Creativity: 9/10\r\n-
-    Impact: 8/10\r\nTotal: 25/30\r\nClosing note: Smooth flow, strong punches.\r\n\r\nRapper
-    2:\r\n- Delivery: 7/10\r\n- Creativity: 6/10\r\n- Impact: 7/10\r\nTotal: 20/30\r\nClosing
-    note: Had sparks, but lost steam.\r\n[/round score]\r\n```\r\n\r\n3. When `rap
-    session over.` received:\r\n\r\n* Stop all reactions.\r\n* State the total number
-    of rounds.\r\n* Provide the final scoreboard with averages or totals for each
-    rapper.\r\n* Wrap the entire result in `[round score] ... [/round score]`.\r\n*
-    Add a roast or hype closing line for each rapper.\r\n* Clearly declare the winner:
-    the rapper with the higher final score.\n* A round score can be sent only once.
-    Don't send the score of a single round twice.\r\n\r\nExample Final Score:\r\n\r\n```\r\n[round
-    score] \r\nFinal Results\r\nTotal Rounds: 3\r\n\r\nRapper 1:\r\n- Avg Delivery:
-    8.3/10\r\n- Avg Creativity: 8.7/10\r\n- Avg Impact: 8.0/10\r\nFinal Average:
-    25/30\r\nClosing note: Consistent champ, crowd favorite.\r\n\r\nRapper 2:\r\n-
-    Avg Delivery: 6.7/10\r\n- Avg Creativity: 7.0/10\r\n- Avg Impact: 6.3/10\r\nFinal
-    Average: 20/30\r\nClosing note: Showed flashes, but couldn\u2019t keep pace.\r\n\r\nWinner:
-    Rapper 1\r\n[/round score]\r\n```\r\n\r\nStyle Guide:\r\n\r\n* Always witty,
-    sarcastic, and confident.\r\n* Never neutral \u2014 always hype or roast.\r\n*
-    During `attempt`: only occasional short reactions, and stay silent if nothing
-    deserves a reaction.\r\n* After `finalized`: produce the full round scoreboard.\r\n*
-    After `rap session over.`: produce the final scoreboard and declare the winner.\r"
+  AiPromptOverride: "You are the **Rap Battle Judge AI**, responsible for reacting
+    live during performances, scoring rounds after both rappers finish, and declaring
+    the final winner.\r\n\r\n---\r\n\r\n### Control Flow\r\n\r\n* `attempt rapper
+    1` \u2192 Rapper 1 is performing. React live only. No scoring.\r\n* `attempt
+    rapper 2` \u2192 Rapper 2 is performing. React live only. No scoring.\r\n* `discard
+    rapper 1` \u2192 Forget Rapper 1\u2019s latest attempt completely. Stay silent.\r\n*
+    `discard rapper 2` \u2192 Forget Rapper 2\u2019s latest attempt completely. Stay
+    silent.\r\n* `finalized rapper 1` \u2192 Mark Rapper 1 as done. Wait for Rapper
+    2. No scoring yet.\r\n* `finalized rapper 2` \u2192 Mark Rapper 2 as done. Wait
+    for the next text input.\r\n* `Round X ended. Give round score.` \u2192 Output
+    the scoreboard for this round immediately.\r\n* `rap session over.` \u2192 The
+    battle is finished. Provide the final scores and announce the winner.\r\n* Ignore
+    any other input. Respond **only** when one of the above commands appears.\r\n\r\n---\r\n\r\n###
+    Rules\r\n\r\n#### 1. During an `attempt`\r\n\r\n* Don\u2019t score yet.\r\n*
+    React only to standout or surprising lines.\r\n* Skip filler, silence, or generic
+    bars. If nothing pops, say nothing.\r\n* Each reaction must be **\u22643 words**
+    and wrapped as:\r\n  `[reaction][positive]Nice punch[/reaction]` or `[reaction][negative]Off
+    beat[/reaction]`.\r\n* Keep them short, witty, and rare.\r\n\r\n#### 2. When
+    `finalized`\r\n\r\n* Stop reacting.\r\n* Once **both rappers** are finalized,
+    post the round scoreboard inside `[round score] ... [/round score]`.\r\n* Score
+    each rapper on **Delivery**, **Creativity**, and **Impact** (0\u201310).\r\n*
+    Include a **Total (out of 30)** and a closing roast or hype line.\r\n\r\n**Example
+    Round Score**\r\n\r\n```\r\n[round score]\r\nRound 1 Results\r\n\r\nRapper 1:\r\n-
+    Delivery: 8/10\r\n- Creativity: 9/10\r\n- Impact: 8/10\r\nTotal: 25/30\r\nClosing
+    note: Smooth flow, strong punches.\r\n\r\nRapper 2:\r\n- Delivery: 7/10\r\n-
+    Creativity: 6/10\r\n- Impact: 7/10\r\nTotal: 20/30\r\nClosing note: Had sparks,
+    but lost steam.\r\n[/round score]\r\n```\r\n\r\nOnly one scoreboard per round\u2014never
+    repeat it.\r\n\r\n#### 3. When `rap session over.`\r\n\r\n* End all reactions.\r\n*
+    State total round count.\r\n* Present the final scoreboard (average or total)
+    for each rapper inside `[round score] ... [/round score]`.\r\n* Add a closing
+    roast or hype for each.\r\n* Clearly declare the **winner**.\r\n\r\n**Example
+    Final Score**\r\n\r\n```\r\n[round score]\r\nFinal Results\r\nTotal Rounds: 3\r\n\r\nRapper
+    1:\r\n- Avg Delivery: 8.3/10\r\n- Avg Creativity: 8.7/10\r\n- Avg Impact: 8.0/10\r\nFinal
+    Average: 25/30\r\nClosing note: Consistent champ, crowd favorite.\r\n\r\nRapper
+    2:\r\n- Avg Delivery: 6.7/10\r\n- Avg Creativity: 7.0/10\r\n- Avg Impact: 6.3/10\r\nFinal
+    Average: 20/30\r\nClosing note: Showed flashes, couldn\u2019t keep pace.\r\n\r\nWinner:
+    Rapper 1\r\n[/round score]\r\n```\r\n\r\n---\r\n\r\n### Style Guide\r\n\r\n*
+    Tone: **Witty, sarcastic, confident.**\r\n* Never neutral\u2014always hype or
+    roast.\r\n* During attempts: minimal, sharp live reactions only.\r\n* After finalization:
+    structured round scoreboard.\r\n* After session end: full summary and winner
+    declaration.\r"
 --- !u!4 &755209405 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1030974328, guid: abc00000000017072569627150325292,
@@ -33974,7 +33965,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1587049341
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -34097,7 +34088,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1605030302
 RectTransform:
   m_ObjectHideFlags: 0
@@ -34650,161 +34641,6 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1030981797}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &1888479742
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1888479743}
-  - component: {fileID: 1888479746}
-  - component: {fileID: 1888479745}
-  - component: {fileID: 1888479744}
-  m_Layer: 5
-  m_Name: ErrorText
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!224 &1888479743
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1888479742}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 2047609463}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
-  m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1888479744
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1888479742}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 306cc8c2b49d7114eaa3623786fc2126, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_IgnoreLayout: 0
-  m_MinWidth: -1
-  m_MinHeight: -1
-  m_PreferredWidth: -1
-  m_PreferredHeight: -1
-  m_FlexibleWidth: 1
-  m_FlexibleHeight: 1
-  m_LayoutPriority: 1
---- !u!114 &1888479745
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1888479742}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  m_text: fdhfdhsdfhfdsgsdfhsdfhsdfhfdhs
-  m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_fontSharedMaterials: []
-  m_fontMaterial: {fileID: 0}
-  m_fontMaterials: []
-  m_fontColor32:
-    serializedVersion: 2
-    rgba: 4278190335
-  m_fontColor: {r: 1, g: 0, b: 0, a: 1}
-  m_enableVertexGradient: 0
-  m_colorMode: 3
-  m_fontColorGradient:
-    topLeft: {r: 1, g: 1, b: 1, a: 1}
-    topRight: {r: 1, g: 1, b: 1, a: 1}
-    bottomLeft: {r: 1, g: 1, b: 1, a: 1}
-    bottomRight: {r: 1, g: 1, b: 1, a: 1}
-  m_fontColorGradientPreset: {fileID: 0}
-  m_spriteAsset: {fileID: 0}
-  m_tintAllSprites: 0
-  m_StyleSheet: {fileID: 0}
-  m_TextStyleHashCode: -1183493901
-  m_overrideHtmlColors: 0
-  m_faceColor:
-    serializedVersion: 2
-    rgba: 4294967295
-  m_fontSize: 72
-  m_fontSizeBase: 36
-  m_fontWeight: 400
-  m_enableAutoSizing: 1
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
-  m_fontStyle: 0
-  m_HorizontalAlignment: 2
-  m_VerticalAlignment: 512
-  m_textAlignment: 65535
-  m_characterSpacing: 0
-  m_wordSpacing: 0
-  m_lineSpacing: 0
-  m_lineSpacingMax: 0
-  m_paragraphSpacing: 0
-  m_charWidthMaxAdj: 0
-  m_enableWordWrapping: 1
-  m_wordWrappingRatios: 0.4
-  m_overflowMode: 0
-  m_linkedTextComponent: {fileID: 0}
-  parentLinkedComponent: {fileID: 0}
-  m_enableKerning: 1
-  m_enableExtraPadding: 0
-  checkPaddingRequired: 0
-  m_isRichText: 1
-  m_parseCtrlCharacters: 1
-  m_isOrthographic: 1
-  m_isCullingEnabled: 0
-  m_horizontalMapping: 0
-  m_verticalMapping: 0
-  m_uvLineOffset: 0
-  m_geometrySortingOrder: 0
-  m_IsTextObjectScaleStatic: 0
-  m_VertexBufferAutoSizeReduction: 0
-  m_useMaxVisibleDescender: 1
-  m_pageToDisplay: 1
-  m_margin: {x: 165.5907, y: 0, z: 124.911255, w: 0}
-  m_isUsingLegacyAnimationComponent: 0
-  m_isVolumetricText: 0
-  m_hasFontAssetChanged: 0
-  m_baseMaterial: {fileID: 0}
-  m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
---- !u!222 &1888479746
-CanvasRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1888479742}
-  m_CullTransparentMesh: 1
 --- !u!1 &1891305146
 GameObject:
   m_ObjectHideFlags: 0
@@ -37642,135 +37478,6 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1030982717}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &2047609462
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2047609463}
-  - component: {fileID: 2047609467}
-  - component: {fileID: 2047609466}
-  - component: {fileID: 2047609465}
-  - component: {fileID: 2047609464}
-  m_Layer: 5
-  m_Name: ErrorUI
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!224 &2047609463
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2047609462}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0, y: 0, z: 0}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 1888479743}
-  m_Father: {fileID: 710027999804078651}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
-  m_Pivot: {x: 0, y: 0}
---- !u!114 &2047609464
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2047609462}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 59f8146938fff824cb5fd77236b75775, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Padding:
-    m_Left: 0
-    m_Right: 0
-    m_Top: 255
-    m_Bottom: 84
-  m_ChildAlignment: 1
-  m_Spacing: 0
-  m_ChildForceExpandWidth: 1
-  m_ChildForceExpandHeight: 1
-  m_ChildControlWidth: 1
-  m_ChildControlHeight: 1
-  m_ChildScaleWidth: 0
-  m_ChildScaleHeight: 0
-  m_ReverseArrangement: 0
---- !u!114 &2047609465
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2047609462}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dc42784cf147c0c48a680349fa168899, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_IgnoreReversedGraphics: 1
-  m_BlockingObjects: 0
-  m_BlockingMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
---- !u!114 &2047609466
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2047609462}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_UiScaleMode: 0
-  m_ReferencePixelsPerUnit: 100
-  m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
-  m_ScreenMatchMode: 0
-  m_MatchWidthOrHeight: 0
-  m_PhysicalUnit: 3
-  m_FallbackScreenDPI: 96
-  m_DefaultSpriteDPI: 96
-  m_DynamicPixelsPerUnit: 1
-  m_PresetInfoIsWorld: 0
---- !u!223 &2047609467
-Canvas:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2047609462}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_RenderMode: 0
-  m_Camera: {fileID: 0}
-  m_PlaneDistance: 100
-  m_PixelPerfect: 0
-  m_ReceivesEvents: 1
-  m_OverrideSorting: 0
-  m_OverridePixelPerfect: 0
-  m_SortingBucketNormalizedSize: 0
-  m_VertexColorAlwaysGammaSpace: 0
-  m_AdditionalShaderChannelsFlag: 25
-  m_UpdateRectTransformForStandalone: 0
-  m_SortingLayerID: 0
-  m_SortingOrder: 1
-  m_TargetDisplay: 0
 --- !u!1 &2078364813
 GameObject:
   m_ObjectHideFlags: 0
@@ -38553,7 +38260,6 @@ Transform:
   - {fileID: 616891732835552191}
   - {fileID: 4630804737039076755}
   - {fileID: 3709554977752335782}
-  - {fileID: 2047609463}
   - {fileID: 4363298028630583614}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -38590,7 +38296,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!222 &1645820201273452780
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -38776,12 +38482,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   aiRapperTextUI: {fileID: 1823067140006300707}
   statusTextUI: {fileID: 322597349607859551}
-  errorTextUI: {fileID: 1888479745}
   aiJudgeTextUI: {fileID: 1434308648}
   MainBattleUI: {fileID: 1823203463}
   PositiveReactionLocationObject: {fileID: 169811953}
   NegativeReactionLocationObject: {fileID: 654523512}
   JudgePanelUI: {fileID: 1605030301}
+  PopUpGameTextPrefab: {fileID: 581902305033153977, guid: e2b110612769c4843a534d73b481484d,
+    type: 3}
 --- !u!222 &3256497840140037071
 CanvasRenderer:
   m_ObjectHideFlags: 0
