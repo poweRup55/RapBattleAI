@@ -181,7 +181,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   animationController: {fileID: 1568477831}
   musicSource: {fileID: 7619184327543653673}
-  AIRapperAAudioSource: {fileID: 7521853462270470912}
+  AIRapperAudioSource: {fileID: 0}
   uiManager: {fileID: 3098442705010825368}
   geminiLiveAIRapper: {fileID: 478225086}
   geminiLiveAIJudge: {fileID: 1891305148}
@@ -1641,7 +1641,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   aiConfig: {fileID: 909767250}
   enableDebugLogs: 1
-  audioBufferFlushThreshold: 70
+  audioBufferFlushThreshold: 90
   audioSource: {fileID: 7521853462270470912}
   uIManager: {fileID: 3098442705010825368}
 --- !u!1 &490830129
@@ -40526,7 +40526,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
-  m_PlayOnAwake: 1
+  m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
   Loop: 0

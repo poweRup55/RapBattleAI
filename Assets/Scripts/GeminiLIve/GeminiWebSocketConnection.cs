@@ -13,7 +13,6 @@ public class GeminiWebSocketConnection
 {
     private const string USER_AGENT = "Rap-Against-The-Machine";
     private const int CONNECTION_WAIT_TIME = 100; // milliseconds
-    private const int SETUP_WAIT_TIME = 1000; // milliseconds
 
     private ClientWebSocket webSocket;
     private CancellationTokenSource cancellationTokenSource;

@@ -6,7 +6,7 @@ using UnityEngine;
 public abstract class GeminiLiveWebRTCAudio : GeminiLiveWebRTC
 {
     [SerializeField]
-    private int audioBufferFlushThreshold = 70;
+    private int audioBufferFlushThreshold = 30;
 
     [Header("Audio")]
     [SerializeField]
@@ -78,42 +78,50 @@ public abstract class GeminiLiveWebRTCAudio : GeminiLiveWebRTC
                 enableDebugLogs
             );
 
-            if (response?.serverContent?.modelTurn?.parts == null)
+            if (response == null)
                 return;
 
-            foreach (var part in response.serverContent.modelTurn.parts)
+            // Process audio parts if they exist
+            if (response.serverContent?.modelTurn?.parts != null)
             {
-                if (part.inlineData != null && !string.IsNullOrEmpty(part.inlineData.data))
+                foreach (var part in response.serverContent.modelTurn.parts)
                 {
-                    try
+                    if (part.inlineData != null && !string.IsNullOrEmpty(part.inlineData.data))
                     {
-                        byte[] audioData = Convert.FromBase64String(part.inlineData.data);
-                        audioProcessor.EnqueueAudioData(audioData);
+                        try
+                        {
+                            byte[] audioData = Convert.FromBase64String(part.inlineData.data);
+                            audioProcessor.EnqueueAudioData(audioData);
 
-                        if (enableDebugLogs)
-                            Debug.Log(
-                                $"Received audio data: {audioData.Length} bytes, MIME: {part.inlineData.mimeType}, queue size: {audioProcessor.ResponseQueueCount}"
+                            if (enableDebugLogs)
+                                Debug.Log(
+                                    $"Received audio data: {audioData.Length} bytes, MIME: {part.inlineData.mimeType}, queue size: {audioProcessor.ResponseQueueCount}"
+                                );
+                        }
+                        catch (Exception e)
+                        {
+                            string errorMessage = $"Error decoding audio data: {e.Message}";
+                            if (enableDebugLogs)
+                                Debug.LogError(errorMessage);
+
+                            throw new GeminiLiveException(
+                                "AUDIO_DECODE_ERROR",
+                                "ProcessAudioResponse",
+                                "DecodeBase64Audio",
+                                errorMessage,
+                                e
                             );
-                    }
-                    catch (Exception e)
-                    {
-                        string errorMessage = $"Error decoding audio data: {e.Message}";
-                        if (enableDebugLogs)
-                            Debug.LogError(errorMessage);
-
-                        throw new GeminiLiveException(
-                            "AUDIO_DECODE_ERROR",
-                            "ProcessAudioResponse",
-                            "DecodeBase64Audio",
-                            errorMessage,
-                            e
-                        );
+                        }
                     }
                 }
             }
 
+            // Check for turn completion even if there are no parts
+            // (turn completion can come in a message without audio parts)
             if (GeminiResponseParser.IsTurnComplete(response))
             {
+                if (enableDebugLogs)
+                    Debug.Log("Audio stream turn complete - marking as finished");
                 audioProcessor.MarkAudioStreamFinished();
             }
         }
@@ -159,7 +167,7 @@ public abstract class GeminiLiveWebRTCAudio : GeminiLiveWebRTC
         yield return StartCoroutine(audioProcessor.CreateAudioCoroutines(this));
     }
 
-    public IEnumerator waitForAudioStreamFinish()
+    public IEnumerator WaitForAudioStreamFinish()
     {
         if (audioProcessor == null)
         {

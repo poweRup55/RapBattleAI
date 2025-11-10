@@ -32,13 +32,14 @@ public static class GeminiResponseParser
 
         try
         {
-            BidiGenerateContentServerMessage response = JsonConvert.DeserializeObject<
-                BidiGenerateContentServerMessage
-            >(json, jsonSettings);
+            BidiGenerateContentServerMessage response =
+                JsonConvert.DeserializeObject<BidiGenerateContentServerMessage>(json, jsonSettings);
 
             if (response == null && enableDebugLogs)
             {
-                Debug.LogWarning("GeminiResponseParser: Failed to parse Gemini response as JSON object");
+                Debug.LogWarning(
+                    "GeminiResponseParser: Failed to parse Gemini response as JSON object"
+                );
             }
 
             return response;
@@ -178,4 +179,3 @@ public static class GeminiResponseParser
         return jsonSettings;
     }
 }
-

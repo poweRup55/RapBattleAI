@@ -34,7 +34,7 @@ public abstract class GeminiLiveWebRTC : MonoBehaviour
 
     private const float CONNECTION_SETUP_DELAY = 0.1f;
     private const float SETUP_MESSAGE_DELAY = 1f;
-    #endregion
+#endregion
 
     #region Components
     protected RapBattleConductorLive rapBattleConductorLive;
@@ -427,7 +427,10 @@ public abstract class GeminiLiveWebRTC : MonoBehaviour
     {
         var activityStartMessage = new BidiGenerateContentClientMessage
         {
-            realtimeInput = new BidiGenerateContentRealtimeInput { activityStart = new ActivityStart() },
+            realtimeInput = new BidiGenerateContentRealtimeInput
+            {
+                activityStart = new ActivityStart(),
+            },
         };
 
         messageQueueProcessor.Enqueue(activityStartMessage);
@@ -438,7 +441,10 @@ public abstract class GeminiLiveWebRTC : MonoBehaviour
     {
         var activityEndMessage = new BidiGenerateContentClientMessage
         {
-            realtimeInput = new BidiGenerateContentRealtimeInput { activityEnd = new ActivityEnd() },
+            realtimeInput = new BidiGenerateContentRealtimeInput
+            {
+                activityEnd = new ActivityEnd(),
+            },
         };
 
         messageQueueProcessor.Enqueue(activityEndMessage);

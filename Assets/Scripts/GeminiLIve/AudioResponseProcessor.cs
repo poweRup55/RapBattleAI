@@ -9,9 +9,8 @@ using UnityEngine;
 /// </summary>
 public class AudioResponseProcessor
 {
-    private const float AUDIO_CLEANUP_BUFFER = 0.1f;
     private const float AUDIO_CHECK_INTERVAL = 0.05f;
-    private const float MAX_WAIT_TIME = 1f;
+    private const float MAX_WAIT_TIME = 2f;
 
     private readonly Queue<byte[]> audioResponseQueue = new Queue<byte[]>();
     private readonly Queue<IEnumerator> audioCoroutineQueue = new Queue<IEnumerator>();
@@ -22,12 +21,18 @@ public class AudioResponseProcessor
 
     private AudioSource audioSource;
     private int originalSampleRate = 24000;
-    private int audioBufferFlushThreshold = 70;
+    private int audioBufferFlushThreshold = 30;
     private bool finishedAudioStreamIn = false;
     private bool enableDebugLogs;
+    private bool hasReceivedFirstAudio = false;
+    private bool isProcessingQueue = false;
 
     public bool IsPlaying => audioSource != null && audioSource.isPlaying;
-    public bool IsAudioActive => IsPlaying || GetCoroutineQueueCount() > 0 || GetResponseQueueCount() > 0 || !finishedAudioStreamIn;
+    public bool IsAudioActive =>
+        IsPlaying
+        || GetCoroutineQueueCount() > 0
+        || GetResponseQueueCount() > 0
+        || !finishedAudioStreamIn;
 
     public AudioResponseProcessor(
         AudioSource audioSource,
@@ -50,9 +55,14 @@ public class AudioResponseProcessor
         if (audioData == null || audioData.Length == 0)
         {
             if (enableDebugLogs)
-                Debug.LogWarning("AudioResponseProcessor: Attempted to enqueue null or empty audio data");
+                Debug.LogWarning(
+                    "AudioResponseProcessor: Attempted to enqueue null or empty audio data"
+                );
             return;
         }
+
+        bool isFirstAudio = !hasReceivedFirstAudio;
+        hasReceivedFirstAudio = true;
 
         lock (audioResponseQueueLock)
         {
@@ -61,7 +71,7 @@ public class AudioResponseProcessor
 
         if (enableDebugLogs)
             Debug.Log(
-                $"AudioResponseProcessor: Enqueued audio data: {audioData.Length} bytes, queue size: {GetResponseQueueCount()}"
+                $"AudioResponseProcessor: Enqueued audio data: {audioData.Length} bytes, queue size: {GetResponseQueueCount()}, isFirst: {isFirstAudio}"
             );
     }
 
@@ -79,6 +89,8 @@ public class AudioResponseProcessor
     public void Reset()
     {
         finishedAudioStreamIn = false;
+        hasReceivedFirstAudio = false;
+        isProcessingQueue = false;
         lock (audioResponseQueueLock)
         {
             audioResponseQueue.Clear();
@@ -104,14 +116,18 @@ public class AudioResponseProcessor
             lock (audioResponseQueueLock)
             {
                 queueCount = audioResponseQueue.Count;
+                // Flush immediately for first audio, or when threshold/timeout is reached
                 shouldProcess =
-                    queueCount > audioBufferFlushThreshold
+                    (!hasReceivedFirstAudio && queueCount > 0) // Immediate flush for first audio
+                    || queueCount > audioBufferFlushThreshold
                     || (timeSinceLastFlush >= MAX_WAIT_TIME && queueCount > 0);
             }
 
-            if (shouldProcess)
+            if (shouldProcess && !isProcessingQueue)
             {
-                coroutineRunner.StartCoroutine(ProcessAudioQueue(coroutineRunner));
+                isProcessingQueue = true;
+                yield return coroutineRunner.StartCoroutine(ProcessAudioQueue());
+                isProcessingQueue = false;
                 timeSinceLastFlush = 0f;
             }
             else
@@ -156,7 +172,7 @@ public class AudioResponseProcessor
         yield return null;
     }
 
-    private IEnumerator ProcessAudioQueue(MonoBehaviour coroutineRunner)
+    private IEnumerator ProcessAudioQueue()
     {
         int totalBytes = 0;
         byte[][] audioChunks;
@@ -200,7 +216,7 @@ public class AudioResponseProcessor
 
                 lock (audioCoroutineQueueLock)
                 {
-                    audioCoroutineQueue.Enqueue(PlayAudioResponse(responseClip, coroutineRunner));
+                    audioCoroutineQueue.Enqueue(PlayAudioResponse(responseClip));
                 }
                 lock (audioClipQueueLock)
                 {
@@ -210,7 +226,9 @@ public class AudioResponseProcessor
             catch (Exception e)
             {
                 if (enableDebugLogs)
-                    Debug.LogError($"AudioResponseProcessor: Error processing audio data: {e.Message}");
+                    Debug.LogError(
+                        $"AudioResponseProcessor: Error processing audio data: {e.Message}"
+                    );
             }
         }
 
@@ -233,7 +251,7 @@ public class AudioResponseProcessor
         return responseClip;
     }
 
-    private IEnumerator PlayAudioResponse(AudioClip responseClip, MonoBehaviour coroutineRunner)
+    private IEnumerator PlayAudioResponse(AudioClip responseClip)
     {
         if (responseClip == null)
         {
@@ -249,12 +267,49 @@ public class AudioResponseProcessor
             yield break;
         }
 
+        // Wait for current audio to finish playing before starting new clip
+        // Use smaller wait interval and check audioSource.time for more accurate timing
+        if (audioSource.isPlaying && audioSource.clip != null)
+        {
+            float remainingTime = audioSource.clip.length - audioSource.time;
+            if (remainingTime > 0)
+            {
+                yield return new WaitForSeconds(remainingTime + 0.01f); // Wait for current clip to finish
+            }
+            else
+            {
+                // Clip should have finished, but wait a tiny bit to ensure
+                while (audioSource.isPlaying)
+                {
+                    yield return new WaitForSeconds(0.01f);
+                }
+            }
+        }
+
+        // Play immediately for seamless transition
         audioSource.clip = responseClip;
         audioSource.Play();
 
-        float clipLength = responseClip.length;
-        yield return new WaitForSeconds(clipLength + AUDIO_CLEANUP_BUFFER);
+        if (enableDebugLogs)
+            Debug.Log(
+                $"AudioResponseProcessor: Playing audio clip, length: {responseClip.length}s"
+            );
 
+        // Wait for clip to finish playing - use audioSource.time for accurate timing
+        while (audioSource.isPlaying && audioSource.clip == responseClip)
+        {
+            // Check if we've played past the clip length (with small buffer for timing precision)
+            if (audioSource.time >= responseClip.length - 0.01f)
+            {
+                break;
+            }
+            yield return new WaitForSeconds(0.01f);
+        }
+
+        // Small wait to ensure audio system has finished
+        yield return new WaitForSeconds(0.02f);
+
+        // Clean up after playback
         if (responseClip != null)
         {
             responseClip.UnloadAudioData();
@@ -317,4 +372,3 @@ public class AudioResponseProcessor
     /// </summary>
     public int ResponseQueueCount => GetResponseQueueCount();
 }
-

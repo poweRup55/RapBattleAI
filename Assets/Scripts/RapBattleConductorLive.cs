@@ -327,7 +327,7 @@ public class RapBattleConductorLive : MonoBehaviour
             animationController.SetTrigger("StartRapping");
         }
 
-        yield return StartCoroutine(geminiLiveAIRapper.waitForAudioStreamFinish());
+        yield return StartCoroutine(geminiLiveAIRapper.WaitForAudioStreamFinish());
 
         if (animationController != null)
         {
