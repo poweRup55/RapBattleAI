@@ -30,8 +30,7 @@ public abstract class GeminiLiveWebRTC : MonoBehaviour
     [SerializeField]
     protected bool enableDebugLogs = true;
 
-    [SerializeField]
-    protected const int maxChunkSize = 1024;
+    protected const int maxChunkSize = 1920;
 
     private static readonly JsonSerializerSettings cachedJsonSettings = new JsonSerializerSettings
     {

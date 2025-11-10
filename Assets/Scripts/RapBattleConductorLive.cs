@@ -6,6 +6,24 @@ using UnityEngine.UI;
 
 public class RapBattleConductorLive : MonoBehaviour
 {
+    #region Constants
+    private const float INITIALIZATION_DELAY = 2f;
+    private const float CONNECTION_STATUS_DISPLAY_TIME = 2f;
+    private const float ROUND_COMPLETE_DISPLAY_TIME = 3f;
+    private const float JUDGE_PANEL_DISPLAY_TIME = 15f;
+    private const float OPPONENT_RESPONSE_TIMEOUT = 20f;
+    private const float RECORDING_WARNING_THRESHOLD = 10f;
+    private const float SHORT_RECORDING_WARNING_TIME = 2f;
+    private const float AUDIO_SEND_INTERVAL = 0.1f;
+    private const float POSITION_CHECK_INTERVAL = 0.05f;
+    private const float INPUT_CHECK_INTERVAL = 0.05f;
+    private const float REACTION_POLL_INTERVAL = 0.3f;
+    private const float FINAL_SILENCE_DURATION = 2f;
+    private const float MESSAGE_WAIT_TIMEOUT = 5f;
+    private const float OPPONENT_CHECK_INTERVAL = 0.1f;
+    #endregion
+
+    #region Serialized Fields
     [Header("Animation Controller")]
     [Tooltip("Animation controller for the rapper.")]
     [SerializeField]
@@ -60,43 +78,108 @@ public class RapBattleConductorLive : MonoBehaviour
 
     [SerializeField]
     private AudioClip fileSubmissionClip;
+    #endregion
+
+    #region Private Fields
     private AudioClip playerRecordingClip;
     private float recordingLengthInSeconds;
     private string microphoneDevice;
     private bool isRecording = false;
     private int currentRound = 0;
+    #endregion
 
+    #region Public Methods
     public void BeginRapBattle()
     {
         StopAllCoroutines();
+        ResetBattleState();
+        CleanupResources();
+        PlayMusic();
+        StartCoroutine(BattleLoop());
+    }
+
+    public void TerminateLiveSession(string errorMessage = null)
+    {
+        if (animationController != null)
+        {
+            animationController.SetTrigger("ReturnToIdle");
+        }
+
+        if (geminiLiveAIRapper != null)
+        {
+            geminiLiveAIRapper.Destroy();
+        }
+
+        if (geminiLiveAIJudge != null)
+        {
+            geminiLiveAIJudge.Destroy();
+        }
+
+        if (uIMenuController != null)
+        {
+            uIMenuController.ShowMainMenu(errorMessage);
+        }
+    }
+    #endregion
+
+    #region Initialization & Cleanup
+    private void ResetBattleState()
+    {
         currentRound = 0;
+        recordingLengthInSeconds = 0f;
+
         if (isRecording)
         {
             StopMicrophoneRecording();
         }
         isRecording = false;
-        recordingLengthInSeconds = 0f;
+    }
 
-        // Clean up player recording clip if it exists
+    private void CleanupResources()
+    {
+        CleanupPlayerRecording();
+        ResetAnimation();
+        StopAllAudio();
+        ClearUI();
+        DisconnectGeminiAgents();
+    }
+
+    private void CleanupPlayerRecording()
+    {
         if (playerRecordingClip != null)
         {
             playerRecordingClip.UnloadAudioData();
             Destroy(playerRecordingClip);
             playerRecordingClip = null;
         }
-        if (animationController != null)
+    }
+
+    private void ResetAnimation()
+    {
+        if (
+            animationController != null
+            && animationController.GetCurrentAnimatorStateInfo(0).IsName("Rapping")
+        )
         {
-            if (animationController.GetCurrentAnimatorStateInfo(0).IsName("Rapping"))
-                animationController.SetTrigger("ReturnToIdle");
+            animationController.SetTrigger("ReturnToIdle");
         }
+    }
+
+    private void StopAllAudio()
+    {
         if (musicSource != null && musicSource.isPlaying)
         {
             musicSource.Stop();
         }
+
         if (AIRapperAAudioSource != null && AIRapperAAudioSource.isPlaying)
         {
             AIRapperAAudioSource.Stop();
         }
+    }
+
+    private void ClearUI()
+    {
         if (uiManager != null)
         {
             uiManager.clearText();
@@ -105,22 +188,24 @@ public class RapBattleConductorLive : MonoBehaviour
             uiManager.ClearAllReactions();
             uiManager.RemovePlayingReactions();
         }
+
         if (recordButton != null)
         {
             recordButton.interactable = false;
         }
+    }
+
+    private void DisconnectGeminiAgents()
+    {
         if (geminiLiveAIRapper != null && geminiLiveAIRapper.IsWebSocketConnected())
         {
             geminiLiveAIRapper.Destroy();
         }
+
         if (geminiLiveAIJudge != null && geminiLiveAIJudge.IsWebSocketConnected())
         {
             geminiLiveAIJudge.Destroy();
         }
-        PlayMusic();
-
-        // Start the battle loop
-        StartCoroutine(BattleLoop());
     }
 
     private void PlayMusic()
@@ -131,7 +216,9 @@ public class RapBattleConductorLive : MonoBehaviour
             musicSource.Play();
         }
     }
+    #endregion
 
+    #region Unity Lifecycle
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.Escape))
@@ -139,102 +226,215 @@ public class RapBattleConductorLive : MonoBehaviour
             TerminateLiveSession();
         }
     }
+    #endregion
 
-    public void TerminateLiveSession(string errorMessage = null)
-    {
-        animationController.SetTrigger("ReturnToIdle");
-        geminiLiveAIRapper.Destroy();
-        geminiLiveAIJudge.Destroy();
-        uIMenuController.ShowMainMenu(errorMessage);
-    }
-
+    #region Battle Flow
     private IEnumerator InitializeWithStatus()
     {
-        uiManager.UpdateStatus("Connecting...");
+        if (uiManager != null)
+        {
+            uiManager.UpdateStatus("Connecting...");
+        }
 
-        // Set reference to this conductor for error handling
-        geminiLiveAIRapper.SetRapBattleConductor(this);
-        geminiLiveAIJudge.SetRapBattleConductor(this);
+        SetupGeminiAgents();
 
-        Coroutine init = StartCoroutine(geminiLiveAIRapper.Initialize());
+        Coroutine initRapper = StartCoroutine(geminiLiveAIRapper.Initialize());
         Coroutine initJudge = StartCoroutine(geminiLiveAIJudge.Initialize());
-        yield return new WaitForSeconds(2f);
-        yield return init;
+
+        yield return new WaitForSeconds(INITIALIZATION_DELAY);
+        yield return initRapper;
         yield return initJudge;
-        uiManager.UpdateStatus("Connected to Rap Battle Servers!");
-        yield return new WaitForSeconds(2f);
+
+        if (uiManager != null)
+        {
+            uiManager.UpdateStatus("Connected to Rap Battle Servers!");
+        }
+
+        yield return new WaitForSeconds(CONNECTION_STATUS_DISPLAY_TIME);
+    }
+
+    private void SetupGeminiAgents()
+    {
+        if (geminiLiveAIRapper != null)
+        {
+            geminiLiveAIRapper.SetRapBattleConductor(this);
+        }
+
+        if (geminiLiveAIJudge != null)
+        {
+            geminiLiveAIJudge.SetRapBattleConductor(this);
+        }
     }
 
     private IEnumerator BattleLoop()
     {
         yield return StartCoroutine(InitializeWithStatus());
+
         while (totalRounds > currentRound)
+        {
+            yield return StartCoroutine(PlayRound());
+            currentRound++;
+
+            if (totalRounds > currentRound)
+            {
+                yield return StartCoroutine(ShowRoundCompleteMessage());
+            }
+        }
+
+        yield return StartCoroutine(EndBattle());
+    }
+
+    private IEnumerator PlayRound()
+    {
+        ClearRoundUI();
+        Coroutine showReactions = StartCoroutine(ShowReactionsCoroutine());
+
+        yield return StartCoroutine(PlayerRapSubmissionLoop());
+        StopCoroutine(showReactions);
+
+        yield return StartCoroutine(PlayNPCTurn());
+        yield return StartCoroutine(ShowJudgeFeedback());
+    }
+
+    private void ClearRoundUI()
+    {
+        if (uiManager != null)
         {
             uiManager.ClearComputerText();
             uiManager.ClearAIJudgeText();
             uiManager.ClearAllReactions();
-            Coroutine showReactions = StartCoroutine(ShowReactionsCoroutine());
-            yield return StartCoroutine(PlayerRapSubmissionLoop());
-            StopCoroutine(showReactions);
+        }
+    }
 
-            // NPC Turn
+    private IEnumerator PlayNPCTurn()
+    {
+        Coroutine showReactions = StartCoroutine(ShowReactionsCoroutine());
+        Coroutine createAudio = StartCoroutine(geminiLiveAIRapper.CreateAudioCoroutines());
+        Coroutine playAudio = StartCoroutine(geminiLiveAIRapper.PlayAudioCoroutine());
+        Coroutine streamAudio = StartCoroutine(
+            geminiLiveAIRapper.StreamToOtherAgent(geminiLiveAIJudge)
+        );
 
-            // Debug.Log("NPC is rapping...");
+        yield return new WaitUntil(() => geminiLiveAIRapper.IsPlaying);
 
-            showReactions = StartCoroutine(ShowReactionsCoroutine());
-            var createAudioCoroutine = StartCoroutine(geminiLiveAIRapper.CreateAudioCoroutines());
-            var playAudioCoroutine = StartCoroutine(geminiLiveAIRapper.PlayAudioCoroutine());
-            var streamAudioToJudge = StartCoroutine(
-                geminiLiveAIRapper.StreamToOtherAgent(geminiLiveAIJudge)
-            );
-            yield return new WaitUntil(() => geminiLiveAIRapper.IsPlaying);
-            uiManager.UpdateStatus($"NPC is rapping!");
+        if (uiManager != null)
+        {
+            uiManager.UpdateStatus("NPC is rapping!");
+        }
+
+        if (animationController != null)
+        {
             animationController.SetTrigger("StartRapping");
-            yield return StartCoroutine(geminiLiveAIRapper.waitForAudioStreamFinish());
-            // yield return new WaitForSeconds(2f);
+        }
+
+        yield return StartCoroutine(geminiLiveAIRapper.waitForAudioStreamFinish());
+
+        if (animationController != null)
+        {
             animationController.SetTrigger("ReturnToIdle");
-            StopCoroutine(createAudioCoroutine);
-            StopCoroutine(playAudioCoroutine);
-            StopCoroutine(showReactions);
+        }
+
+        StopCoroutine(createAudio);
+        StopCoroutine(playAudio);
+        StopCoroutine(showReactions);
+    }
+
+    private IEnumerator ShowJudgeFeedback()
+    {
+        if (geminiLiveAIJudge != null)
+        {
             yield return StartCoroutine(
                 geminiLiveAIJudge.SendTextToGeminiCoroutine(
                     $"Round {currentRound + 1} ended. Give round score."
                 )
             );
-            uiManager.UpdateStatus($"Let's see what the judge thinks! wait for it...");
-            yield return StartCoroutine(geminiLiveAIJudge.WaitForAllMessagesToBeSent(5f));
-            yield return StartCoroutine(geminiLiveAIRapper.WaitForAllMessagesToBeSent(5f));
-            yield return StartCoroutine(uiManager.ShowJudgePanelTemporarily(15.0f));
+        }
+
+        if (uiManager != null)
+        {
+            uiManager.UpdateStatus("Let's see what the judge thinks! wait for it...");
+        }
+
+        yield return StartCoroutine(WaitForAllMessages());
+        yield return StartCoroutine(uiManager.ShowJudgePanelTemporarily(JUDGE_PANEL_DISPLAY_TIME));
+
+        if (uiManager != null)
+        {
             uiManager.ClearAllReactions();
             uiManager.RemovePlayingReactions();
-            // Rest Turn
-            currentRound++;
-            if (totalRounds > currentRound)
-            {
-                uiManager.UpdateStatus(
-                    $"Finished round number {currentRound + 1} of {totalRounds}"
-                );
-                yield return new WaitForSeconds(3f);
-            }
         }
-        uiManager.ClearAIJudgeText();
-        uiManager.ClearComputerText();
-        yield return StartCoroutine(
-            geminiLiveAIJudge.SendTextToGeminiCoroutine("rap session over.")
-        );
-        uiManager.UpdateStatus("Finished! Let's wait for the judge to decide the winner!");
-        yield return new WaitForSeconds(2f);
-        yield return StartCoroutine(uiManager.ShowJudgePanelTemporarily(15.0f));
-        uiManager.UpdateStatus("Press space or tap anywhere to return to the main menu.");
-        while (!Input.GetKeyDown(KeyCode.Space) && !Input.GetMouseButtonDown(0))
-        {
-            yield return null;
-        }
-        TerminateLiveSession();
     }
 
+    private IEnumerator WaitForAllMessages()
+    {
+        if (geminiLiveAIJudge != null)
+        {
+            yield return StartCoroutine(
+                geminiLiveAIJudge.WaitForAllMessagesToBeSent(MESSAGE_WAIT_TIMEOUT)
+            );
+        }
+
+        if (geminiLiveAIRapper != null)
+        {
+            yield return StartCoroutine(
+                geminiLiveAIRapper.WaitForAllMessagesToBeSent(MESSAGE_WAIT_TIMEOUT)
+            );
+        }
+    }
+
+    private IEnumerator ShowRoundCompleteMessage()
+    {
+        if (uiManager != null)
+        {
+            uiManager.UpdateStatus($"Finished round number {currentRound} of {totalRounds}");
+        }
+        yield return new WaitForSeconds(ROUND_COMPLETE_DISPLAY_TIME);
+    }
+
+    private IEnumerator EndBattle()
+    {
+        if (uiManager != null)
+        {
+            uiManager.ClearAIJudgeText();
+            uiManager.ClearComputerText();
+        }
+
+        if (geminiLiveAIJudge != null)
+        {
+            yield return StartCoroutine(
+                geminiLiveAIJudge.SendTextToGeminiCoroutine("rap session over.")
+            );
+        }
+
+        if (uiManager != null)
+        {
+            uiManager.UpdateStatus("Finished! Let's wait for the judge to decide the winner!");
+        }
+
+        yield return new WaitForSeconds(CONNECTION_STATUS_DISPLAY_TIME);
+        yield return StartCoroutine(uiManager.ShowJudgePanelTemporarily(JUDGE_PANEL_DISPLAY_TIME));
+
+        if (uiManager != null)
+        {
+            uiManager.UpdateStatus("Press space or tap anywhere to return to the main menu.");
+        }
+
+        yield return new WaitUntil(() =>
+            Input.GetKeyDown(KeyCode.Space) || Input.GetMouseButtonDown(0)
+        );
+
+        TerminateLiveSession();
+    }
+    #endregion
+
+    #region UI Reactions
     private IEnumerator ShowReactionsCoroutine()
     {
+        if (uiManager == null)
+        {
+            yield break;
+        }
+
         uiManager.ClearAllReactions();
         uiManager.RemovePlayingReactions();
 
@@ -244,13 +444,14 @@ public class RapBattleConductorLive : MonoBehaviour
             firstReaction = uiManager.PopNextReaction();
             return firstReaction != null;
         });
+
         if (firstReaction != null && firstReaction.gameObject != null)
         {
             firstReaction.gameObject.SetActive(false);
         }
 
         PopUpGameText currentReaction = null;
-        const float reactionPollInterval = 0.3f;
+        while (true)
         {
             if (currentReaction == null || currentReaction.gameObject == null)
             {
@@ -268,165 +469,184 @@ public class RapBattleConductorLive : MonoBehaviour
                     nextReaction.gameObject.SetActive(false);
                 }
             }
-            yield return new WaitForSeconds(reactionPollInterval);
+            yield return new WaitForSeconds(REACTION_POLL_INTERVAL);
         }
     }
+    #endregion
 
+    #region Player Recording
     private IEnumerator PlayerRapSubmissionLoop()
     {
         while (true)
         {
-            uiManager.UpdateStatus(
-                "Hold the space bar or tap and hold anywhere to begin recording your rap!"
-            );
-
             if (useFileSubmission && fileSubmissionClip != null)
             {
-                uiManager.UpdateStatus("Using file submission for this round.");
-                playerRecordingClip = fileSubmissionClip;
+                HandleFileSubmission();
             }
 
             yield return StartCoroutine(GetRapRecording());
 
             if (playBackRecording)
             {
-                yield return PlayBackRecording();
+                yield return StartCoroutine(PlayBackRecording());
             }
-            animationController.SetTrigger("StartThinking");
-            uiManager.UpdateStatus("Waiting for your opponent to respond...");
-            float startTime = Time.time;
-            while (Time.time - startTime < 20f)
+
+            bool opponentResponded = false;
+            yield return StartCoroutine(
+                WaitForOpponentResponse((responded) => opponentResponded = responded)
+            );
+
+            if (opponentResponded)
             {
-                if (geminiLiveAIRapper.IsAudioActive())
-                {
-                    yield break;
-                }
-                yield return new WaitForSeconds(0.1f);
+                break;
             }
-            uiManager.UpdateStatus("Opponent response timed out. Try again.");
-            yield return new WaitForSeconds(2f);
         }
+    }
+
+    private void HandleFileSubmission()
+    {
+        if (uiManager != null)
+        {
+            uiManager.UpdateStatus("Using file submission for this round.");
+        }
+        playerRecordingClip = fileSubmissionClip;
+    }
+
+    private IEnumerator WaitForOpponentResponse(System.Action<bool> resultCallback)
+    {
+        if (animationController != null)
+        {
+            animationController.SetTrigger("StartThinking");
+        }
+
+        if (uiManager != null)
+        {
+            uiManager.UpdateStatus("Waiting for your opponent to respond...");
+        }
+
+        float startTime = Time.time;
+        while (Time.time - startTime < OPPONENT_RESPONSE_TIMEOUT)
+        {
+            if (geminiLiveAIRapper != null && geminiLiveAIRapper.IsAudioActive())
+            {
+                resultCallback?.Invoke(true);
+                yield break;
+            }
+            yield return new WaitForSeconds(OPPONENT_CHECK_INTERVAL);
+        }
+
+        if (uiManager != null)
+        {
+            uiManager.UpdateStatus("Opponent response timed out. Try again.");
+        }
+        yield return new WaitForSeconds(SHORT_RECORDING_WARNING_TIME);
+        resultCallback?.Invoke(false);
     }
 
     private IEnumerator GetRapRecording()
     {
-        bool rapSubmitted = false;
+        if (geminiLiveAIRapper == null)
+        {
+            yield break;
+        }
+
         yield return StartCoroutine(geminiLiveAIRapper.SendActivityStartToGeminiCoroutine());
 
+        bool rapSubmitted = false;
         while (!rapSubmitted)
         {
             yield return StartCoroutine(RecordPlayerRap());
-            float submitEndTime = Time.time + submitRapPeriodInSeconds;
             bool retakeRequested = false;
-
-            const float inputCheckInterval = 0.05f; // Check input every 50ms instead of every frame
-            while (Time.time < submitEndTime)
-            {
-                uiManager.UpdateStatus(
-                    $"Submitting rap in {Mathf.CeilToInt(submitEndTime - Time.time)} seconds."
-                );
-                if (Input.GetKeyDown(KeyCode.Space) || Input.GetMouseButtonDown(0))
-                {
-                    retakeRequested = true;
-                    break;
-                }
-                yield return new WaitForSeconds(inputCheckInterval);
-            }
+            yield return StartCoroutine(
+                WaitForSubmissionConfirmation((result) => retakeRequested = result)
+            );
 
             if (!retakeRequested)
             {
                 rapSubmitted = true;
             }
         }
-        yield return StartCoroutine(geminiLiveAIRapper.SendTextToGeminiCoroutine("finalized"));
-        yield return StartCoroutine(geminiLiveAIRapper.SendActivityEndToGeminiCoroutine());
-        yield return StartCoroutine(
-            geminiLiveAIJudge.SendTextToGeminiCoroutine("finalized rapper 1")
-        );
+
+        yield return StartCoroutine(FinalizeRapSubmission());
+    }
+
+    private IEnumerator WaitForSubmissionConfirmation(System.Action<bool> resultCallback)
+    {
+        float submitEndTime = Time.time + submitRapPeriodInSeconds;
+        bool retakeRequested = false;
+
+        while (Time.time < submitEndTime)
+        {
+            if (uiManager != null)
+            {
+                uiManager.UpdateStatus(
+                    $"Submitting rap in {Mathf.CeilToInt(submitEndTime - Time.time)} seconds."
+                );
+            }
+
+            if (Input.GetKeyDown(KeyCode.Space) || Input.GetMouseButtonDown(0))
+            {
+                retakeRequested = true;
+                break;
+            }
+            yield return new WaitForSeconds(INPUT_CHECK_INTERVAL);
+        }
+
+        resultCallback?.Invoke(retakeRequested);
+    }
+
+    private IEnumerator FinalizeRapSubmission()
+    {
+        if (geminiLiveAIRapper != null)
+        {
+            yield return StartCoroutine(geminiLiveAIRapper.SendTextToGeminiCoroutine("finalized"));
+            yield return StartCoroutine(geminiLiveAIRapper.SendActivityEndToGeminiCoroutine());
+        }
+
+        if (geminiLiveAIJudge != null)
+        {
+            yield return StartCoroutine(
+                geminiLiveAIJudge.SendTextToGeminiCoroutine("finalized rapper 1")
+            );
+        }
     }
 
     private IEnumerator WaitForRecordingStart()
     {
-        recordButton.interactable = true;
-
-        while (!Input.GetKeyDown(KeyCode.Space) && !Input.GetMouseButtonDown(0))
+        if (recordButton != null)
         {
-            yield return null;
+            recordButton.interactable = true;
         }
-        recordButton.interactable = false;
-        yield break;
+
+        yield return new WaitUntil(() =>
+            Input.GetKeyDown(KeyCode.Space) || Input.GetMouseButtonDown(0)
+        );
+
+        if (recordButton != null)
+        {
+            recordButton.interactable = false;
+        }
     }
 
     private IEnumerator RecordPlayerRap()
     {
         bool submitRecording = false;
         bool firstAttempt = true;
+
         while (!submitRecording)
         {
             if (!firstAttempt)
             {
-                yield return StartCoroutine(
-                    geminiLiveAIRapper.SendTextToGeminiCoroutine("discard")
-                );
-                yield return StartCoroutine(
-                    geminiLiveAIJudge.SendTextToGeminiCoroutine("discard rapper 1")
-                );
+                yield return StartCoroutine(DiscardPreviousAttempt());
             }
-            uiManager.UpdateStatus("Press and hold the button to record your rap.");
-            yield return StartCoroutine(WaitForRecordingStart());
-            StartMicrophoneRecording();
-            var startTime = Time.time;
 
-            StartCoroutine(
-                StreamAudioToGemini(
-                    geminiLiveAIRapper,
-                    playerRecordingClip,
-                    () => Microphone.GetPosition(microphoneDevice),
-                    () => isRecording,
-                    "attempt"
-                )
-            );
+            yield return StartCoroutine(StartRecordingProcess());
 
-            StartCoroutine(
-                StreamAudioToGemini(
-                    geminiLiveAIJudge,
-                    playerRecordingClip,
-                    () => Microphone.GetPosition(microphoneDevice),
-                    () => isRecording,
-                    "attempt rapper 1"
-                )
-            );
+            yield return StartCoroutine(MonitorRecording());
 
-            uiManager.UpdateStatus("Recording your rap! Release to stop recording.");
-
-            while (!Input.GetKeyUp(KeyCode.Space) && !Input.GetMouseButtonUp(0) && isRecording)
+            if (!ValidateRecordingLength(recordingLengthInSeconds))
             {
-                if (Time.time - startTime >= maxPlayerRecordingLengthInSeconds)
-                {
-                    uiManager.UpdateStatus("Maximum recording length reached. Stopping recording.");
-                    break;
-                }
-                else if (Time.time - startTime >= maxPlayerRecordingLengthInSeconds - 10)
-                {
-                    float secondsLeft = maxPlayerRecordingLengthInSeconds - (Time.time - startTime);
-                    uiManager.UpdateStatus(
-                        $"Stopping recording in {Mathf.CeilToInt(secondsLeft)} seconds."
-                    );
-                }
-                yield return null;
-            }
-            recordingLengthInSeconds = Time.time - startTime;
-            // Debug.Log(
-            //     $"Recording length: {recordingLengthInSeconds} seconds, max allowed: {maxPlayerRecordingLengthInSeconds} seconds."
-            // );
-            StopMicrophoneRecording();
-
-            if (recordingLengthInSeconds < minRecordingLengthInSeconds)
-            {
-                uiManager.UpdateStatus(
-                    $"Recording too short. Please record at least {minRecordingLengthInSeconds} second."
-                );
-                yield return new WaitForSeconds(2f);
+                yield return new WaitForSeconds(SHORT_RECORDING_WARNING_TIME);
                 firstAttempt = false;
                 continue;
             }
@@ -436,6 +656,108 @@ public class RapBattleConductorLive : MonoBehaviour
         }
     }
 
+    private IEnumerator DiscardPreviousAttempt()
+    {
+        if (geminiLiveAIRapper != null)
+        {
+            yield return StartCoroutine(geminiLiveAIRapper.SendTextToGeminiCoroutine("discard"));
+        }
+
+        if (geminiLiveAIJudge != null)
+        {
+            yield return StartCoroutine(
+                geminiLiveAIJudge.SendTextToGeminiCoroutine("discard rapper 1")
+            );
+        }
+    }
+
+    private IEnumerator StartRecordingProcess()
+    {
+        if (uiManager != null)
+        {
+            uiManager.UpdateStatus("Press and hold the button to record your rap.");
+        }
+
+        yield return StartCoroutine(WaitForRecordingStart());
+        StartMicrophoneRecording();
+
+        StartCoroutine(
+            StreamAudioToGemini(
+                geminiLiveAIRapper,
+                playerRecordingClip,
+                () => Microphone.GetPosition(microphoneDevice),
+                () => isRecording,
+                "attempt"
+            )
+        );
+
+        StartCoroutine(
+            StreamAudioToGemini(
+                geminiLiveAIJudge,
+                playerRecordingClip,
+                () => Microphone.GetPosition(microphoneDevice),
+                () => isRecording,
+                "attempt rapper 1"
+            )
+        );
+
+        if (uiManager != null)
+        {
+            uiManager.UpdateStatus("Recording your rap! Release to stop recording.");
+        }
+    }
+
+    private IEnumerator MonitorRecording()
+    {
+        float startTime = Time.time;
+        float warningThreshold = maxPlayerRecordingLengthInSeconds - RECORDING_WARNING_THRESHOLD;
+
+        while (!Input.GetKeyUp(KeyCode.Space) && !Input.GetMouseButtonUp(0) && isRecording)
+        {
+            float elapsed = Time.time - startTime;
+
+            if (elapsed >= maxPlayerRecordingLengthInSeconds)
+            {
+                if (uiManager != null)
+                {
+                    uiManager.UpdateStatus("Maximum recording length reached. Stopping recording.");
+                }
+                break;
+            }
+            else if (elapsed >= warningThreshold)
+            {
+                float secondsLeft = maxPlayerRecordingLengthInSeconds - elapsed;
+                if (uiManager != null)
+                {
+                    uiManager.UpdateStatus(
+                        $"Stopping recording in {Mathf.CeilToInt(secondsLeft)} seconds."
+                    );
+                }
+            }
+            yield return null;
+        }
+
+        StopMicrophoneRecording();
+        recordingLengthInSeconds = Time.time - startTime;
+    }
+
+    private bool ValidateRecordingLength(float duration)
+    {
+        if (duration < minRecordingLengthInSeconds)
+        {
+            if (uiManager != null)
+            {
+                uiManager.UpdateStatus(
+                    $"Recording too short. Please record at least {minRecordingLengthInSeconds} second."
+                );
+            }
+            return false;
+        }
+        return true;
+    }
+    #endregion
+
+    #region Audio Streaming
     private bool ValidateAudioStreamInputs(GeminiLiveWebRTC agent, AudioClip clip = null)
     {
         if (agent == null)
@@ -444,12 +766,7 @@ public class RapBattleConductorLive : MonoBehaviour
             return false;
         }
 
-        if (clip != null)
-        {
-            return true;
-        }
-
-        return false;
+        return clip != null;
     }
 
     private AudioClip PrepareAudioClip(AudioClip originalClip, string agentName)
@@ -470,20 +787,10 @@ public class RapBattleConductorLive : MonoBehaviour
 
     private IEnumerator SendInitialMessage(GeminiLiveWebRTC agent, string message)
     {
-        if (!string.IsNullOrEmpty(message))
+        if (agent != null && !string.IsNullOrEmpty(message))
         {
             yield return StartCoroutine(agent.SendTextToGeminiCoroutine(message));
         }
-    }
-
-    private IEnumerator SendEndActivityMarker(GeminiLiveWebRTC agent)
-    {
-        yield return StartCoroutine(agent.SendActivityEndToGeminiCoroutine());
-    }
-
-    private IEnumerator SendStartActivityMarker(GeminiLiveWebRTC agent)
-    {
-        yield return StartCoroutine(agent.SendActivityStartToGeminiCoroutine());
     }
 
     private IEnumerator ProcessAndSendAudioSamples(
@@ -494,11 +801,10 @@ public class RapBattleConductorLive : MonoBehaviour
     )
     {
         int samplesToGet = currentSamplePosition - lastSamplePosition;
-        if (samplesToGet > 0)
+        if (samplesToGet > 0 && agent != null && clip != null)
         {
             float[] samples = new float[samplesToGet * clip.channels];
             clip.GetData(samples, lastSamplePosition % clip.samples);
-
             yield return StartCoroutine(agent.SendAudioToGeminiCoroutine(samples));
         }
     }
@@ -511,10 +817,16 @@ public class RapBattleConductorLive : MonoBehaviour
         float resizeClip = -1f
     )
     {
-        if (resizeClip > 0 && clip != null && clip.samples != resizeClip)
+        if (agent == null || clip == null)
+        {
+            yield break;
+        }
+
+        if (resizeClip > 0 && clip.samples != resizeClip)
         {
             clip = WavUtility.TrimClipToLength(clip, resizeClip);
         }
+
         int finalSamplePosition = getPosition();
         if (finalSamplePosition < lastSamplePosition)
         {
@@ -531,8 +843,13 @@ public class RapBattleConductorLive : MonoBehaviour
             );
             yield return StartCoroutine(agent.SendAudioToGeminiCoroutine(finalSamples));
         }
+
         yield return StartCoroutine(
-            agent.SendSilenceToGeminiCoroutine(2f, clip.frequency, clip.channels)
+            agent.SendSilenceToGeminiCoroutine(
+                FINAL_SILENCE_DURATION,
+                clip.frequency,
+                clip.channels
+            )
         );
     }
 
@@ -559,21 +876,32 @@ public class RapBattleConductorLive : MonoBehaviour
             yield break;
         }
 
-        const float sendInterval = 0.1f;
-        const float positionCheckInterval = 0.05f; // Check position every 50ms instead of every frame
-        int lastSamplePosition = 0;
-
         if (waitCondition != null)
         {
             yield return new WaitUntil(waitCondition);
         }
+
+        yield return StartCoroutine(StreamAudioLoop(agent, clip, getPosition, isActive));
+        yield return StartCoroutine(
+            SendFinalAudioData(agent, clip, getPosition, 0, recordingLengthInSeconds)
+        );
+        yield return StartCoroutine(SendInitialMessage(agent, endText));
+    }
+
+    private IEnumerator StreamAudioLoop(
+        GeminiLiveWebRTC agent,
+        AudioClip clip,
+        Func<int> getPosition,
+        Func<bool> isActive
+    )
+    {
+        int lastSamplePosition = 0;
         float lastSendTime = Time.time;
         float lastPositionCheckTime = Time.time;
 
         while (isActive())
         {
-            // Only check position at intervals to reduce overhead
-            if (Time.time - lastPositionCheckTime >= positionCheckInterval)
+            if (Time.time - lastPositionCheckTime >= POSITION_CHECK_INTERVAL)
             {
                 int currentSamplePosition = getPosition();
                 if (currentSamplePosition < lastSamplePosition)
@@ -581,7 +909,7 @@ public class RapBattleConductorLive : MonoBehaviour
                     currentSamplePosition += clip.samples;
                 }
 
-                if (Time.time - lastSendTime >= sendInterval)
+                if (Time.time - lastSendTime >= AUDIO_SEND_INTERVAL)
                 {
                     yield return StartCoroutine(
                         ProcessAndSendAudioSamples(
@@ -596,22 +924,12 @@ public class RapBattleConductorLive : MonoBehaviour
                 }
                 lastPositionCheckTime = Time.time;
             }
-            yield return new WaitForSeconds(positionCheckInterval);
+            yield return new WaitForSeconds(POSITION_CHECK_INTERVAL);
         }
-
-        yield return StartCoroutine(
-            SendFinalAudioData(
-                agent,
-                clip,
-                getPosition,
-                lastSamplePosition,
-                recordingLengthInSeconds
-            )
-        );
-
-        yield return StartCoroutine(SendInitialMessage(agent, endText));
     }
+    #endregion
 
+    #region Microphone Recording
     private void StartMicrophoneRecording()
     {
         playerRecordingClip = Microphone.Start(
@@ -626,25 +944,45 @@ public class RapBattleConductorLive : MonoBehaviour
     private void StopMicrophoneRecording()
     {
         if (!isRecording)
+        {
             return;
+        }
+
         Microphone.End(microphoneDevice);
         isRecording = false;
     }
+    #endregion
 
+    #region Audio Playback
     private IEnumerator PlayBackRecording()
     {
-        uiManager.UpdateStatus("Playing back your recording...");
-        if (playerRecordingClip != null)
+        if (uiManager != null)
+        {
+            uiManager.UpdateStatus("Playing back your recording...");
+        }
+
+        if (playerRecordingClip == null)
+        {
+            yield break;
+        }
+
+        if (musicSource != null)
         {
             musicSource.Pause();
-            AudioSource playbackSource = gameObject.AddComponent<AudioSource>();
-            playbackSource.clip = playerRecordingClip;
-            playbackSource.Play();
-            yield return new WaitForSeconds(recordingLengthInSeconds);
-            Destroy(playbackSource);
-            musicSource.UnPause();
-            // Note: playerRecordingClip cleanup is handled elsewhere when no longer needed
         }
-        yield break;
+
+        AudioSource playbackSource = gameObject.AddComponent<AudioSource>();
+        playbackSource.clip = playerRecordingClip;
+        playbackSource.Play();
+
+        yield return new WaitForSeconds(recordingLengthInSeconds);
+
+        Destroy(playbackSource);
+
+        if (musicSource != null)
+        {
+            musicSource.UnPause();
+        }
     }
+    #endregion
 }
