@@ -27,11 +27,11 @@ public class AIRapperGeminiLive : GeminiLiveWebRTCAudio
                             prebuiltVoiceConfig = new PrebuiltVoiceConfig { voiceName = voiceName },
                         },
                     },
-                    temperature = temperature,
+                    // temperature = temperature,
                     // topP = topP,
                     // topK = topK,
-                    maxOutputTokens = maxOutputTokens,
-                    candidateCount = candidateCount,
+                    // maxOutputTokens = maxOutputTokens,
+                    // candidateCount = candidateCount,
                 },
                 realtimeInputConfig = new RealtimeInputConfig
                 {

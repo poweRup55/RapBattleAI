@@ -36,7 +36,7 @@ public class RapBattleConductorLive : MonoBehaviour
 
     [Tooltip("Audio source for AI rapper.")]
     [SerializeField]
-    private AudioSource AIRapperAAudioSource;
+    private AudioSource AIRapperAudioSource;
 
     [SerializeField]
     private UIManager uiManager;
@@ -172,9 +172,9 @@ public class RapBattleConductorLive : MonoBehaviour
             musicSource.Stop();
         }
 
-        if (AIRapperAAudioSource != null && AIRapperAAudioSource.isPlaying)
+        if (AIRapperAudioSource != null && AIRapperAudioSource.isPlaying)
         {
-            AIRapperAAudioSource.Stop();
+            AIRapperAudioSource.Stop();
         }
     }
 

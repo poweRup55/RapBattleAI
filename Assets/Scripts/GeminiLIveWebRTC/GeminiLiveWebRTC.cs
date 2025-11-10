@@ -1,12 +1,9 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Net.WebSockets;
-using System.Text;
 using EpicRapBattle.Config;
-using Newtonsoft.Json;
 using UnityEngine;
 
+#region Configuration
 public abstract class GeminiLiveWebRTC : MonoBehaviour
 {
     [Header("Configuration")]
@@ -32,51 +29,41 @@ public abstract class GeminiLiveWebRTC : MonoBehaviour
 
     protected const int maxChunkSize = 1920;
 
-    private static readonly JsonSerializerSettings cachedJsonSettings = new JsonSerializerSettings
-    {
-        DefaultValueHandling = DefaultValueHandling.Ignore,
-        Formatting = Formatting.None,
-        NullValueHandling = NullValueHandling.Ignore,
-    };
+    private const string GEMINI_WEBSOCKET_URL =
+        "wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContentConstrained";
 
+    private const float CONNECTION_SETUP_DELAY = 0.1f;
+    private const float SETUP_MESSAGE_DELAY = 1f;
+    #endregion
+
+    #region Components
     protected RapBattleConductorLive rapBattleConductorLive;
-    protected ClientWebSocket webSocket;
-    protected System.Threading.CancellationTokenSource cancellationTokenSource;
+    protected GeminiWebSocketConnection webSocketConnection;
+    protected MessageQueueProcessor messageQueueProcessor;
+    #endregion
+
+    #region State
+    private string ephemeralKey;
     protected bool isConnected = false;
     protected bool isSetupComplete = false;
-    protected bool isSetupSent = false;
-    protected bool isReceiving = false;
-    protected Coroutine receiveCoroutine = null;
+    private bool isSetupSent = false;
+    private Coroutine receiveCoroutine = null;
+    private Coroutine messageQueueCoroutine = null;
+
     public bool IsConnected => isConnected;
     public bool IsSetupComplete => isSetupComplete;
+    #endregion
 
+    #region Public Methods
     public void SetRapBattleConductor(RapBattleConductorLive conductor)
     {
         rapBattleConductorLive = conductor;
     }
 
-    protected void HandleError(
-        string errorType,
-        string method,
-        string operation,
-        string message,
-        Exception innerException = null
-    )
+    public bool IsWebSocketConnected()
     {
-        if (rapBattleConductorLive != null)
-        {
-            rapBattleConductorLive.TerminateLiveSession($"Connection Error: {message}");
-        }
-
-        throw new GeminiLiveException(errorType, method, operation, message, innerException);
+        return webSocketConnection != null && webSocketConnection.IsConnected;
     }
-
-    private Queue<object> messagesQueue = new Queue<object>();
-
-    private string ephemeralKey;
-
-    private const string GEMINI_WEBSOCKET_URL =
-        "wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContentConstrained";
 
     public IEnumerator Initialize()
     {
@@ -87,6 +74,8 @@ public abstract class GeminiLiveWebRTC : MonoBehaviour
         }
 
         ResetConnectionState();
+        InitializeComponents();
+
         try
         {
             ephemeralKey = aiConfig.GenerateEphemeralKey();
@@ -95,214 +84,112 @@ public abstract class GeminiLiveWebRTC : MonoBehaviour
         {
             HandleError("CONFIG_ERROR", "Initialize", "GenerateEphemeralKey", ex.Message, ex);
         }
+
         yield return StartCoroutine(ConnectWebSocketCoroutine());
-        StartCoroutine(ProcessMessagesQueue());
+        StartMessageProcessing();
 
         if (enableDebugLogs)
-            Debug.Log($"GeminiLive: Initialized - Connected: {isConnected}");
-    }
-
-    private IEnumerator ProcessMessagesQueue()
-    {
-        while (
-            IsWebSocketConnected()
-            && cancellationTokenSource != null
-            && !cancellationTokenSource.IsCancellationRequested
-        )
-        {
-            yield return new WaitUntil(() =>
-            {
-                lock (messagesQueue)
-                {
-                    return messagesQueue.Count > 0
-                        || !IsWebSocketConnected()
-                        || (cancellationTokenSource?.IsCancellationRequested == true);
-                }
-            });
-
-            object message = null;
-            lock (messagesQueue)
-            {
-                if (messagesQueue.Count > 0)
-                {
-                    message = messagesQueue.Dequeue();
-                }
-            }
-
-            if (message != null)
-            {
-                yield return StartCoroutine(SendWebSocketMessageCoroutine(message));
-            }
-            message = null;
-        }
+            Debug.Log($"[{name}] GeminiLive: Initialized - Connected: {isConnected}");
     }
 
     public IEnumerator WaitForAllMessagesToBeSent(float timeoutSeconds = 30f)
     {
-        float elapsedTime = 0f;
-        int initialMessageCount = 0;
-
-        lock (messagesQueue)
+        if (messageQueueProcessor != null)
         {
-            initialMessageCount = messagesQueue.Count;
-        }
-
-        if (initialMessageCount == 0)
-        {
-            yield break;
-        }
-
-        while (elapsedTime < timeoutSeconds)
-        {
-            int currentMessageCount = 0;
-            lock (messagesQueue)
-            {
-                currentMessageCount = messagesQueue.Count;
-            }
-
-            // Check if all messages have been sent
-            if (currentMessageCount == 0)
-            {
-                yield break;
-            }
-
-            elapsedTime += Time.deltaTime;
-            yield return null;
-        }
-
-        // Timeout reached
-        int remainingMessages = 0;
-        lock (messagesQueue)
-        {
-            remainingMessages = messagesQueue.Count;
-        }
-
-        if (enableDebugLogs && remainingMessages > 0)
-            Debug.LogWarning($"GeminiLive: Timeout - {remainingMessages} messages still pending");
-    }
-
-    protected virtual void ResetConnectionState()
-    {
-        isConnected = false;
-        isSetupComplete = false;
-        isSetupSent = false;
-        isReceiving = false;
-        if (receiveCoroutine != null)
-        {
-            StopCoroutine(receiveCoroutine);
-            receiveCoroutine = null;
+            yield return StartCoroutine(messageQueueProcessor.WaitForEmpty(timeoutSeconds));
         }
     }
+    #endregion
 
-    protected virtual void ClearMessageQueue()
+    #region Initialization
+    private void InitializeComponents()
     {
-        int messageCount = 0;
-        lock (messagesQueue)
-        {
-            messageCount = messagesQueue.Count;
-            messagesQueue.Clear();
-        }
+        webSocketConnection = new GeminiWebSocketConnection(name, enableDebugLogs);
+        messageQueueProcessor = new MessageQueueProcessor(enableDebugLogs);
 
-        if (enableDebugLogs && messageCount > 0)
-            Debug.Log($"GeminiLive: Cleared {messageCount} pending messages due to error");
-    }
-
-    public bool IsWebSocketConnected()
-    {
-        return webSocket != null && webSocket.State == WebSocketState.Open && isConnected;
+        webSocketConnection.OnMessageReceived += HandleWebSocketMessage;
+        webSocketConnection.OnConnected += HandleWebSocketConnected;
+        webSocketConnection.OnError += HandleWebSocketError;
     }
 
     private IEnumerator ConnectWebSocketCoroutine()
     {
-        cancellationTokenSource = new System.Threading.CancellationTokenSource();
-        webSocket = new ClientWebSocket();
+        yield return StartCoroutine(
+            webSocketConnection.ConnectCoroutine(GEMINI_WEBSOCKET_URL, ephemeralKey)
+        );
 
-        webSocket.Options.SetRequestHeader("User-Agent", "Rap-Against-The-Machine");
-        webSocket.Options.SetRequestHeader("Authorization", $"Token {ephemeralKey}");
-
-        string url = $"{GEMINI_WEBSOCKET_URL}";
-        Uri uri = new Uri(url);
-
-        if (enableDebugLogs)
-            Debug.Log($"Connecting to Gemini Live API: {GEMINI_WEBSOCKET_URL}");
-
-        ConnectWebSocketAsync(uri);
-
-        if (webSocket?.State == WebSocketState.Open)
+        if (webSocketConnection.IsConnected)
         {
-            yield return new WaitForSeconds(0.1f);
+            yield return new WaitForSeconds(CONNECTION_SETUP_DELAY);
             SendSetupMessage();
-            yield return new WaitForSeconds(1f);
+            yield return new WaitForSeconds(SETUP_MESSAGE_DELAY);
 
-            if (!isReceiving && receiveCoroutine == null)
+            if (receiveCoroutine == null)
             {
-                receiveCoroutine = StartCoroutine(ReceiveMessagesCoroutine());
+                receiveCoroutine = StartCoroutine(
+                    webSocketConnection.ReceiveMessagesCoroutine(this)
+                );
             }
-            isConnected = true;
-
-            if (enableDebugLogs)
-                Debug.Log("GeminiLive: Connected successfully");
         }
-        else
+    }
+
+    private void StartMessageProcessing()
+    {
+        if (messageQueueCoroutine == null)
         {
+            messageQueueCoroutine = StartCoroutine(ProcessMessagesQueue());
+        }
+    }
+    #endregion
+
+    #region Message Processing
+    private IEnumerator ProcessMessagesQueue()
+    {
+        const float checkInterval = 0.05f; // Check every 50ms to reduce CPU usage
+
+        while (IsWebSocketConnected())
+        {
+            object message = messageQueueProcessor.Dequeue();
+            if (message != null)
+            {
+                yield return StartCoroutine(SendWebSocketMessageCoroutine(message));
+            }
+            else
+            {
+                yield return new WaitForSeconds(checkInterval);
+            }
+        }
+    }
+
+    private IEnumerator SendWebSocketMessageCoroutine(object message)
+    {
+        if (!IsWebSocketConnected())
+        {
+            string errorMessage = $"Cannot send message - State: {webSocketConnection?.State}";
             if (enableDebugLogs)
-                Debug.LogError($"GeminiLive: Connection timeout - State: {webSocket?.State}");
+                Debug.LogWarning($"GeminiLive: {errorMessage}");
 
             ClearMessageQueue();
             HandleError(
                 "CONNECTION_ERROR",
-                "ConnectWebSocketCoroutine",
-                "ConnectWebSocketAsync",
-                $"Failed to connect - State: {webSocket?.State}"
+                "SendWebSocketMessageCoroutine",
+                "IsWebSocketConnected",
+                errorMessage
+            );
+            yield break;
+        }
+
+        string json = GeminiResponseParser.SerializeMessage(message, enableDebugLogs);
+        if (json != null)
+        {
+            yield return StartCoroutine(
+                webSocketConnection.SendMessageCoroutine(json, maxChunkSize, this)
             );
         }
     }
+    #endregion
 
-    private void ConnectWebSocketAsync(Uri uri)
-    {
-        if (cancellationTokenSource == null)
-        {
-            HandleError(
-                "CONNECTION_ERROR",
-                "ConnectWebSocketAsync",
-                "NullCancellationToken",
-                "CancellationTokenSource is null"
-            );
-            return;
-        }
-
-        var connectTask = webSocket.ConnectAsync(uri, cancellationTokenSource.Token);
-
-        while (!connectTask.IsCompleted) { }
-
-        if (connectTask.IsFaulted)
-        {
-            LogWebSocketConnectionError(connectTask);
-        }
-    }
-
-    private void LogWebSocketConnectionError(System.Threading.Tasks.Task connectTask)
-    {
-        Exception baseException = connectTask.Exception?.GetBaseException();
-        string errorMessage = $"WebSocket connection failed: {baseException?.Message}";
-
-        if (baseException is System.Net.WebException webEx)
-        {
-            errorMessage += $" (WebException: {webEx.Status})";
-        }
-        else if (baseException is System.Net.HttpListenerException httpEx)
-        {
-            errorMessage += $" (HTTP Status: {httpEx.ErrorCode})";
-        }
-        HandleError(
-            "CONNECTION_ERROR",
-            "ConnectWebSocketAsync",
-            "ConnectAsync",
-            errorMessage,
-            baseException
-        );
-    }
-
+    #region Setup
     private void SendSetupMessage()
     {
         if (isSetupSent)
@@ -312,277 +199,49 @@ public abstract class GeminiLiveWebRTC : MonoBehaviour
             return;
         }
 
-        // Get the appropriate model string for live API
         string modelString = aiConfig.GeminiLiveModel;
         string voiceName = aiConfig.SelectedGeminiTtsVoice.ToString();
 
-        var setupMessage = GetSetupMessage(modelString, voiceName);
-
-        // Validate the setup message
         if (string.IsNullOrEmpty(modelString))
         {
             string errorMessage = "Model string is null or empty!";
             Debug.LogError($"GeminiLive: {errorMessage}");
-
             HandleError("SETUP_ERROR", "SendSetupMessage", "ValidateModelString", errorMessage);
+            return;
         }
 
+        var setupMessage = GetSetupMessage(modelString, voiceName);
+        messageQueueProcessor.Enqueue(setupMessage);
         isSetupSent = true;
-        lock (messagesQueue)
-        {
-            messagesQueue.Enqueue(setupMessage);
-        }
     }
 
     protected abstract BidiGenerateContentClientMessage GetSetupMessage(
         string modelString,
         string voiceName
     );
+    #endregion
 
-    private IEnumerator ReceiveMessagesCoroutine()
+    #region WebSocket Event Handlers
+    private void HandleWebSocketMessage(string json)
     {
-        if (isReceiving)
-        {
-            if (enableDebugLogs)
-                Debug.LogWarning("GeminiLive: ReceiveMessagesCoroutine already running, skipping");
-            yield break;
-        }
-
-        isReceiving = true;
-        byte[] buffer = new byte[1024 * 16];
-        StringBuilder messageBuilder = new StringBuilder();
-
-        try
-        {
-            while (
-                webSocket != null
-                && webSocket.State == WebSocketState.Open
-                && cancellationTokenSource != null
-                && !cancellationTokenSource.IsCancellationRequested
-            )
-            {
-                // Store local reference to prevent race conditions
-                var localCancellationTokenSource = cancellationTokenSource;
-                var localWebSocket = webSocket;
-
-                if (localCancellationTokenSource == null || localWebSocket == null)
-                {
-                    if (enableDebugLogs)
-                        Debug.LogWarning(
-                            "GeminiLive: CancellationTokenSource or WebSocket is null, stopping receive loop"
-                        );
-                    break;
-                }
-
-                if (localCancellationTokenSource.IsCancellationRequested)
-                {
-                    if (enableDebugLogs)
-                        Debug.LogWarning(
-                            "GeminiLive: Cancellation requested, stopping receive loop"
-                        );
-                    break;
-                }
-
-                System.Threading.Tasks.Task<WebSocketReceiveResult> receiveTask = null;
-
-                try
-                {
-                    receiveTask = localWebSocket.ReceiveAsync(
-                        new ArraySegment<byte>(buffer),
-                        localCancellationTokenSource.Token
-                    );
-                }
-                catch (ObjectDisposedException)
-                {
-                    if (enableDebugLogs)
-                        Debug.LogWarning(
-                            "GeminiLive: WebSocket disposed during ReceiveAsync, stopping receive loop"
-                        );
-                    break;
-                }
-                catch (Exception e)
-                {
-                    if (enableDebugLogs)
-                        Debug.LogError($"GeminiLive: Error starting ReceiveAsync: {e.Message}");
-                    break;
-                }
-
-                if (receiveTask == null)
-                {
-                    if (enableDebugLogs)
-                        Debug.LogWarning(
-                            "GeminiLive: ReceiveAsync task is null, stopping receive loop"
-                        );
-                    break;
-                }
-
-                while (!receiveTask.IsCompleted)
-                {
-                    // Check if we should stop waiting due to cleanup
-                    if (
-                        webSocket == null
-                        || cancellationTokenSource == null
-                        || cancellationTokenSource.IsCancellationRequested
-                    )
-                    {
-                        if (enableDebugLogs)
-                            Debug.LogWarning(
-                                "GeminiLive: Cleanup initiated while waiting for receive task, stopping"
-                            );
-                        throw new GeminiLiveException(
-                            "RECEIVE_CANCELED",
-                            "ReceiveMessagesCoroutine",
-                            "ReceiveAsync",
-                            "Receive operation was canceled due to cleanup."
-                        );
-                    }
-                    yield return null;
-                }
-
-                if (receiveTask.IsFaulted)
-                {
-                    LogWebSocketReceiveError(receiveTask);
-                    break;
-                }
-                else if (receiveTask.IsCompletedSuccessfully)
-                {
-                    WebSocketReceiveResult result = null;
-                    try
-                    {
-                        result = receiveTask.Result;
-                    }
-                    catch (Exception e)
-                    {
-                        if (enableDebugLogs)
-                            Debug.LogError(
-                                $"GeminiLive: Error getting receive task result: {e.Message}"
-                            );
-                        break;
-                    }
-
-                    if (result == null)
-                    {
-                        if (enableDebugLogs)
-                            Debug.LogWarning(
-                                "GeminiLive: Receive task result is null, stopping receive loop"
-                            );
-                        break;
-                    }
-
-                    if (enableDebugLogs)
-                        Debug.Log(
-                            $"Received message type: {result.MessageType}, Count: {result.Count}, EndOfMessage: {result.EndOfMessage}"
-                        );
-
-                    switch (result.MessageType)
-                    {
-                        case WebSocketMessageType.Text:
-                            ParseWebSocketTextMessage(buffer, messageBuilder, result);
-                            break;
-                        case WebSocketMessageType.Binary:
-                            ParseWebSocketBinaryMessage(buffer, result);
-                            break;
-                        case WebSocketMessageType.Close:
-                            ThrowWebSocketClosureDetails(result);
-                            break;
-                    }
-                }
-            }
-        }
-        finally
-        {
-            isReceiving = false;
-            receiveCoroutine = null;
-
-            // Cleanup notification when loop exits
-            if (enableDebugLogs)
-                Debug.Log("GeminiLive: ReceiveMessagesCoroutine exited");
-        }
+        ProcessGeminiResponse(json);
     }
 
-    private void LogWebSocketReceiveError(
-        System.Threading.Tasks.Task<WebSocketReceiveResult> receiveTask
-    )
+    private void HandleWebSocketConnected()
     {
-        if (receiveTask.Exception?.GetBaseException() is OperationCanceledException)
-        {
-            return;
-        }
-        else
-        {
-            Exception baseException = receiveTask.Exception?.GetBaseException();
-
-            if (enableDebugLogs)
-                Debug.LogError($"GeminiLive: Receive error - {baseException?.Message}");
-
-            ClearMessageQueue();
-            HandleError(
-                "RECEIVE_ERROR",
-                "ReceiveMessagesCoroutine",
-                "ReceiveAsync",
-                $"Receive error - {baseException?.Message}",
-                baseException
-            );
-        }
-    }
-
-    private void ParseWebSocketBinaryMessage(byte[] buffer, WebSocketReceiveResult result)
-    {
+        isConnected = true;
         if (enableDebugLogs)
-            Debug.Log($"Received binary data, count: {result.Count} bytes");
-
-        byte[] binaryData = new byte[result.Count];
-        Array.Copy(buffer, 0, binaryData, 0, result.Count);
-
-        try
-        {
-            string jsonMessage = Encoding.UTF8.GetString(binaryData);
-
-            if (jsonMessage.TrimStart().StartsWith("{") && jsonMessage.TrimEnd().EndsWith("}"))
-            {
-                ProcessGeminiResponse(jsonMessage);
-            }
-        }
-        catch (DecoderFallbackException ex)
-        {
-            string errorMessage =
-                $"Failed to decode binary as UTF-8: {ex.Message}, treating as audio data";
-            if (enableDebugLogs)
-                Debug.Log(errorMessage);
-        }
+            Debug.Log($"[{name}] GeminiLive: Connected successfully");
     }
 
-    private void ParseWebSocketTextMessage(
-        byte[] buffer,
-        StringBuilder messageBuilder,
-        WebSocketReceiveResult result
-    )
+    private void HandleWebSocketError(string errorMessage)
     {
-        string chunk = Encoding.UTF8.GetString(buffer, 0, result.Count);
-        messageBuilder.Append(chunk);
-
-        // If this is the end of the message, process it
-        if (result.EndOfMessage)
-        {
-            string completeMessage = messageBuilder.ToString();
-            ProcessGeminiResponse(completeMessage);
-            messageBuilder.Clear();
-        }
+        ClearMessageQueue();
+        HandleError("CONNECTION_ERROR", "HandleWebSocketError", "WebSocketError", errorMessage);
     }
+    #endregion
 
-    private void ThrowWebSocketClosureDetails(WebSocketReceiveResult result)
-    {
-        if (enableDebugLogs)
-            Debug.LogWarning($"GeminiLive: WebSocket closed - {result.CloseStatus}");
-
-        HandleError(
-            "CONNECTION_CLOSED",
-            "ReceiveMessagesCoroutine",
-            "WebSocketClosed",
-            $"WebSocket closed - {result.CloseStatus}: {result.CloseStatusDescription}"
-        );
-    }
-
+    #region Response Processing
     protected virtual void ProcessGeminiResponse(string json)
     {
         try
@@ -592,70 +251,23 @@ public abstract class GeminiLiveWebRTC : MonoBehaviour
                     $"Received Gemini response: {json.Substring(0, Math.Min(json.Length, 200))}..."
                 );
 
-            // Parse JSON into object
-            BidiGenerateContentServerMessage response =
-                JsonConvert.DeserializeObject<BidiGenerateContentServerMessage>(
-                    json,
-                    cachedJsonSettings
-                );
+            BidiGenerateContentServerMessage response = GeminiResponseParser.ParseServerMessage(
+                json,
+                enableDebugLogs
+            );
 
             if (response == null)
-            {
-                string errorMessage = "Failed to parse Gemini response as JSON object";
-                if (enableDebugLogs)
-                    Debug.LogWarning(errorMessage);
-            }
-
-            // Check for setup completion
-            if (response.setupComplete != null && !isSetupComplete)
-            {
-                isSetupComplete = true;
-                if (enableDebugLogs)
-                    Debug.Log(
-                        $"GeminiLive: Setup completed by Gemini Live API - {response.setupComplete}. State now - isSetupComplete: {isSetupComplete}, isSetupSent: {isSetupSent}"
-                    );
-            }
-
-            if (!string.IsNullOrEmpty(response.serverContent?.outputTranscription?.text))
-            {
-                Debug.Log($"Transcription : {response.serverContent?.outputTranscription?.text}");
-                OnTranscriptionReceived(response.serverContent?.outputTranscription?.text);
                 return;
-            }
 
-            // Process server content
-            if (response.serverContent?.modelTurn?.parts != null)
-            {
-                if (enableDebugLogs)
-                    Debug.Log(
-                        $"Processing {response.serverContent.modelTurn.parts.Length} parts from Gemini response"
-                    );
-                foreach (var part in response.serverContent.modelTurn.parts)
-                {
-                    // Handle text response
-                    if (!string.IsNullOrEmpty(part.text))
-                    {
-                        // uiManager?.UpdateComputerText(part.text);
-                        if (enableDebugLogs)
-                            Debug.Log($"Received text response: {part.text}");
-                        OnTextResponseReceived(part.text);
-                    }
-                }
-            }
-
-            // Check for turn completion
-            if (response.turnComplete || (response.serverContent?.turnComplete == true))
-            {
-                if (enableDebugLogs)
-                    Debug.Log("Gemini turn complete");
-            }
-
-            // Check for interrupted responses
-            if (response.interrupted || (response.serverContent?.interrupted == true))
-            {
-                if (enableDebugLogs)
-                    Debug.Log("Gemini response interrupted");
-            }
+            HandleSetupCompletion(response);
+            HandleTranscription(response);
+            HandleTextResponse(response);
+            HandleTurnCompletion(response);
+            HandleInterruption(response);
+        }
+        catch (GeminiLiveException)
+        {
+            throw; // Re-throw GeminiLiveException as-is
         }
         catch (Exception e)
         {
@@ -665,10 +277,73 @@ public abstract class GeminiLiveWebRTC : MonoBehaviour
         }
     }
 
+    private void HandleSetupCompletion(BidiGenerateContentServerMessage response)
+    {
+        if (GeminiResponseParser.IsSetupComplete(response) && !isSetupComplete)
+        {
+            isSetupComplete = true;
+            if (enableDebugLogs)
+                Debug.Log(
+                    $"GeminiLive: Setup completed by Gemini Live API. State now - isSetupComplete: {isSetupComplete}, isSetupSent: {isSetupSent}"
+                );
+        }
+    }
+
+    private void HandleTranscription(BidiGenerateContentServerMessage response)
+    {
+        string transcription = GeminiResponseParser.ExtractTranscription(response);
+        if (!string.IsNullOrEmpty(transcription))
+        {
+            Debug.Log($"Transcription : {transcription}");
+            OnTranscriptionReceived(transcription);
+        }
+    }
+
+    private void HandleTextResponse(BidiGenerateContentServerMessage response)
+    {
+        if (response.serverContent?.modelTurn?.parts != null)
+        {
+            if (enableDebugLogs)
+                Debug.Log(
+                    $"Processing {response.serverContent.modelTurn.parts.Length} parts from Gemini response"
+                );
+
+            foreach (var part in response.serverContent.modelTurn.parts)
+            {
+                if (!string.IsNullOrEmpty(part.text))
+                {
+                    if (enableDebugLogs)
+                        Debug.Log($"Received text response: {part.text}");
+                    OnTextResponseReceived(part.text);
+                }
+            }
+        }
+    }
+
+    private void HandleTurnCompletion(BidiGenerateContentServerMessage response)
+    {
+        if (GeminiResponseParser.IsTurnComplete(response))
+        {
+            if (enableDebugLogs)
+                Debug.Log("Gemini turn complete");
+        }
+    }
+
+    private void HandleInterruption(BidiGenerateContentServerMessage response)
+    {
+        if (GeminiResponseParser.IsInterrupted(response))
+        {
+            if (enableDebugLogs)
+                Debug.Log("Gemini response interrupted");
+        }
+    }
+
     protected abstract void OnTextResponseReceived(string text);
 
     protected abstract void OnTranscriptionReceived(string text);
+    #endregion
 
+    #region Audio Methods
     public IEnumerator SendSilenceToGeminiCoroutine(
         float durationSeconds,
         int sampleRate,
@@ -686,38 +361,19 @@ public abstract class GeminiLiveWebRTC : MonoBehaviour
         {
             string errorMessage = "Recording clip is null or empty";
             Debug.LogError($"GeminiLiveWebRTC: {errorMessage}");
-
             HandleError(
                 "AUDIO_INPUT_ERROR",
                 "SendAudioToGeminiCoroutine",
                 "ValidateAudioClip",
                 errorMessage
             );
+            yield break;
         }
 
-        // Validate audio samples for NaN or extreme values
-        bool hasInvalidSamples = false;
-        for (int i = 0; i < samples.Length; i++)
-        {
-            if (
-                float.IsNaN(samples[i])
-                || float.IsInfinity(samples[i])
-                || Mathf.Abs(samples[i]) > 1.0f
-            )
-            {
-                samples[i] = 0f; // Replace invalid samples with silence
-                hasInvalidSamples = true;
-            }
-        }
-
-        if (hasInvalidSamples && enableDebugLogs)
-        {
-            Debug.LogWarning("GeminiLive: Invalid audio samples detected and corrected");
-        }
+        ValidateAndFixAudioSamples(samples);
 
         byte[] pcmData = WavUtility.ConvertToPCM16(samples);
 
-        // Validate PCM data before converting to base64
         if (pcmData == null || pcmData.Length == 0)
         {
             string errorMessage = "Failed to convert audio samples to PCM data";
@@ -739,27 +395,42 @@ public abstract class GeminiLiveWebRTC : MonoBehaviour
             },
         };
 
-        lock (messagesQueue)
-        {
-            messagesQueue.Enqueue(message);
-        }
+        messageQueueProcessor.Enqueue(message);
         yield return null;
     }
 
+    private void ValidateAndFixAudioSamples(float[] samples)
+    {
+        bool hasInvalidSamples = false;
+        for (int i = 0; i < samples.Length; i++)
+        {
+            if (
+                float.IsNaN(samples[i])
+                || float.IsInfinity(samples[i])
+                || Mathf.Abs(samples[i]) > 1.0f
+            )
+            {
+                samples[i] = 0f;
+                hasInvalidSamples = true;
+            }
+        }
+
+        if (hasInvalidSamples && enableDebugLogs)
+        {
+            Debug.LogWarning("GeminiLive: Invalid audio samples detected and corrected");
+        }
+    }
+    #endregion
+
+    #region Activity Methods
     public IEnumerator SendActivityStartToGeminiCoroutine()
     {
         var activityStartMessage = new BidiGenerateContentClientMessage
         {
-            realtimeInput = new BidiGenerateContentRealtimeInput
-            {
-                activityStart = new ActivityStart(),
-            },
+            realtimeInput = new BidiGenerateContentRealtimeInput { activityStart = new ActivityStart() },
         };
 
-        lock (messagesQueue)
-        {
-            messagesQueue.Enqueue(activityStartMessage);
-        }
+        messageQueueProcessor.Enqueue(activityStartMessage);
         yield return null;
     }
 
@@ -767,16 +438,10 @@ public abstract class GeminiLiveWebRTC : MonoBehaviour
     {
         var activityEndMessage = new BidiGenerateContentClientMessage
         {
-            realtimeInput = new BidiGenerateContentRealtimeInput
-            {
-                activityEnd = new ActivityEnd(),
-            },
+            realtimeInput = new BidiGenerateContentRealtimeInput { activityEnd = new ActivityEnd() },
         };
 
-        lock (messagesQueue)
-        {
-            messagesQueue.Enqueue(activityEndMessage);
-        }
+        messageQueueProcessor.Enqueue(activityEndMessage);
         yield return null;
     }
 
@@ -786,13 +451,13 @@ public abstract class GeminiLiveWebRTC : MonoBehaviour
         {
             string errorMessage = "Text is null or empty";
             Debug.LogError($"GeminiLiveWebRTC: {errorMessage}");
-
             HandleError(
                 "TEXT_INPUT_ERROR",
                 "SendTextToGeminiCoroutine",
                 "ValidateTextInput",
                 errorMessage
             );
+            yield break;
         }
 
         var message = new BidiGenerateContentClientMessage
@@ -800,131 +465,59 @@ public abstract class GeminiLiveWebRTC : MonoBehaviour
             realtimeInput = new BidiGenerateContentRealtimeInput { text = inputText },
         };
 
-        lock (messagesQueue)
-        {
-            messagesQueue.Enqueue(message);
-        }
+        messageQueueProcessor.Enqueue(message);
         yield return null;
     }
+    #endregion
 
-    protected IEnumerator SendWebSocketMessageCoroutine(object message)
+    #region Error Handling
+    protected void HandleError(
+        string errorType,
+        string method,
+        string operation,
+        string message,
+        Exception innerException = null
+    )
     {
-        if (!IsWebSocketConnected())
+        if (rapBattleConductorLive != null)
         {
-            if (enableDebugLogs)
-                Debug.LogWarning($"GeminiLive: Cannot send message - State: {webSocket?.State}");
-
-            ClearMessageQueue();
-            HandleError(
-                "CONNECTION_ERROR",
-                "SendWebSocketMessageCoroutine",
-                "IsWebSocketConnected",
-                $"Cannot send message - State: {webSocket?.State}"
-            );
+            rapBattleConductorLive.TerminateLiveSession($"Connection Error: {message}");
         }
 
-        string json = JsonConvert.SerializeObject(message, cachedJsonSettings);
+        throw new GeminiLiveException(errorType, method, operation, message, innerException);
+    }
+    #endregion
 
-        byte[] bytes = Encoding.UTF8.GetBytes(json);
-        int totalBytes = bytes.Length;
-        int offset = 0;
+    #region State Management
+    protected virtual void ResetConnectionState()
+    {
+        isConnected = false;
+        isSetupComplete = false;
+        isSetupSent = false;
 
-        while (offset < totalBytes)
+        if (receiveCoroutine != null)
         {
-            int chunkSize = Math.Min(maxChunkSize, totalBytes - offset);
-            bool endOfMessage = (offset + chunkSize) >= totalBytes;
-            var chunk = new ArraySegment<byte>(bytes, offset, chunkSize);
+            StopCoroutine(receiveCoroutine);
+            receiveCoroutine = null;
+        }
 
-            yield return StartCoroutine(SendWebSocketMessageChunk(endOfMessage, chunk));
-            offset += chunkSize;
+        if (messageQueueCoroutine != null)
+        {
+            StopCoroutine(messageQueueCoroutine);
+            messageQueueCoroutine = null;
         }
     }
 
-    private IEnumerator SendWebSocketMessageChunk(bool endOfMessage, ArraySegment<byte> chunk)
+    protected virtual void ClearMessageQueue()
     {
-        // Store local references to prevent race conditions
-        var localCancellationTokenSource = cancellationTokenSource;
-        var localWebSocket = webSocket;
-
-        if (
-            localCancellationTokenSource == null
-            || localCancellationTokenSource.IsCancellationRequested
-            || localWebSocket == null
-        )
+        if (messageQueueProcessor != null)
         {
-            if (enableDebugLogs)
-                Debug.LogWarning(
-                    "GeminiLive: Cannot send message chunk - cancellation requested, token is null, or WebSocket is null"
-                );
-            yield break;
-        }
-
-        System.Threading.Tasks.Task sendTask = null;
-
-        try
-        {
-            sendTask = localWebSocket.SendAsync(
-                chunk,
-                WebSocketMessageType.Text,
-                endOfMessage,
-                localCancellationTokenSource.Token
-            );
-        }
-        catch (ObjectDisposedException)
-        {
-            if (enableDebugLogs)
-                Debug.LogWarning("GeminiLive: WebSocket disposed during SendAsync");
-            yield break;
-        }
-        catch (Exception e)
-        {
-            if (enableDebugLogs)
-                Debug.LogError($"GeminiLive: Error starting SendAsync: {e.Message}");
-            yield break;
-        }
-
-        if (sendTask == null)
-        {
-            if (enableDebugLogs)
-                Debug.LogWarning("GeminiLive: SendAsync task is null");
-            yield break;
-        }
-
-        while (!sendTask.IsCompleted)
-        {
-            // Check if we should stop waiting due to cleanup
-            if (
-                webSocket == null
-                || cancellationTokenSource == null
-                || cancellationTokenSource.IsCancellationRequested
-            )
-            {
-                if (enableDebugLogs)
-                    Debug.LogWarning(
-                        "GeminiLive: Cleanup initiated while waiting for send task, stopping"
-                    );
-                yield break;
-            }
-            yield return null;
-        }
-
-        if (sendTask.IsFaulted)
-        {
-            if (enableDebugLogs)
-                Debug.LogError(
-                    $"Error sending message: {sendTask.Exception?.GetBaseException()?.Message}"
-                );
-
-            ClearMessageQueue();
-            HandleError(
-                "SEND_MESSAGE_ERROR",
-                "SendWebSocketMessageChunk",
-                "SendAsync",
-                sendTask.Exception?.GetBaseException()?.Message
-            );
+            messageQueueProcessor.Clear();
         }
     }
+    #endregion
 
+    #region Cleanup
     protected virtual void OnDestroy()
     {
         if (enableDebugLogs)
@@ -948,93 +541,27 @@ public abstract class GeminiLiveWebRTC : MonoBehaviour
     {
         try
         {
-            // Stop receive coroutine first
             if (receiveCoroutine != null)
             {
                 StopCoroutine(receiveCoroutine);
                 receiveCoroutine = null;
             }
-            isReceiving = false;
 
-            // Cancel all ongoing operations first
-            if (cancellationTokenSource != null && !cancellationTokenSource.IsCancellationRequested)
+            if (messageQueueCoroutine != null)
             {
-                cancellationTokenSource.Cancel();
+                StopCoroutine(messageQueueCoroutine);
+                messageQueueCoroutine = null;
             }
 
-            // Clear message queue to prevent further processing
             ClearMessageQueue();
 
-            // Close WebSocket connection if open
-            if (webSocket != null)
+            if (webSocketConnection != null)
             {
-                if (
-                    webSocket.State == WebSocketState.Open
-                    || webSocket.State == WebSocketState.Connecting
-                )
-                {
-                    try
-                    {
-                        // Use a timeout to prevent hanging
-                        var closeTask = webSocket.CloseAsync(
-                            WebSocketCloseStatus.NormalClosure,
-                            "Cleanup",
-                            System.Threading.CancellationToken.None
-                        );
-
-                        // Don't await in synchronous cleanup - just fire and forget
-                        _ = closeTask;
-                    }
-                    catch (Exception e)
-                    {
-                        if (enableDebugLogs)
-                            Debug.LogWarning(
-                                $"GeminiLive: Error during WebSocket close: {e.Message}"
-                            );
-                    }
-                }
-
-                // Dispose WebSocket
-                try
-                {
-                    webSocket.Dispose();
-                }
-                catch (Exception e)
-                {
-                    if (enableDebugLogs)
-                        Debug.LogWarning($"GeminiLive: Error disposing WebSocket: {e.Message}");
-                }
-                finally
-                {
-                    webSocket = null;
-                }
+                webSocketConnection.Disconnect();
+                webSocketConnection = null;
             }
 
-            // Dispose cancellation token source
-            if (cancellationTokenSource != null)
-            {
-                try
-                {
-                    cancellationTokenSource.Dispose();
-                }
-                catch (Exception e)
-                {
-                    if (enableDebugLogs)
-                        Debug.LogWarning(
-                            $"GeminiLive: Error disposing CancellationTokenSource: {e.Message}"
-                        );
-                }
-                finally
-                {
-                    cancellationTokenSource = null;
-                }
-            }
-
-            // Reset connection state
-            isConnected = false;
-            isSetupComplete = false;
-            isSetupSent = false;
-            isReceiving = false;
+            ResetConnectionState();
 
             if (enableDebugLogs)
                 Debug.Log("GeminiLive: Connection cleanup completed");
@@ -1053,4 +580,5 @@ public abstract class GeminiLiveWebRTC : MonoBehaviour
 
         CleanupConnection();
     }
+    #endregion
 }
