@@ -10,7 +10,7 @@ public class RapBattleConductorLive : MonoBehaviour
     private const float INITIALIZATION_DELAY = 2f;
     private const float CONNECTION_STATUS_DISPLAY_TIME = 2f;
     private const float ROUND_COMPLETE_DISPLAY_TIME = 3f;
-    private const float JUDGE_PANEL_DISPLAY_TIME = 15f;
+    private const float JUDGE_PANEL_DISPLAY_TIME = 10f;
     private const float OPPONENT_RESPONSE_TIMEOUT = 20f;
     private const float RECORDING_WARNING_THRESHOLD = 10f;
     private const float SHORT_RECORDING_WARNING_TIME = 2f;
